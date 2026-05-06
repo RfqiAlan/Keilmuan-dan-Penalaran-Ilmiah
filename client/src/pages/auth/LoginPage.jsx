@@ -20,7 +20,8 @@ export default function LoginPage() {
       const isAdmin = ["admin", "ketua", "sekretaris"].includes(user.role);
       navigate(isAdmin ? "/admin/dashboard" : "/dashboard", { replace: true });
     } catch (err) {
-      setError(err.response?.data?.message || "Login gagal. Periksa email dan password Anda.");
+      const errorMsg = err.response?.data?.message || err.message || JSON.stringify(err);
+      setError(`Detail Error: ${errorMsg}`);
     } finally {
       setLoading(false);
     }
