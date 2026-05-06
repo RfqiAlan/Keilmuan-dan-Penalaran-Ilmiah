@@ -130,9 +130,12 @@ export default function ArchivesPage() {
           <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-xs text-yellow-400">
             ⚠️ Dokumen ini hanya untuk dilihat. Dilarang mendistribusikan konten ini.
           </div>
-          <div className="rounded-lg overflow-hidden border border-slate-700" style={{ height: "520px" }}>
+          <div className="rounded-lg overflow-hidden border border-slate-700 relative" style={{ height: "520px" }}>
             {previewModal.previewUrl && (
-              <iframe src={previewModal.previewUrl} className="w-full h-full" title="Document Preview" allow="autoplay" />
+              <>
+                <iframe src={previewModal.previewUrl} className="w-full h-full" title="Document Preview" allow="autoplay" />
+                <div className="absolute top-0 right-0 w-16 h-16 z-10 bg-transparent cursor-not-allowed" title="Pop-out dibatasi" />
+              </>
             )}
           </div>
         </div>

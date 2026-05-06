@@ -156,13 +156,14 @@ export default function AdminArchives() {
               <div><span className="text-slate-500">Tahun:</span> <span className="text-slate-200">{previewModal.archive.year}</span></div>
               <div><span className="text-slate-500">Akses:</span> <Badge status={previewModal.archive.access_level} /></div>
             </div>
-            <div className="rounded-lg overflow-hidden border border-slate-700" style={{ height: "500px" }}>
+            <div className="rounded-lg overflow-hidden border border-slate-700 relative" style={{ height: "500px" }}>
               <iframe
                 src={`https://drive.google.com/file/d/${previewModal.archive.drive_file_id}/preview`}
                 className="w-full h-full"
                 title="Document Preview"
                 allow="autoplay"
               />
+              <div className="absolute top-0 right-0 w-16 h-16 z-10 bg-transparent cursor-not-allowed" title="Pop-out dibatasi" />
             </div>
           </div>
         )}
