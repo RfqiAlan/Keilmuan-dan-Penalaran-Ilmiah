@@ -9,9 +9,11 @@ export default function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [editModal, setEditModal] = useState({ open: false, user: null });
+  const [editModal, setEditModal] = useState({ open: false, mode: "create", user: null });
+  const [delModal, setDelModal] = useState({ open: false, user: null });
   const [form, setForm] = useState({});
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   const fetchUsers = () => {
     setLoading(true);
@@ -21,15 +23,44 @@ export default function AdminUsers() {
 
   useEffect(() => { fetchUsers(); }, [search]);
 
-  const openEdit = (user) => { setForm({ name: user.name, phone: user.phone, role: user.role, status: user.status }); setEditModal({ open: true, user }); };
+  const openCreate = () => {
+    setForm({ name: "", email: "", password: "", phone: "", role: "anggota", status: "active" });
+    setError("");
+    setEditModal({ open: true, mode: "create", user: null });
+  };
+
+  const openEdit = (user) => { 
+    setForm({ name: user.name, phone: user.phone, role: user.role, status: user.status }); 
+    setError("");
+    setEditModal({ open: true, mode: "edit", user }); 
+  };
 
   const handleSave = async (e) => {
-    e.preventDefault(); setSaving(true);
+    e.preventDefault(); setSaving(true); setError("");
     try {
-      await api.put(`/users/${editModal.user.id}`, form);
+      if (editModal.mode === "create") {
+        if (!form.password || form.password.length < 6) {
+          setError("Password minimal 6 karakter.");
+          setSaving(false);
+          return;
+        }
+        await api.post("/auth/register", form); // Menggunakan endpoint register untuk membuat user baru
+      } else {
+        await api.put(`/users/${editModal.user.id}`, form);
+      }
       setEditModal({ open: false }); fetchUsers();
-    } catch (err) { alert(err.response?.data?.message || "Gagal menyimpan."); }
+    } catch (err) { setError(err.response?.data?.message || "Gagal menyimpan."); }
     finally { setSaving(false); }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await api.delete(`/users/${delModal.user.id}`);
+      setDelModal({ open: false });
+      fetchUsers();
+    } catch (err) {
+      alert(err.response?.data?.message || "Gagal menghapus.");
+    }
   };
 
   const roles = ["admin","ketua","sekretaris","bendahara","koordinator","anggota","alumni"];
@@ -37,7 +68,10 @@ export default function AdminUsers() {
 
   return (
     <div className="space-y-6">
-      <div><h1 className="text-2xl font-bold text-slate-100">Manajemen Pengguna</h1><p className="text-slate-400 text-sm mt-1">Kelola akun dan role pengguna sistem</p></div>
+      <div className="flex items-center justify-between">
+        <div><h1 className="text-2xl font-bold text-slate-100">Manajemen Pengguna</h1><p className="text-slate-400 text-sm mt-1">Kelola akun dan role pengguna sistem</p></div>
+        <Button onClick={openCreate}>+ Tambah Pengguna</Button>
+      </div>
       <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="🔍 Cari nama atau email..."
         className="bg-slate-800 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full max-w-md placeholder-slate-500" />
       <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl overflow-hidden">
@@ -61,16 +95,28 @@ export default function AdminUsers() {
                   <td className="px-4 py-3 text-slate-400">{u.phone || "—"}</td>
                   <td className="px-4 py-3"><Badge status={u.status} /></td>
                   <td className="px-4 py-3 text-slate-400">{new Date(u.created_at).toLocaleDateString("id-ID")}</td>
-                  <td className="px-4 py-3"><Button size="sm" variant="secondary" onClick={() => openEdit(u)}>Edit</Button></td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-1">
+                      <Button size="sm" variant="secondary" onClick={() => openEdit(u)}>Edit</Button>
+                      <Button size="sm" variant="danger" onClick={() => setDelModal({ open: true, user: u })}>Hapus</Button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </div>
-      <Modal isOpen={editModal.open} onClose={() => setEditModal({ open: false })} title="Edit Pengguna" size="sm">
+      <Modal isOpen={editModal.open} onClose={() => setEditModal({ open: false })} title={editModal.mode === "create" ? "Tambah Pengguna" : "Edit Pengguna"} size="sm">
         <form onSubmit={handleSave} className="space-y-4">
-          <Input label="Nama" value={form.name || ""} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          {error && <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">{error}</div>}
+          <Input label="Nama Lengkap" value={form.name || ""} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+          {editModal.mode === "create" && (
+            <>
+              <Input label="Email" type="email" value={form.email || ""} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+              <Input label="Password" type="password" value={form.password || ""} onChange={(e) => setForm({ ...form, password: e.target.value })} required placeholder="Min. 6 karakter" />
+            </>
+          )}
           <Input label="No. HP" value={form.phone || ""} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
           <Select label="Role" value={form.role || "anggota"} onChange={(e) => setForm({ ...form, role: e.target.value })}>
             {roles.map((r) => <option key={r} value={r}>{r}</option>)}
@@ -78,11 +124,19 @@ export default function AdminUsers() {
           <Select label="Status" value={form.status || "active"} onChange={(e) => setForm({ ...form, status: e.target.value })}>
             {statuses.map((s) => <option key={s} value={s}>{s}</option>)}
           </Select>
-          <div className="flex gap-3 justify-end">
+          <div className="flex gap-3 justify-end pt-2">
             <Button type="button" variant="secondary" onClick={() => setEditModal({ open: false })}>Batal</Button>
             <Button type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Simpan"}</Button>
           </div>
         </form>
+      </Modal>
+
+      <Modal isOpen={delModal.open} onClose={() => setDelModal({ open: false })} title="Konfirmasi Hapus" size="sm">
+        <p className="text-slate-300 mb-6">Hapus pengguna <strong className="text-slate-100">{delModal.user?.name}</strong>? Tindakan ini tidak bisa dibatalkan.</p>
+        <div className="flex gap-3 justify-end">
+          <Button variant="secondary" onClick={() => setDelModal({ open: false })}>Batal</Button>
+          <Button variant="danger" onClick={handleDelete}>Hapus</Button>
+        </div>
       </Modal>
     </div>
   );
