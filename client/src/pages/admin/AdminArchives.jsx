@@ -172,7 +172,7 @@ export default function AdminArchives() {
             </div>
           </div>
           <Input label="Divisi" value={form.division || ""} onChange={(e) => setForm({ ...form, division: e.target.value })} placeholder="Contoh: Pengurus, Divisi Media" />
-          <Input label="Google Drive File ID" value={form.drive_file_id || ""} onChange={(e) => setForm({ ...form, drive_file_id: e.target.value })} required placeholder="ID dari URL Google Drive" />
+          <Input label="Link Google Drive" value={form.drive_file_id || ""} onChange={(e) => setForm({ ...form, drive_file_id: e.target.value })} required placeholder="Paste link Google Drive atau File ID" />
           <Textarea label="Deskripsi" value={form.description || ""} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} />
           <div className="flex gap-3 justify-end pt-2">
             <Button type="button" variant="secondary" onClick={() => setModal({ open: false })}>Batal</Button>
