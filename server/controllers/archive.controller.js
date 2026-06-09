@@ -45,31 +45,36 @@ const getArchiveById = async (req, res) => {
   }
 };
 
-// Helper: extract Google Drive file ID from URL or plain ID
-const extractDriveFileId = (input) => {
-  if (!input) return null;
-  const match = input.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  if (match) return match[1];
-  const match2 = input.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-  if (match2) return match2[1];
-  // If no URL pattern matched, assume it's already a plain ID
-  return input.trim();
+// Helper: extract Google Drive file/folder ID and type from URL or plain ID
+const extractDriveInfo = (input) => {
+  if (!input) return { id: null, type: 'file' };
+  // Folder URL: /drive/folders/ID or /folders/ID
+  const folderMatch = input.match(/\/folders\/([a-zA-Z0-9_-]+)/);
+  if (folderMatch) return { id: folderMatch[1], type: 'folder' };
+  // File URL: /d/ID
+  const fileMatch = input.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (fileMatch) return { id: fileMatch[1], type: 'file' };
+  // Query param: ?id=ID
+  const paramMatch = input.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (paramMatch) return { id: paramMatch[1], type: 'file' };
+  // Plain ID
+  return { id: input.trim(), type: 'file' };
 };
 
 // POST /api/archives
 const createArchive = async (req, res) => {
   const { archive_number, title, year, category, division, description, drive_file_id, preview_url, access_level } = req.body;
 
-  const fileId = extractDriveFileId(drive_file_id);
-  if (!archive_number || !title || !year || !category || !fileId) {
+  const driveInfo = extractDriveInfo(drive_file_id);
+  if (!archive_number || !title || !year || !category || !driveInfo.id) {
     return res.status(400).json({ message: "Nomor arsip, judul, tahun, kategori, dan Link Google Drive wajib diisi." });
   }
 
   try {
     const result = await pool.query(
-      `INSERT INTO archives (archive_number, title, year, category, division, description, drive_file_id, preview_url, access_level, uploaded_by)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
-      [archive_number, title, parseInt(year), category, division, description, fileId, preview_url, access_level || "admin", req.user.id]
+      `INSERT INTO archives (archive_number, title, year, category, division, description, drive_file_id, preview_url, access_level, drive_type, uploaded_by)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
+      [archive_number, title, parseInt(year), category, division, description, driveInfo.id, preview_url, access_level || "admin", driveInfo.type, req.user.id]
     );
     await logActivity(req.user.id, "unggah_arsip", "archives", `Arsip baru: ${title} (${year})`);
     res.status(201).json({ message: "Arsip berhasil ditambahkan.", archive: result.rows[0] });
@@ -83,7 +88,7 @@ const createArchive = async (req, res) => {
 // PUT /api/archives/:id
 const updateArchive = async (req, res) => {
   const { title, year, category, division, description, drive_file_id, preview_url, access_level } = req.body;
-  const fileId = drive_file_id ? extractDriveFileId(drive_file_id) : null;
+  const driveInfo = drive_file_id ? extractDriveInfo(drive_file_id) : { id: null, type: null };
   try {
     const result = await pool.query(
       `UPDATE archives SET
@@ -95,9 +100,10 @@ const updateArchive = async (req, res) => {
         drive_file_id = COALESCE($6, drive_file_id),
         preview_url   = COALESCE($7, preview_url),
         access_level  = COALESCE($8, access_level),
+        drive_type    = COALESCE($9, drive_type),
         updated_at    = NOW()
-       WHERE id = $9 RETURNING *`,
-      [title, year, category, division, description, fileId, preview_url, access_level, req.params.id]
+       WHERE id = $10 RETURNING *`,
+      [title, year, category, division, description, driveInfo.id, preview_url, access_level, driveInfo.type, req.params.id]
     );
     if (result.rows.length === 0) return res.status(404).json({ message: "Arsip tidak ditemukan." });
     res.json({ message: "Arsip diperbarui.", archive: result.rows[0] });
@@ -165,9 +171,12 @@ const getPreview = async (req, res) => {
     if (archiveResult.rows.length === 0) return res.status(404).json({ message: "Arsip tidak ditemukan." });
 
     const archive = archiveResult.rows[0];
+    const driveType = archive.drive_type || 'file';
 
-    // Build the Google Drive preview URL (embed viewer, no download)
-    const previewUrl = `https://drive.google.com/file/d/${archive.drive_file_id}/preview`;
+    // Build the Google Drive preview URL based on type
+    const previewUrl = driveType === 'folder'
+      ? `https://drive.google.com/embeddedfolderview?id=${archive.drive_file_id}#list`
+      : `https://drive.google.com/file/d/${archive.drive_file_id}/preview`;
 
     await logActivity(req.user.id, "buka_dokumen", "archives", `Buka arsip: ${archive.title}`);
 
@@ -175,6 +184,7 @@ const getPreview = async (req, res) => {
       previewUrl,
       title: archive.title,
       drive_file_id: archive.drive_file_id,
+      drive_type: driveType,
     });
   } catch (err) {
     console.error(err);

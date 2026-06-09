@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS archives (
   drive_file_id   VARCHAR(255) NOT NULL,
   preview_url     TEXT,
   access_level    VARCHAR(50)  NOT NULL DEFAULT 'internal',
+  drive_type      VARCHAR(10)  NOT NULL DEFAULT 'file',
   uploaded_by     INT REFERENCES users(id) ON DELETE SET NULL,
   created_at      TIMESTAMP DEFAULT NOW(),
   updated_at      TIMESTAMP DEFAULT NOW()

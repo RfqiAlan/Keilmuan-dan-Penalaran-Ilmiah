@@ -86,14 +86,14 @@ export default function ArchivesPage() {
           <table className="w-full text-sm">
             <thead className="bg-slate-800/80 border-b border-slate-700/50">
               <tr>
-                {["No. Arsip","Judul","Kategori","Tahun","Divisi","Akses","Aksi"].map((h) => (
+                {["No. Arsip","Judul","Kategori","Tahun","Tipe","Divisi","Akses","Aksi"].map((h) => (
                   <th key={h} className="text-left px-4 py-3 text-slate-400 font-medium text-xs uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700/30">
-              {loading ? <tr><td colSpan={7} className="px-4 py-8 text-center text-slate-500">Memuat...</td></tr>
-              : archives.length === 0 ? <tr><td colSpan={7} className="px-4 py-8 text-center text-slate-500">Tidak ada arsip ditemukan.</td></tr>
+              {loading ? <tr><td colSpan={8} className="px-4 py-8 text-center text-slate-500">Memuat...</td></tr>
+              : archives.length === 0 ? <tr><td colSpan={8} className="px-4 py-8 text-center text-slate-500">Tidak ada arsip ditemukan.</td></tr>
               : archives.map((a) => (
                 <tr key={a.id} className="hover:bg-slate-700/20 transition-colors">
                   <td className="px-4 py-3 font-mono text-xs text-slate-400">{a.archive_number}</td>
@@ -103,6 +103,11 @@ export default function ArchivesPage() {
                   </td>
                   <td className="px-4 py-3 text-slate-400 capitalize">{a.category?.replace(/_/g," ")}</td>
                   <td className="px-4 py-3 text-slate-300">{a.year}</td>
+                  <td className="px-4 py-3">
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${a.drive_type === 'folder' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}`}>
+                      {a.drive_type === 'folder' ? '📁 Folder' : '📄 File'}
+                    </span>
+                  </td>
                   <td className="px-4 py-3 text-slate-400">{a.division || "—"}</td>
                   <td className="px-4 py-3">
                     <div className="flex gap-1 flex-wrap max-w-40" title={a.access_level}>
@@ -142,7 +147,9 @@ export default function ArchivesPage() {
             {previewModal.previewUrl && (
               <>
                 <iframe src={previewModal.previewUrl} className="w-full h-full" title="Document Preview" allow="autoplay" />
-                <div className="absolute top-0 right-0 w-16 h-16 z-10 bg-transparent cursor-not-allowed" title="Pop-out dibatasi" />
+                {previewModal.archive?.drive_type !== 'folder' && (
+                  <div className="absolute top-0 right-0 w-16 h-16 z-10 bg-transparent cursor-not-allowed" title="Pop-out dibatasi" />
+                )}
               </>
             )}
           </div>
