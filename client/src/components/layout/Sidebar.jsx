@@ -52,7 +52,7 @@ export default function Sidebar({ isOpen, onClose }) {
         {/* Logo */}
         <div className="p-6 border-b border-slate-800">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-indigo-600 rounded-lg flex items-center justify-center text-lg">📁</div>
+            <div className="w-9 h-9 bg-[#28517E] rounded-lg flex items-center justify-center text-lg">📁</div>
             <div>
               <div className="font-bold text-slate-100 leading-tight">SIMPAR UKM</div>
               <div className="text-xs text-slate-500">v1.0.0</div>
@@ -63,7 +63,7 @@ export default function Sidebar({ isOpen, onClose }) {
         {/* User info */}
         <div className="px-4 py-3 border-b border-slate-800">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-indigo-600/30 border border-indigo-500/30 rounded-full flex items-center justify-center text-sm font-bold text-indigo-400">
+            <div className="w-8 h-8 bg-[#28517E]/30 border border-[#4EA8DE]/30 rounded-full flex items-center justify-center text-sm font-bold text-[#4EA8DE]">
               {user?.name?.charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0">
@@ -86,7 +86,7 @@ export default function Sidebar({ isOpen, onClose }) {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 mb-0.5 ${
                   isActive
-                    ? "bg-indigo-600/20 text-indigo-400 border border-indigo-500/30"
+                    ? "bg-[#28517E]/20 text-[#4EA8DE] border border-[#4EA8DE]/30"
                     : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
                 }`
               }

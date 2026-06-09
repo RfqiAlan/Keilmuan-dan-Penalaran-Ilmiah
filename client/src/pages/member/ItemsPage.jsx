@@ -54,22 +54,22 @@ export default function ItemsPage() {
 
       <div className="flex flex-wrap gap-3">
         <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="🔍 Cari barang..."
-          className="bg-slate-800 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 flex-1 min-w-48 placeholder-slate-500" />
+          className="bg-slate-800 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE] flex-1 min-w-48 placeholder-slate-500" />
         <select value={filterCat} onChange={(e) => setFilterCat(e.target.value)}
-          className="bg-slate-800 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          className="bg-slate-800 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE]">
           <option value="">Semua Kategori</option>
           {categories.map((c) => <option key={c} value={c}>{c.replace(/_/g," ")}</option>)}
         </select>
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center min-h-64"><div className="animate-spin w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full" /></div>
+        <div className="flex items-center justify-center min-h-64"><div className="animate-spin w-8 h-8 border-2 border-[#4EA8DE] border-t-transparent rounded-full" /></div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {items.length === 0 ? (
             <div className="col-span-3 text-center py-16 text-slate-500">Tidak ada barang tersedia.</div>
           ) : items.map((item) => (
-            <div key={item.id} className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 hover:border-indigo-500/40 transition-all duration-200">
+            <div key={item.id} className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 hover:border-[#4EA8DE]/40 transition-all duration-200">
               {item.image_url ? (
                 <img src={item.image_url} alt={item.name} className="w-full h-40 object-cover rounded-lg mb-4" />
               ) : (

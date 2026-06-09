@@ -45,7 +45,7 @@ export default function AdminAccessRequests() {
 
       <div className="flex gap-3">
         <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}
-          className="bg-slate-800 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          className="bg-slate-800 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE]">
           <option value="">Semua Status</option>
           {["pending","approved","rejected","expired"].map((s) => <option key={s} value={s}>{s}</option>)}
         </select>

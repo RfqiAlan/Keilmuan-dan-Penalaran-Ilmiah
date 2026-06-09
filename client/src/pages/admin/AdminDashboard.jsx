@@ -16,7 +16,7 @@ export default function AdminDashboard() {
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-64">
-      <div className="animate-spin w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full" />
+      <div className="animate-spin w-8 h-8 border-2 border-[#4EA8DE] border-t-transparent rounded-full" />
     </div>
   );
 
@@ -53,7 +53,7 @@ export default function AdminDashboard() {
         <div className="divide-y divide-slate-700/30">
           {stats.recent_activity?.length > 0 ? stats.recent_activity.map((log) => (
             <div key={log.id} className="px-6 py-3 flex items-center gap-4 hover:bg-slate-700/20 transition-colors">
-              <div className="w-8 h-8 bg-indigo-600/20 border border-indigo-500/30 rounded-full flex items-center justify-center text-xs font-bold text-indigo-400 shrink-0">
+              <div className="w-8 h-8 bg-[#28517E]/20 border border-[#4EA8DE]/30 rounded-full flex items-center justify-center text-xs font-bold text-[#4EA8DE] shrink-0">
                 {log.user_name?.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">

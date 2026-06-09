@@ -31,14 +31,14 @@ export default function LoginPage() {
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-indigo-600/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-800/10 rounded-full blur-3xl" />
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#28517E]/10 rounded-full blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#4EA8DE]/10 rounded-full blur-3xl" />
       </div>
 
       <div className="relative w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-600 rounded-2xl text-3xl mb-4 shadow-lg shadow-indigo-500/30">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-[#28517E] rounded-2xl text-3xl mb-4 shadow-lg shadow-[#28517E]/30">
             📁
           </div>
           <h1 className="text-2xl font-bold text-slate-100">SIMPAR UKM</h1>
@@ -80,7 +80,7 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-slate-400 mt-6">
             Belum punya akun?{" "}
-            <Link to="/register" className="text-indigo-400 hover:text-indigo-300 font-medium">
+            <Link to="/register" className="text-[#4EA8DE] hover:text-[#F3620F] font-medium">
               Daftar sekarang
             </Link>
           </p>

@@ -3,7 +3,7 @@ export function Input({ label, error, className = "", ...props }) {
     <div className="flex flex-col gap-1.5">
       {label && <label className="text-sm font-medium text-slate-300">{label}</label>}
       <input
-        className={`w-full bg-slate-800/80 border ${error ? "border-red-500" : "border-slate-600"} text-slate-100 rounded-lg px-3 py-2.5 text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all ${className}`}
+        className={`w-full bg-slate-800/80 border ${error ? "border-red-500" : "border-slate-600"} text-slate-100 rounded-lg px-3 py-2.5 text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#4EA8DE] focus:border-transparent transition-all ${className}`}
         {...props}
       />
       {error && <p className="text-xs text-red-400">{error}</p>}
@@ -16,7 +16,7 @@ export function Select({ label, error, className = "", children, ...props }) {
     <div className="flex flex-col gap-1.5">
       {label && <label className="text-sm font-medium text-slate-300">{label}</label>}
       <select
-        className={`w-full bg-slate-800/80 border ${error ? "border-red-500" : "border-slate-600"} text-slate-100 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all ${className}`}
+        className={`w-full bg-slate-800/80 border ${error ? "border-red-500" : "border-slate-600"} text-slate-100 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE] focus:border-transparent transition-all ${className}`}
         {...props}
       >
         {children}
@@ -31,7 +31,7 @@ export function Textarea({ label, error, className = "", ...props }) {
     <div className="flex flex-col gap-1.5">
       {label && <label className="text-sm font-medium text-slate-300">{label}</label>}
       <textarea
-        className={`w-full bg-slate-800/80 border ${error ? "border-red-500" : "border-slate-600"} text-slate-100 rounded-lg px-3 py-2.5 text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none ${className}`}
+        className={`w-full bg-slate-800/80 border ${error ? "border-red-500" : "border-slate-600"} text-slate-100 rounded-lg px-3 py-2.5 text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#4EA8DE] focus:border-transparent transition-all resize-none ${className}`}
         rows={4}
         {...props}
       />

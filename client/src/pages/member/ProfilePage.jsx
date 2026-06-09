@@ -36,7 +36,7 @@ export default function ProfilePage() {
       {/* Profile Info */}
       <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-16 h-16 bg-indigo-600/30 border-2 border-indigo-500/50 rounded-full flex items-center justify-center text-2xl font-bold text-indigo-400">
+          <div className="w-16 h-16 bg-[#28517E]/30 border-2 border-[#4EA8DE]/50 rounded-full flex items-center justify-center text-2xl font-bold text-[#4EA8DE]">
             {user?.name?.charAt(0).toUpperCase()}
           </div>
           <div>

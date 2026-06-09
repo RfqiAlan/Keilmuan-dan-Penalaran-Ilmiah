@@ -73,7 +73,7 @@ export default function AdminUsers() {
         <Button onClick={openCreate}>+ Tambah Pengguna</Button>
       </div>
       <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="🔍 Cari nama atau email..."
-        className="bg-slate-800 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full max-w-md placeholder-slate-500" />
+        className="bg-slate-800 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE] w-full max-w-md placeholder-slate-500" />
       <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -89,7 +89,7 @@ export default function AdminUsers() {
               : users.length === 0 ? <tr><td colSpan={7} className="px-4 py-8 text-center text-slate-500">Tidak ada pengguna.</td></tr>
               : users.map((u) => (
                 <tr key={u.id} className="hover:bg-slate-700/20 transition-colors">
-                  <td className="px-4 py-3"><div className="flex items-center gap-2"><div className="w-7 h-7 bg-indigo-600/30 border border-indigo-500/30 rounded-full flex items-center justify-center text-xs font-bold text-indigo-400">{u.name?.charAt(0).toUpperCase()}</div><span className="text-slate-200 font-medium">{u.name}</span></div></td>
+                  <td className="px-4 py-3"><div className="flex items-center gap-2"><div className="w-7 h-7 bg-[#28517E]/30 border border-[#4EA8DE]/30 rounded-full flex items-center justify-center text-xs font-bold text-[#4EA8DE]">{u.name?.charAt(0).toUpperCase()}</div><span className="text-slate-200 font-medium">{u.name}</span></div></td>
                   <td className="px-4 py-3 text-slate-400">{u.email}</td>
                   <td className="px-4 py-3"><span className="text-slate-300 capitalize">{u.role}</span></td>
                   <td className="px-4 py-3 text-slate-400">{u.phone || "—"}</td>

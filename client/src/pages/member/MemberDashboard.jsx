@@ -29,7 +29,7 @@ export default function MemberDashboard() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Link to="/items" className="bg-indigo-600/20 border border-indigo-500/30 rounded-xl p-5 hover:-translate-y-1 transition-transform duration-200 block">
+        <Link to="/items" className="bg-[#28517E]/20 border border-[#4EA8DE]/30 rounded-xl p-5 hover:-translate-y-1 transition-transform duration-200 block">
           <div className="text-2xl mb-2">📦</div>
           <div className="font-semibold text-slate-200">Lihat Barang</div>
           <div className="text-xs text-slate-400 mt-1">Ajukan peminjaman</div>
@@ -56,7 +56,7 @@ export default function MemberDashboard() {
         <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-700/50 flex items-center justify-between">
             <h2 className="font-semibold text-slate-100">Peminjaman Aktif</h2>
-            <Link to="/borrowings/my" className="text-xs text-indigo-400 hover:text-indigo-300">Lihat semua →</Link>
+            <Link to="/borrowings/my" className="text-xs text-[#4EA8DE] hover:text-[#F3620F]">Lihat semua →</Link>
           </div>
           <div className="divide-y divide-slate-700/30">
             {loading ? <div className="px-6 py-4 text-slate-500 text-sm">Memuat...</div>
@@ -79,7 +79,7 @@ export default function MemberDashboard() {
         <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-700/50 flex items-center justify-between">
             <h2 className="font-semibold text-slate-100">Permintaan Akses Terbaru</h2>
-            <Link to="/access-requests/my" className="text-xs text-indigo-400 hover:text-indigo-300">Lihat semua →</Link>
+            <Link to="/access-requests/my" className="text-xs text-[#4EA8DE] hover:text-[#F3620F]">Lihat semua →</Link>
           </div>
           <div className="divide-y divide-slate-700/30">
             {myRequests.map((r) => (

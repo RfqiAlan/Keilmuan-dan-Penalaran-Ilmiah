@@ -8,7 +8,7 @@ export default function Card({ children, className = "" }) {
 
 export function StatCard({ icon, label, value, color = "indigo", trend }) {
   const colors = {
-    indigo: "from-indigo-500/20 to-indigo-600/10 border-indigo-500/30 text-indigo-400",
+    indigo: "from-[#28517E]/20 to-[#28517E]/10 border-[#4EA8DE]/30 text-[#4EA8DE]",
     green:  "from-emerald-500/20 to-emerald-600/10 border-emerald-500/30 text-emerald-400",
     yellow: "from-yellow-500/20 to-yellow-600/10 border-yellow-500/30 text-yellow-400",
     red:    "from-red-500/20 to-red-600/10 border-red-500/30 text-red-400",

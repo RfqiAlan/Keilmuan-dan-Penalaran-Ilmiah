@@ -14,7 +14,7 @@ export default function MyAccessRequestsPage() {
     <div className="space-y-6">
       <div><h1 className="text-2xl font-bold text-slate-100">Permintaan Akses Saya</h1><p className="text-slate-400 text-sm mt-1">Status permintaan akses dokumen Anda</p></div>
       <div className="space-y-3">
-        {loading ? <div className="flex items-center justify-center min-h-40"><div className="animate-spin w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full" /></div>
+        {loading ? <div className="flex items-center justify-center min-h-40"><div className="animate-spin w-8 h-8 border-2 border-[#4EA8DE] border-t-transparent rounded-full" /></div>
         : requests.length === 0 ? <div className="text-center py-16 text-slate-500 bg-slate-800/50 rounded-xl border border-slate-700/50">Belum ada permintaan akses dokumen.</div>
         : requests.map((r) => (
           <div key={r.id} className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 hover:border-slate-600/50 transition-colors">
