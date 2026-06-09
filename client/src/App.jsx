@@ -15,6 +15,7 @@ import AdminBorrowings from "./pages/admin/AdminBorrowings";
 import AdminArchives from "./pages/admin/AdminArchives";
 import AdminAccessRequests from "./pages/admin/AdminAccessRequests";
 import AdminActivityLogs from "./pages/admin/AdminActivityLogs";
+import AdminReports from "./pages/admin/AdminReports";
 
 // Member pages
 import MemberDashboard from "./pages/member/MemberDashboard";
@@ -47,6 +48,7 @@ export default function App() {
                 <Route path="/admin/archives" element={<AdminArchives />} />
                 <Route path="/admin/access-requests" element={<AdminAccessRequests />} />
                 <Route path="/admin/activity-logs" element={<AdminActivityLogs />} />
+                <Route path="/admin/reports" element={<AdminReports />} />
               </Route>
               <Route element={<RoleRoute roles={["admin"]} />}>
                 <Route path="/admin/users" element={<AdminUsers />} />

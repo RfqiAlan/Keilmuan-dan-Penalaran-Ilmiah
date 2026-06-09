@@ -6,7 +6,7 @@ import Modal from "../../components/ui/Modal";
 import { Input, Select, Textarea } from "../../components/ui/Input";
 
 const CATEGORIES = ["arsip_divisi","arsip_karya","arsip_inovasi","lpj","arsip_kegiatan","proposal","surat_masuk","surat_keluar","notulen","sk","keuangan","sertifikat"];
-const ACCESS_LEVELS = ["public","internal","restricted","private"];
+const ROLES = ["admin", "ketua", "sekretaris", "bendahara", "koordinator", "anggota", "alumni"];
 
 export default function AdminArchives() {
   const [archives, setArchives] = useState([]);
@@ -32,7 +32,7 @@ export default function AdminArchives() {
   useEffect(() => { fetchArchives(); }, [search, filterCat, filterYear]);
 
   const openCreate = () => {
-    setForm({ archive_number: "", title: "", year: new Date().getFullYear(), category: "lpj", division: "", description: "", drive_file_id: "", access_level: "internal" });
+    setForm({ archive_number: "", title: "", year: new Date().getFullYear(), category: "lpj", division: "", description: "", drive_file_id: "", access_level: "admin" });
     setError("");
     setModal({ open: true, mode: "create", archive: null });
   };
@@ -55,6 +55,16 @@ export default function AdminArchives() {
     if (!confirm(`Hapus arsip "${archive.title}"?`)) return;
     try { await api.delete(`/archives/${archive.id}`); fetchArchives(); }
     catch (err) { alert(err.response?.data?.message || "Gagal menghapus."); }
+  };
+
+  const handleRoleToggle = (role) => {
+    let roles = form.access_level ? form.access_level.split(",") : ["admin"];
+    if (roles.includes(role)) {
+      if (role !== "admin") roles = roles.filter((r) => r !== role);
+    } else {
+      roles.push(role);
+    }
+    setForm({ ...form, access_level: roles.join(",") });
   };
 
   const openPreview = (archive) => { setPreviewModal({ open: true, archive }); };
@@ -104,7 +114,13 @@ export default function AdminArchives() {
                   <td className="px-4 py-3 text-slate-200 font-medium max-w-48 truncate" title={a.title}>{a.title}</td>
                   <td className="px-4 py-3 text-slate-400 capitalize">{a.category?.replace(/_/g, " ")}</td>
                   <td className="px-4 py-3 text-slate-300">{a.year}</td>
-                  <td className="px-4 py-3"><Badge status={a.access_level} /></td>
+                  <td className="px-4 py-3">
+                    <div className="flex gap-1 flex-wrap max-w-40" title={a.access_level}>
+                      {a.access_level?.split(",").map(r => (
+                        <span key={r} className="px-2 py-0.5 bg-[#4EA8DE]/10 text-[#4EA8DE] border border-[#4EA8DE]/20 rounded text-[10px] capitalize">{r}</span>
+                      ))}
+                    </div>
+                  </td>
                   <td className="px-4 py-3 text-slate-400">{a.uploaded_by_name}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
@@ -133,9 +149,27 @@ export default function AdminArchives() {
             <Select label="Kategori" value={form.category || "lpj"} onChange={(e) => setForm({ ...form, category: e.target.value })}>
               {CATEGORIES.map((c) => <option key={c} value={c}>{c.replace(/_/g, " ").toUpperCase()}</option>)}
             </Select>
-            <Select label="Tingkat Akses" value={form.access_level || "internal"} onChange={(e) => setForm({ ...form, access_level: e.target.value })}>
-              {ACCESS_LEVELS.map((l) => <option key={l} value={l}>{l}</option>)}
-            </Select>
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">Akses Role</label>
+              <div className="bg-slate-800/80 border border-slate-600 rounded-lg p-3 grid grid-cols-2 gap-2 h-32 overflow-y-auto">
+                {ROLES.map((role) => {
+                  const isChecked = (form.access_level || "").split(",").includes(role);
+                  const isDisabled = role === "admin";
+                  return (
+                    <label key={role} className={`flex items-center gap-2 text-sm ${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}>
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        disabled={isDisabled}
+                        onChange={() => handleRoleToggle(role)}
+                        className="rounded border-slate-600 bg-slate-700 text-[#4EA8DE] focus:ring-[#4EA8DE]"
+                      />
+                      <span className="text-slate-200 capitalize">{role}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
           </div>
           <Input label="Divisi" value={form.division || ""} onChange={(e) => setForm({ ...form, division: e.target.value })} placeholder="Contoh: Pengurus, Divisi Media" />
           <Input label="Google Drive File ID" value={form.drive_file_id || ""} onChange={(e) => setForm({ ...form, drive_file_id: e.target.value })} required placeholder="ID dari URL Google Drive" />
@@ -154,7 +188,14 @@ export default function AdminArchives() {
             <div className="grid grid-cols-3 gap-3 text-sm">
               <div><span className="text-slate-500">Kategori:</span> <span className="text-slate-200 capitalize">{previewModal.archive.category?.replace(/_/g," ")}</span></div>
               <div><span className="text-slate-500">Tahun:</span> <span className="text-slate-200">{previewModal.archive.year}</span></div>
-              <div><span className="text-slate-500">Akses:</span> <Badge status={previewModal.archive.access_level} /></div>
+              <div className="col-span-3">
+                <span className="text-slate-500 mr-2">Akses:</span>
+                <div className="inline-flex gap-1 flex-wrap">
+                  {previewModal.archive.access_level?.split(",").map(r => (
+                    <span key={r} className="px-2 py-0.5 bg-[#4EA8DE]/10 text-[#4EA8DE] border border-[#4EA8DE]/20 rounded text-[10px] capitalize">{r}</span>
+                  ))}
+                </div>
+              </div>
             </div>
             <div className="rounded-lg overflow-hidden border border-slate-700 relative" style={{ height: "500px" }}>
               <iframe

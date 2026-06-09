@@ -62,8 +62,6 @@ export default function ArchivesPage() {
 
   const years = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i);
 
-  const accessIcon = { public: "🌐", internal: "🔒", restricted: "🔐", private: "🚫" };
-
   return (
     <div className="space-y-6">
       <div><h1 className="text-2xl font-bold text-slate-100">Arsip Dokumen</h1><p className="text-slate-400 text-sm mt-1">Cari dan akses dokumen arsip UKM</p></div>
@@ -106,10 +104,16 @@ export default function ArchivesPage() {
                   <td className="px-4 py-3 text-slate-400 capitalize">{a.category?.replace(/_/g," ")}</td>
                   <td className="px-4 py-3 text-slate-300">{a.year}</td>
                   <td className="px-4 py-3 text-slate-400">{a.division || "—"}</td>
-                  <td className="px-4 py-3"><span className="mr-1">{accessIcon[a.access_level]}</span><Badge status={a.access_level} /></td>
+                  <td className="px-4 py-3">
+                    <div className="flex gap-1 flex-wrap max-w-40" title={a.access_level}>
+                      {a.access_level?.split(",").map(r => (
+                        <span key={r} className="px-2 py-0.5 bg-[#4EA8DE]/10 text-[#4EA8DE] border border-[#4EA8DE]/20 rounded text-[10px] capitalize">{r}</span>
+                      ))}
+                    </div>
+                  </td>
                   <td className="px-4 py-3">
                     <Button size="sm" onClick={() => handleOpenDoc(a)}>
-                      {a.access_level === "restricted" ? "🔐 Buka" : "👁️ Lihat"}
+                      Buka
                     </Button>
                   </td>
                 </tr>
@@ -122,10 +126,14 @@ export default function ArchivesPage() {
       {/* Preview Modal */}
       <Modal isOpen={previewModal.open} onClose={() => setPreviewModal({ open: false })} title={previewModal.archive?.title || "Preview Dokumen"} size="xl">
         <div className="space-y-3">
-          <div className="flex items-center gap-4 text-sm">
-            <Badge status={previewModal.archive?.access_level} />
+          <div className="flex items-center flex-wrap gap-4 text-sm">
             <span className="text-slate-500">{previewModal.archive?.year}</span>
             <span className="text-slate-500 capitalize">{previewModal.archive?.category?.replace(/_/g," ")}</span>
+            <div className="flex gap-1 flex-wrap">
+              {previewModal.archive?.access_level?.split(",").map(r => (
+                <span key={r} className="px-2 py-0.5 bg-[#4EA8DE]/10 text-[#4EA8DE] border border-[#4EA8DE]/20 rounded text-[10px] capitalize">{r}</span>
+              ))}
+            </div>
           </div>
           <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-xs text-yellow-400">
             ⚠️ Dokumen ini hanya untuk dilihat. Dilarang mendistribusikan konten ini.
