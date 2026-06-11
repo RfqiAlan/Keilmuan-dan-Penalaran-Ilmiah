@@ -2,7 +2,7 @@ const router = require("express").Router();
 const {
   getAllArchives, getAvailableYears, getPendingArchives, getArchiveById,
   createArchive, updateArchive, deleteArchive, approveArchive,
-  checkAccess, getPreview,
+  checkAccess, getPreview, listDriveFolder,
 } = require("../controllers/archive.controller");
 const verifyToken = require("../middleware/auth");
 const requireRole = require("../middleware/role");
@@ -12,6 +12,7 @@ const requireKta = require("../middleware/requireKta");
 router.get("/", verifyToken, getAllArchives);
 router.get("/years", verifyToken, getAvailableYears);
 router.get("/pending", verifyToken, requireRole("admin", "sekretaris"), getPendingArchives);
+router.get("/drive/folder/:folderId", verifyToken, requireKta, listDriveFolder);
 router.get("/:id/access-check", verifyToken, checkAccess);
 router.get("/:id/preview", verifyToken, requireKta, getPreview);
 router.get("/:id", verifyToken, getArchiveById);

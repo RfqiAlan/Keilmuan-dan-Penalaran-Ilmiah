@@ -329,8 +329,65 @@ const getPreview = async (req, res) => {
   }
 };
 
+// GET /api/archives/drive/folder/:folderId — List contents of a Google Drive folder
+const listDriveFolder = async (req, res) => {
+  try {
+    const { google } = require("googleapis");
+
+    if (!process.env.GOOGLE_CLIENT_EMAIL || !process.env.GOOGLE_PRIVATE_KEY) {
+      return res.status(500).json({ message: "Google Drive belum dikonfigurasi." });
+    }
+
+    const auth = new google.auth.GoogleAuth({
+      credentials: {
+        client_email: process.env.GOOGLE_CLIENT_EMAIL,
+        private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+      },
+      scopes: ["https://www.googleapis.com/auth/drive.readonly"],
+    });
+
+    const drive = google.drive({ version: "v3", auth });
+    const folderId = req.params.folderId;
+
+    const response = await drive.files.list({
+      q: `'${folderId}' in parents AND trashed = false`,
+      fields: "files(id, name, mimeType, size, createdTime, modifiedTime, iconLink, thumbnailLink)",
+      orderBy: "folder,name",
+      pageSize: 200,
+    });
+
+    const items = response.data.files.map((file) => ({
+      id: file.id,
+      name: file.name,
+      mimeType: file.mimeType,
+      isFolder: file.mimeType === "application/vnd.google-apps.folder",
+      size: file.size ? parseInt(file.size) : null,
+      createdTime: file.createdTime,
+      modifiedTime: file.modifiedTime,
+      iconLink: file.iconLink,
+      thumbnailLink: file.thumbnailLink,
+      previewUrl: file.mimeType === "application/vnd.google-apps.folder"
+        ? null
+        : `https://drive.google.com/file/d/${file.id}/preview`,
+    }));
+
+    // Sort: folders first, then files, both alphabetically
+    items.sort((a, b) => {
+      if (a.isFolder && !b.isFolder) return -1;
+      if (!a.isFolder && b.isFolder) return 1;
+      return a.name.localeCompare(b.name);
+    });
+
+    res.json({ items, folderId });
+  } catch (err) {
+    console.error("listDriveFolder error:", err.message);
+    if (err.code === 404) return res.status(404).json({ message: "Folder tidak ditemukan." });
+    res.status(500).json({ message: "Gagal mengakses Google Drive." });
+  }
+};
+
 module.exports = {
   getAllArchives, getAvailableYears, getPendingArchives, getArchiveById,
   createArchive, updateArchive, deleteArchive, approveArchive,
-  checkAccess, getPreview,
+  checkAccess, getPreview, listDriveFolder,
 };

@@ -5,6 +5,7 @@ import Badge from "../../components/ui/Badge";
 import Button from "../../components/ui/Button";
 import Modal from "../../components/ui/Modal";
 import { Input, Select, Textarea } from "../../components/ui/Input";
+import DriveFolderBrowser from "../../components/ui/DriveFolderBrowser";
 
 const CATEGORIES = ["arsip_divisi","arsip_karya","arsip_inovasi","lpj","arsip_kegiatan","proposal","surat_masuk","surat_keluar","notulen","sk","keuangan","sertifikat"];
 const ROLES = ["admin", "ketua", "sekretaris", "bendahara", "koordinator", "anggota", "alumni"];
@@ -363,19 +364,22 @@ export default function AdminArchives() {
                 </div>
               </div>
             </div>
-            <div className="rounded-lg overflow-hidden border border-slate-700 relative" style={{ height: "500px" }}>
-              <iframe
-                src={previewModal.archive.drive_type === 'folder'
-                  ? `https://drive.google.com/embeddedfolderview?id=${previewModal.archive.drive_file_id}#list`
-                  : `https://drive.google.com/file/d/${previewModal.archive.drive_file_id}/preview`}
-                className="w-full h-full"
-                title="Document Preview"
-                allow="autoplay"
+            {previewModal.archive.drive_type === 'folder' ? (
+              <DriveFolderBrowser
+                rootFolderId={previewModal.archive.drive_file_id}
+                rootFolderName={previewModal.archive.title}
               />
-              {previewModal.archive.drive_type !== 'folder' && (
+            ) : (
+              <div className="rounded-lg overflow-hidden border border-slate-700 relative" style={{ height: "500px" }}>
+                <iframe
+                  src={`https://drive.google.com/file/d/${previewModal.archive.drive_file_id}/preview`}
+                  className="w-full h-full"
+                  title="Document Preview"
+                  allow="autoplay"
+                />
                 <div className="absolute top-0 right-0 w-16 h-16 z-10 bg-transparent cursor-not-allowed" title="Pop-out dibatasi" />
-              )}
-            </div>
+              </div>
+            )}
           </div>
         )}
       </Modal>
