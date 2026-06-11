@@ -79,7 +79,7 @@ export default function AdminUsers() {
           <table className="w-full text-sm">
             <thead className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700/50">
               <tr>
-                {["Nama","Email","Role","No. HP","Status","Bergabung","Aksi"].map((h) => (
+                {["Nama","Email","Role","No. HP","Status","KTA","Bergabung","Aksi"].map((h) => (
                   <th key={h} className="text-left px-4 py-3 text-slate-600 dark:text-slate-400 font-medium text-xs uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
@@ -94,6 +94,13 @@ export default function AdminUsers() {
                   <td className="px-4 py-3"><span className="text-slate-700 dark:text-slate-300 capitalize">{u.role}</span></td>
                   <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{u.phone || "—"}</td>
                   <td className="px-4 py-3"><Badge status={u.status} /></td>
+                  <td className="px-4 py-3">
+                    {u.kta_drive_id ? (
+                      <a href={`${import.meta.env.VITE_API_URL.replace("/api", "")}/uploads/kta/${u.kta_drive_id}`} target="_blank" rel="noreferrer" className="text-xs text-[#4EA8DE] hover:underline font-medium">Lihat KTA</a>
+                    ) : (
+                      <span className="text-xs text-slate-400">—</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{new Date(u.created_at).toLocaleDateString("id-ID")}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">

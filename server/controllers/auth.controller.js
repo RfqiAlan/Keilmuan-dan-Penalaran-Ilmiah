@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 const pool = require("../config/db");
 const logActivity = require("../middleware/logger");
 const path = require("path");
-const { uploadToDrive } = require("../config/googleDrive");
 const { notifyAdminNewUser } = require("../utils/notifier");
 
 // POST /api/auth/register
@@ -33,25 +32,14 @@ const register = async (req, res) => {
     const allowedRoles = ["admin", "ketua", "sekretaris", "bendahara", "koordinator", "anggota", "alumni"];
     const userRole = allowedRoles.includes(role) ? role : "anggota";
 
-    // Upload KTA to Google Drive
-    const ext = path.extname(req.file.originalname) || ".jpg";
-    const fileName = `KTA_${name.replace(/\s+/g, "_")}_${Date.now()}${ext}`;
-    const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID || null;
-
-    const driveResult = await uploadToDrive(
-      req.file.buffer,
-      fileName,
-      req.file.mimetype,
-      folderId
-    );
-
-    const ktaDriveId = driveResult.fileId;
+    // Upload KTA to Local Storage (already handled by multer, just get filename)
+    const ktaFileName = req.file.filename;
     const initialStatus = "pending";
 
     const result = await pool.query(
       `INSERT INTO users (name, email, password, phone, role, status, kta_drive_id)
        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, name, email, phone, role, status, created_at`,
-      [name, email, hashedPassword, phone || null, userRole, initialStatus, ktaDriveId]
+      [name, email, hashedPassword, phone || null, userRole, initialStatus, ktaFileName]
     );
 
     const user = result.rows[0];

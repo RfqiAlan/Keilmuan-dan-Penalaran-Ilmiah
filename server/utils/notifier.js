@@ -55,7 +55,7 @@ const notifyAdminNewUser = async (newUser) => {
             </tr>
           </table>
 
-          <p>Anggota tersebut telah mengunggah file Kartu Tanda Anggota (KTA) ke Google Drive.</p>
+          <p>Anggota tersebut telah mengunggah file Kartu Tanda Anggota (KTA) ke dalam sistem.</p>
           
           <div style="text-align: center; margin-top: 30px;">
             <a href="${process.env.CLIENT_URL}/admin/users" style="background-color: #4EA8DE; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">

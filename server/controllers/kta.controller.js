@@ -1,11 +1,29 @@
 const pool = require("../config/db");
 const multer = require("multer");
-const { uploadToDrive, deleteFromDrive } = require("../config/googleDrive");
 const logActivity = require("../middleware/logger");
+const path = require("path");
+const fs = require("fs");
 
-// Multer config: memory storage (buffer) for Google Drive upload
+// Ensure upload directory exists
+const uploadDir = path.join(__dirname, "../uploads/kta");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Multer config: local storage for KTA
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const nameStr = req.body.name ? req.body.name.replace(/\s+/g, "_") : "User";
+    const ext = path.extname(file.originalname) || ".jpg";
+    cb(null, `KTA_${nameStr}_${Date.now()}${ext}`);
+  },
+});
+
 const upload = multer({
-  storage: multer.memoryStorage(),
+  storage: storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
   fileFilter: (req, file, cb) => {
     const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
@@ -17,44 +35,39 @@ const upload = multer({
   },
 });
 
-// POST /api/users/kta — Upload KTA to Google Drive
+// POST /api/users/kta — Upload KTA to Local Storage
 const uploadKta = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: "File KTA wajib diunggah." });
     }
 
-    // Check if user already has a KTA, delete old one from Drive
+    // Check if user already has a KTA, delete old one from local storage
     const existing = await pool.query("SELECT kta_drive_id FROM users WHERE id = $1", [req.user.id]);
     if (existing.rows[0]?.kta_drive_id) {
-      await deleteFromDrive(existing.rows[0].kta_drive_id);
+      const oldPath = path.join(__dirname, "../uploads/kta", existing.rows[0].kta_drive_id);
+      if (fs.existsSync(oldPath)) {
+        fs.unlinkSync(oldPath);
+      }
     }
 
-    // Upload to Google Drive
-    const fileName = `KTA_${req.user.name.replace(/\s+/g, "_")}_${req.user.id}_${Date.now()}${getExtension(req.file.mimetype)}`;
-    const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID || null;
+    // The file is already saved by multer, filename is in req.file.filename
+    const fileName = req.file.filename;
 
-    const driveResult = await uploadToDrive(
-      req.file.buffer,
-      fileName,
-      req.file.mimetype,
-      folderId
-    );
-
-    // Update user's kta_drive_id in database
+    // Update user's kta_drive_id (now storing local filename) in database
     await pool.query(
       "UPDATE users SET kta_drive_id = $1, updated_at = NOW() WHERE id = $2",
-      [driveResult.fileId, req.user.id]
+      [fileName, req.user.id]
     );
 
-    await logActivity(req.user.id, "upload_kta", "users", `Upload KTA: ${fileName}`);
+    await logActivity(req.user.id, "upload_kta", "users", `Upload KTA lokal: ${fileName}`);
 
     res.json({
       message: "KTA berhasil diunggah.",
       kta: {
-        drive_id: driveResult.fileId,
-        preview_url: driveResult.previewUrl,
-        thumbnail_url: driveResult.thumbnailUrl,
+        drive_id: fileName,
+        preview_url: `${req.protocol}://${req.get("host")}/uploads/kta/${fileName}`,
+        thumbnail_url: `${req.protocol}://${req.get("host")}/uploads/kta/${fileName}`,
       },
     });
   } catch (err) {
@@ -75,16 +88,16 @@ const checkKta = async (req, res) => {
       return res.status(404).json({ message: "User tidak ditemukan." });
     }
 
-    const ktaDriveId = result.rows[0].kta_drive_id;
-    const hasKta = !!ktaDriveId;
+    const ktaFileName = result.rows[0].kta_drive_id;
+    const hasKta = !!ktaFileName;
 
     res.json({
       hasKta,
       kta: hasKta
         ? {
-            drive_id: ktaDriveId,
-            preview_url: `https://drive.google.com/file/d/${ktaDriveId}/preview`,
-            thumbnail_url: `https://drive.google.com/thumbnail?id=${ktaDriveId}&sz=w400`,
+            drive_id: ktaFileName,
+            preview_url: `${req.protocol}://${req.get("host")}/uploads/kta/${ktaFileName}`,
+            thumbnail_url: `${req.protocol}://${req.get("host")}/uploads/kta/${ktaFileName}`,
           }
         : null,
     });
@@ -98,8 +111,13 @@ const checkKta = async (req, res) => {
 const deleteKta = async (req, res) => {
   try {
     const result = await pool.query("SELECT kta_drive_id FROM users WHERE id = $1", [req.user.id]);
-    if (result.rows[0]?.kta_drive_id) {
-      await deleteFromDrive(result.rows[0].kta_drive_id);
+    const fileName = result.rows[0]?.kta_drive_id;
+    
+    if (fileName) {
+      const filePath = path.join(__dirname, "../uploads/kta", fileName);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
     }
 
     await pool.query("UPDATE users SET kta_drive_id = NULL, updated_at = NOW() WHERE id = $1", [req.user.id]);

@@ -4,7 +4,7 @@ const pool = require("../config/db");
 const getAllUsers = async (req, res) => {
   try {
     const { role, status, search } = req.query;
-    let query = "SELECT id, name, email, phone, role, status, created_at FROM users WHERE 1=1";
+    let query = "SELECT id, name, email, phone, role, status, kta_drive_id, created_at FROM users WHERE 1=1";
     const params = [];
 
     if (role) { params.push(role); query += ` AND role = $${params.length}`; }
