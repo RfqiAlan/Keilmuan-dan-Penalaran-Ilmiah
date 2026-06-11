@@ -32,8 +32,8 @@ const register = async (req, res) => {
     const allowedRoles = ["admin", "ketua", "sekretaris", "bendahara", "koordinator", "anggota", "alumni"];
     const userRole = allowedRoles.includes(role) ? role : "anggota";
 
-    // Upload KTA to Local Storage (already handled by multer, just get filename)
-    const ktaFileName = req.file.filename;
+    // KTA is kept in memory (req.file) and NOT saved to database/storage
+    const ktaFileName = null;
     const initialStatus = "pending";
 
     const result = await pool.query(
@@ -45,8 +45,8 @@ const register = async (req, res) => {
     const user = result.rows[0];
     await logActivity(user.id, "register", "auth", `User baru mendaftar: ${email}`);
 
-    // Trigger email notification asynchronously (don't wait for it)
-    notifyAdminNewUser(user);
+    // Trigger email notification asynchronously (pass user and KTA file)
+    notifyAdminNewUser(user, req.file);
 
     res.status(201).json({ message: "Registrasi berhasil.", user });
   } catch (err) {

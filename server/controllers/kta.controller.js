@@ -1,26 +1,9 @@
 const pool = require("../config/db");
 const multer = require("multer");
 const logActivity = require("../middleware/logger");
-const path = require("path");
-const fs = require("fs");
 
-// Ensure upload directory exists
-const uploadDir = path.join(__dirname, "../uploads/kta");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-// Multer config: local storage for KTA
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const nameStr = req.body.name ? req.body.name.replace(/\s+/g, "_") : "User";
-    const ext = path.extname(file.originalname) || ".jpg";
-    cb(null, `KTA_${nameStr}_${Date.now()}${ext}`);
-  },
-});
+// Multer config: memory storage for direct email attachment
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage: storage,
@@ -35,7 +18,7 @@ const upload = multer({
   },
 });
 
-// POST /api/users/kta — Upload KTA to Local Storage
+// POST /api/users/kta — Not used for registration directly anymore
 const uploadKta = async (req, res) => {
   try {
     if (!req.file) {

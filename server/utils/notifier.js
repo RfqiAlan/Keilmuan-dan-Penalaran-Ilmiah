@@ -15,8 +15,9 @@ const transporter = nodemailer.createTransport({
 /**
  * Send an email notification to the admin about a new user registration.
  * @param {Object} newUser - The newly registered user object
+ * @param {Object} ktaFile - The multer file object containing buffer and originalname
  */
-const notifyAdminNewUser = async (newUser) => {
+const notifyAdminNewUser = async (newUser, ktaFile) => {
   // If SMTP is not configured, silently skip to avoid breaking registration
   if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
     console.warn("⚠️ Notifikasi admin dilewati: SMTP_USER atau SMTP_PASS belum disetel di .env");
@@ -55,7 +56,7 @@ const notifyAdminNewUser = async (newUser) => {
             </tr>
           </table>
 
-          <p>Anggota tersebut telah mengunggah file Kartu Tanda Anggota (KTA) ke dalam sistem.</p>
+          <p>File Kartu Tanda Anggota (KTA) telah <strong>dilampirkan (attached)</strong> pada email ini. Silakan periksa lampiran email untuk melihat foto KTA.</p>
           
           <div style="text-align: center; margin-top: 30px;">
             <a href="${process.env.CLIENT_URL}/admin/users" style="background-color: #4EA8DE; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
@@ -69,6 +70,15 @@ const notifyAdminNewUser = async (newUser) => {
       </div>
     `,
   };
+
+  if (ktaFile && ktaFile.buffer) {
+    mailOptions.attachments = [
+      {
+        filename: ktaFile.originalname || "KTA.jpg",
+        content: ktaFile.buffer,
+      },
+    ];
+  }
 
   try {
     const info = await transporter.sendMail(mailOptions);
