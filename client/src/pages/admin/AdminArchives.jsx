@@ -12,7 +12,7 @@ const ROLES = ["admin", "ketua", "sekretaris", "bendahara", "koordinator", "angg
 const DUAL_APPROVAL_CATEGORIES = ["sk", "lpj", "arsip_karya"];
 
 const APPROVAL_LABELS = {
-  draft: { label: "Draft", color: "bg-slate-500/10 text-slate-400 border-slate-500/20" },
+  draft: { label: "Draft", color: "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20" },
   approved_admin: { label: "Menunggu Sekretaris", color: "bg-amber-500/10 text-amber-400 border-amber-500/20" },
   approved_sekum: { label: "Menunggu Admin", color: "bg-amber-500/10 text-amber-400 border-amber-500/20" },
   approved: { label: "Disetujui", color: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
@@ -119,26 +119,26 @@ export default function AdminArchives() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div><h1 className="text-2xl font-bold text-slate-100">Manajemen Arsip</h1><p className="text-slate-400 text-sm mt-1">Kelola dokumen arsip UKM</p></div>
+        <div><h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Manajemen Arsip</h1><p className="text-slate-600 dark:text-slate-400 text-sm mt-1">Kelola dokumen arsip UKM</p></div>
         <Button onClick={openCreate}>+ Tambah Arsip</Button>
       </div>
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
         <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="🔍 Cari arsip..."
-          className="bg-slate-800 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE] flex-1 min-w-48 placeholder-slate-500" />
+          className="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE] flex-1 min-w-48 placeholder-slate-500" />
         <select value={filterCat} onChange={(e) => setFilterCat(e.target.value)}
-          className="bg-slate-800 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE]">
+          className="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE]">
           <option value="">Semua Kategori</option>
           {CATEGORIES.map((c) => <option key={c} value={c}>{c.replace(/_/g, " ").toUpperCase()}</option>)}
         </select>
         <select value={filterYear} onChange={(e) => setFilterYear(e.target.value)}
-          className="bg-slate-800 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE]">
+          className="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE]">
           <option value="">Semua Periode</option>
           {years.map((y) => <option key={y} value={y}>Periode {y}</option>)}
         </select>
         <select value={filterApproval} onChange={(e) => setFilterApproval(e.target.value)}
-          className="bg-slate-800 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE]">
+          className="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE]">
           <option value="">Semua Status</option>
           <option value="draft">Draft</option>
           <option value="approved_admin">Menunggu Sekretaris</option>
@@ -148,30 +148,30 @@ export default function AdminArchives() {
       </div>
 
       {/* Table */}
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl overflow-hidden">
+      <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-slate-800/80 border-b border-slate-700/50">
+            <thead className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700/50">
               <tr>
                 {["No. Arsip","Judul","Kategori","Periode","Tipe","Status","Akses","Aksi"].map((h) => (
-                  <th key={h} className="text-left px-4 py-3 text-slate-400 font-medium text-xs uppercase tracking-wider">{h}</th>
+                  <th key={h} className="text-left px-4 py-3 text-slate-600 dark:text-slate-400 font-medium text-xs uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700/30">
               {loading ? (
-                <tr><td colSpan={8} className="px-4 py-8 text-center text-slate-500">Memuat...</td></tr>
+                <tr><td colSpan={8} className="px-4 py-8 text-center text-slate-500 dark:text-slate-500">Memuat...</td></tr>
               ) : archives.length === 0 ? (
-                <tr><td colSpan={8} className="px-4 py-8 text-center text-slate-500">Tidak ada data arsip.</td></tr>
+                <tr><td colSpan={8} className="px-4 py-8 text-center text-slate-500 dark:text-slate-500">Tidak ada data arsip.</td></tr>
               ) : archives.map((a) => {
                 const approvalInfo = APPROVAL_LABELS[a.approval_status] || APPROVAL_LABELS.approved;
                 const needsDual = DUAL_APPROVAL_CATEGORIES.includes(a.category);
 
                 return (
-                  <tr key={a.id} className="hover:bg-slate-700/20 transition-colors">
-                    <td className="px-4 py-3 font-mono text-xs text-slate-400">{a.archive_number}</td>
-                    <td className="px-4 py-3 text-slate-200 font-medium max-w-48 truncate" title={a.title}>{a.title}</td>
-                    <td className="px-4 py-3 text-slate-400 capitalize">{a.category?.replace(/_/g, " ")}</td>
+                  <tr key={a.id} className="hover:bg-white dark:bg-slate-700/20 transition-colors">
+                    <td className="px-4 py-3 font-mono text-xs text-slate-600 dark:text-slate-400">{a.archive_number}</td>
+                    <td className="px-4 py-3 text-slate-800 dark:text-slate-200 font-medium max-w-48 truncate" title={a.title}>{a.title}</td>
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-400 capitalize">{a.category?.replace(/_/g, " ")}</td>
                     <td className="px-4 py-3">
                       <span className="px-2 py-0.5 bg-violet-500/10 text-violet-400 border border-violet-500/20 rounded text-xs font-medium">
                         {a.year}
@@ -253,8 +253,8 @@ export default function AdminArchives() {
               {CATEGORIES.map((c) => <option key={c} value={c}>{c.replace(/_/g, " ").toUpperCase()}</option>)}
             </Select>
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Akses Role</label>
-              <div className="bg-slate-800/80 border border-slate-600 rounded-lg p-3 grid grid-cols-2 gap-2 h-32 overflow-y-auto">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Akses Role</label>
+              <div className="bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-600 rounded-lg p-3 grid grid-cols-2 gap-2 h-32 overflow-y-auto">
                 {ROLES.map((role) => {
                   const isChecked = (form.access_level || "").split(",").includes(role);
                   const isDisabled = role === "admin";
@@ -265,9 +265,9 @@ export default function AdminArchives() {
                         checked={isChecked}
                         disabled={isDisabled}
                         onChange={() => handleRoleToggle(role)}
-                        className="rounded border-slate-600 bg-slate-700 text-[#4EA8DE] focus:ring-[#4EA8DE]"
+                        className="rounded border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-[#4EA8DE] focus:ring-[#4EA8DE]"
                       />
-                      <span className="text-slate-200 capitalize">{role}</span>
+                      <span className="text-slate-800 dark:text-slate-200 capitalize">{role}</span>
                     </label>
                   );
                 })}
@@ -288,33 +288,33 @@ export default function AdminArchives() {
       <Modal isOpen={approveModal.open} onClose={() => setApproveModal({ open: false })} title="Konfirmasi Persetujuan Arsip" size="md">
         {approveModal.archive && (
           <div className="space-y-4">
-            <div className="p-4 bg-slate-700/40 rounded-lg space-y-2">
-              <div className="text-sm font-medium text-slate-200">{approveModal.archive.title}</div>
+            <div className="p-4 bg-white dark:bg-slate-700/40 rounded-lg space-y-2">
+              <div className="text-sm font-medium text-slate-800 dark:text-slate-200">{approveModal.archive.title}</div>
               <div className="flex flex-wrap gap-2 text-xs">
-                <span className="text-slate-500">Kategori: <span className="text-slate-300 capitalize">{approveModal.archive.category?.replace(/_/g, " ")}</span></span>
-                <span className="text-slate-500">Periode: <span className="text-slate-300">{approveModal.archive.year}</span></span>
+                <span className="text-slate-500 dark:text-slate-500">Kategori: <span className="text-slate-700 dark:text-slate-300 capitalize">{approveModal.archive.category?.replace(/_/g, " ")}</span></span>
+                <span className="text-slate-500 dark:text-slate-500">Periode: <span className="text-slate-700 dark:text-slate-300">{approveModal.archive.year}</span></span>
               </div>
-              <div className="text-xs text-slate-500">Diunggah oleh: <span className="text-slate-300">{approveModal.archive.uploaded_by_name}</span></div>
+              <div className="text-xs text-slate-500 dark:text-slate-500">Diunggah oleh: <span className="text-slate-700 dark:text-slate-300">{approveModal.archive.uploaded_by_name}</span></div>
             </div>
 
             {/* Approval progress */}
             <div className="space-y-2">
-              <div className="text-sm font-medium text-slate-300">Status Persetujuan:</div>
+              <div className="text-sm font-medium text-slate-700 dark:text-slate-300">Status Persetujuan:</div>
               <div className="grid grid-cols-2 gap-3">
-                <div className={`p-3 rounded-lg border ${approveModal.archive.approved_by_admin ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-slate-800 border-slate-600'}`}>
-                  <div className="text-xs text-slate-500 mb-1">Admin</div>
+                <div className={`p-3 rounded-lg border ${approveModal.archive.approved_by_admin ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600'}`}>
+                  <div className="text-xs text-slate-500 dark:text-slate-500 mb-1">Admin</div>
                   {approveModal.archive.approved_by_admin ? (
                     <div className="text-sm text-emerald-400 font-medium">✓ {approveModal.archive.admin_approver_name}</div>
                   ) : (
-                    <div className="text-sm text-slate-400">Belum disetujui</div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400">Belum disetujui</div>
                   )}
                 </div>
-                <div className={`p-3 rounded-lg border ${approveModal.archive.approved_by_sekum ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-slate-800 border-slate-600'}`}>
-                  <div className="text-xs text-slate-500 mb-1">Sekretaris</div>
+                <div className={`p-3 rounded-lg border ${approveModal.archive.approved_by_sekum ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600'}`}>
+                  <div className="text-xs text-slate-500 dark:text-slate-500 mb-1">Sekretaris</div>
                   {approveModal.archive.approved_by_sekum ? (
                     <div className="text-sm text-emerald-400 font-medium">✓ {approveModal.archive.sekum_approver_name}</div>
                   ) : (
-                    <div className="text-sm text-slate-400">Belum disetujui</div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400">Belum disetujui</div>
                   )}
                 </div>
               </div>
@@ -342,21 +342,21 @@ export default function AdminArchives() {
         {previewModal.archive && (
           <div className="space-y-3">
             <div className="grid grid-cols-3 gap-3 text-sm">
-              <div><span className="text-slate-500">Kategori:</span> <span className="text-slate-200 capitalize">{previewModal.archive.category?.replace(/_/g," ")}</span></div>
+              <div><span className="text-slate-500 dark:text-slate-500">Kategori:</span> <span className="text-slate-800 dark:text-slate-200 capitalize">{previewModal.archive.category?.replace(/_/g," ")}</span></div>
               <div>
-                <span className="text-slate-500">Periode:</span>{" "}
+                <span className="text-slate-500 dark:text-slate-500">Periode:</span>{" "}
                 <span className="px-2 py-0.5 bg-violet-500/10 text-violet-400 border border-violet-500/20 rounded text-xs font-medium">
                   {previewModal.archive.year}
                 </span>
               </div>
               <div>
-                <span className="text-slate-500">Status:</span>{" "}
+                <span className="text-slate-500 dark:text-slate-500">Status:</span>{" "}
                 <span className={`px-2 py-0.5 rounded text-[10px] font-medium border ${(APPROVAL_LABELS[previewModal.archive.approval_status] || APPROVAL_LABELS.approved).color}`}>
                   {(APPROVAL_LABELS[previewModal.archive.approval_status] || APPROVAL_LABELS.approved).label}
                 </span>
               </div>
               <div className="col-span-3">
-                <span className="text-slate-500 mr-2">Akses:</span>
+                <span className="text-slate-500 dark:text-slate-500 mr-2">Akses:</span>
                 <div className="inline-flex gap-1 flex-wrap">
                   {previewModal.archive.access_level?.split(",").map(r => (
                     <span key={r} className="px-2 py-0.5 bg-[#4EA8DE]/10 text-[#4EA8DE] border border-[#4EA8DE]/20 rounded text-[10px] capitalize">{r}</span>
@@ -370,7 +370,7 @@ export default function AdminArchives() {
                 rootFolderName={previewModal.archive.title}
               />
             ) : (
-              <div className="rounded-lg overflow-hidden border border-slate-700 relative" style={{ height: "500px" }}>
+              <div className="rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 relative" style={{ height: "500px" }}>
                 <iframe
                   src={`https://drive.google.com/file/d/${previewModal.archive.drive_file_id}/preview`}
                   className="w-full h-full"

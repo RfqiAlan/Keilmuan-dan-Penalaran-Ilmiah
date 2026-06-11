@@ -93,7 +93,7 @@ export default function ItemsPage() {
 
   return (
     <div className="space-y-6">
-      <div><h1 className="text-2xl font-bold text-slate-100">Daftar Barang</h1><p className="text-slate-400 text-sm mt-1">Pilih barang yang ingin dipinjam</p></div>
+      <div><h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Daftar Barang</h1><p className="text-slate-600 dark:text-slate-400 text-sm mt-1">Pilih barang yang ingin dipinjam</p></div>
 
       {/* KTA Warning Banner */}
       {hasKta === false && (
@@ -101,7 +101,7 @@ export default function ItemsPage() {
           <span className="text-2xl">🪪</span>
           <div className="flex-1">
             <div className="text-sm font-medium text-amber-300">Kartu Tanda Anggota Belum Diunggah</div>
-            <div className="text-xs text-slate-400 mt-0.5">Anda harus mengunggah KTA terlebih dahulu untuk bisa meminjam barang.</div>
+            <div className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Anda harus mengunggah KTA terlebih dahulu untuk bisa meminjam barang.</div>
           </div>
           <Button size="sm" onClick={() => setKtaModal(true)}>Upload KTA</Button>
         </div>
@@ -109,9 +109,9 @@ export default function ItemsPage() {
 
       <div className="flex flex-wrap gap-3">
         <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="🔍 Cari barang..."
-          className="bg-slate-800 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE] flex-1 min-w-48 placeholder-slate-500" />
+          className="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE] flex-1 min-w-48 placeholder-slate-500" />
         <select value={filterCat} onChange={(e) => setFilterCat(e.target.value)}
-          className="bg-slate-800 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE]">
+          className="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE]">
           <option value="">Semua Kategori</option>
           {categories.map((c) => <option key={c} value={c}>{c.replace(/_/g," ")}</option>)}
         </select>
@@ -122,23 +122,23 @@ export default function ItemsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {items.length === 0 ? (
-            <div className="col-span-3 text-center py-16 text-slate-500">Tidak ada barang tersedia.</div>
+            <div className="col-span-3 text-center py-16 text-slate-500 dark:text-slate-500">Tidak ada barang tersedia.</div>
           ) : items.map((item) => (
-            <div key={item.id} className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 hover:border-[#4EA8DE]/40 transition-all duration-200">
+            <div key={item.id} className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl p-5 hover:border-[#4EA8DE]/40 transition-all duration-200">
               {item.image_url ? (
                 <img src={item.image_url} alt={item.name} className="w-full h-40 object-cover rounded-lg mb-4" />
               ) : (
-                <div className="w-full h-40 bg-slate-700/50 rounded-lg mb-4 flex items-center justify-center text-4xl">📦</div>
+                <div className="w-full h-40 bg-white dark:bg-slate-700/50 rounded-lg mb-4 flex items-center justify-center text-4xl">📦</div>
               )}
               <div className="space-y-2">
                 <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-semibold text-slate-100">{item.name}</h3>
+                  <h3 className="font-semibold text-slate-900 dark:text-slate-100">{item.name}</h3>
                   <Badge status={item.status} />
                 </div>
-                <div className="text-xs text-slate-500 font-mono">{item.code}</div>
-                <div className="text-sm text-slate-400 capitalize">{item.category?.replace(/_/g," ")}</div>
+                <div className="text-xs text-slate-500 dark:text-slate-500 font-mono">{item.code}</div>
+                <div className="text-sm text-slate-600 dark:text-slate-400 capitalize">{item.category?.replace(/_/g," ")}</div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-400">Tersedia: <span className="text-slate-200 font-medium">{item.available_stock}</span></span>
+                  <span className="text-sm text-slate-600 dark:text-slate-400">Tersedia: <span className="text-slate-800 dark:text-slate-200 font-medium">{item.available_stock}</span></span>
                   <Button size="sm" onClick={() => openBorrow(item)} disabled={item.available_stock < 1}>Pinjam</Button>
                 </div>
               </div>
@@ -150,8 +150,8 @@ export default function ItemsPage() {
       <Modal isOpen={borrowModal.open} onClose={() => setBorrowModal({ open: false })} title={`Pinjam: ${borrowModal.item?.name}`} size="md">
         <form onSubmit={handleBorrow} className="space-y-4">
           {error && <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">{error}</div>}
-          <div className="p-3 bg-slate-700/40 rounded-lg text-sm">
-            <div className="text-slate-300">Stok tersedia: <strong className="text-slate-100">{borrowModal.item?.available_stock}</strong></div>
+          <div className="p-3 bg-white dark:bg-slate-700/40 rounded-lg text-sm">
+            <div className="text-slate-700 dark:text-slate-300">Stok tersedia: <strong className="text-slate-900 dark:text-slate-100">{borrowModal.item?.available_stock}</strong></div>
           </div>
           <Input label="Jumlah" type="number" min="1" max={borrowModal.item?.available_stock} value={form.quantity || 1}
             onChange={(e) => setForm({ ...form, quantity: parseInt(e.target.value) })} required />

@@ -16,12 +16,12 @@ export default function Modal({ isOpen, onClose, title, children, size = "md" })
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
       <div
-        className={`relative w-full ${sizes[size]} bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl animate-fade-in`}
+        className={`relative w-full ${sizes[size]} bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl animate-fade-in`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-6 border-b border-slate-700">
-          <h2 className="text-lg font-semibold text-slate-100">{title}</h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-200 transition-colors text-xl leading-none">&times;</button>
+        <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{title}</h2>
+          <button onClick={onClose} className="text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:text-slate-200 transition-colors text-xl leading-none">&times;</button>
         </div>
         <div className="p-6">{children}</div>
       </div>

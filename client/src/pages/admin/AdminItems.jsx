@@ -73,8 +73,8 @@ export default function AdminItems() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100">Manajemen Barang</h1>
-          <p className="text-slate-400 text-sm mt-1">Kelola inventaris barang UKM</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Manajemen Barang</h1>
+          <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">Kelola inventaris barang UKM</p>
         </div>
         <Button onClick={openCreate}>+ Tambah Barang</Button>
       </div>
@@ -82,42 +82,42 @@ export default function AdminItems() {
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
         <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="🔍 Cari barang..."
-          className="bg-slate-800 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE] flex-1 min-w-48 placeholder-slate-500" />
+          className="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE] flex-1 min-w-48 placeholder-slate-500" />
         <select value={filterCat} onChange={(e) => setFilterCat(e.target.value)}
-          className="bg-slate-800 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE]">
+          className="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE]">
           <option value="">Semua Kategori</option>
           {categories.map((c) => <option key={c} value={c}>{c.replace(/_/g, " ")}</option>)}
         </select>
         <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}
-          className="bg-slate-800 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE]">
+          className="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE]">
           <option value="">Semua Status</option>
           {statuses.map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
       </div>
 
       {/* Table */}
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl overflow-hidden">
+      <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-slate-800/80 border-b border-slate-700/50">
+            <thead className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700/50">
               <tr>
                 {["Kode","Nama Barang","Kategori","Stok","Tersedia","Status","Aksi"].map((h) => (
-                  <th key={h} className="text-left px-4 py-3 text-slate-400 font-medium text-xs uppercase tracking-wider">{h}</th>
+                  <th key={h} className="text-left px-4 py-3 text-slate-600 dark:text-slate-400 font-medium text-xs uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700/30">
               {loading ? (
-                <tr><td colSpan={7} className="px-4 py-8 text-center text-slate-500">Memuat...</td></tr>
+                <tr><td colSpan={7} className="px-4 py-8 text-center text-slate-500 dark:text-slate-500">Memuat...</td></tr>
               ) : items.length === 0 ? (
-                <tr><td colSpan={7} className="px-4 py-8 text-center text-slate-500">Tidak ada data barang.</td></tr>
+                <tr><td colSpan={7} className="px-4 py-8 text-center text-slate-500 dark:text-slate-500">Tidak ada data barang.</td></tr>
               ) : items.map((item) => (
-                <tr key={item.id} className="hover:bg-slate-700/20 transition-colors">
-                  <td className="px-4 py-3 font-mono text-xs text-slate-400">{item.code}</td>
-                  <td className="px-4 py-3 text-slate-200 font-medium">{item.name}</td>
-                  <td className="px-4 py-3 text-slate-400 capitalize">{item.category?.replace(/_/g, " ")}</td>
-                  <td className="px-4 py-3 text-slate-300">{item.total_stock}</td>
-                  <td className="px-4 py-3 text-slate-300">{item.available_stock}</td>
+                <tr key={item.id} className="hover:bg-white dark:bg-slate-700/20 transition-colors">
+                  <td className="px-4 py-3 font-mono text-xs text-slate-600 dark:text-slate-400">{item.code}</td>
+                  <td className="px-4 py-3 text-slate-800 dark:text-slate-200 font-medium">{item.name}</td>
+                  <td className="px-4 py-3 text-slate-600 dark:text-slate-400 capitalize">{item.category?.replace(/_/g, " ")}</td>
+                  <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{item.total_stock}</td>
+                  <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{item.available_stock}</td>
                   <td className="px-4 py-3"><Badge status={item.status} /></td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
@@ -163,7 +163,7 @@ export default function AdminItems() {
 
       {/* Delete Confirm Modal */}
       <Modal isOpen={delModal.open} onClose={() => setDelModal({ open: false })} title="Konfirmasi Hapus" size="sm">
-        <p className="text-slate-300 mb-6">Hapus barang <strong className="text-slate-100">{delModal.item?.name}</strong>? Tindakan ini tidak bisa dibatalkan.</p>
+        <p className="text-slate-700 dark:text-slate-300 mb-6">Hapus barang <strong className="text-slate-900 dark:text-slate-100">{delModal.item?.name}</strong>? Tindakan ini tidak bisa dibatalkan.</p>
         <div className="flex gap-3 justify-end">
           <Button variant="secondary" onClick={() => setDelModal({ open: false })}>Batal</Button>
           <Button variant="danger" onClick={handleDelete}>Hapus</Button>

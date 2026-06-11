@@ -125,7 +125,7 @@ export default function ArchivesPage() {
 
   return (
     <div className="space-y-6">
-      <div><h1 className="text-2xl font-bold text-slate-100">Arsip Dokumen</h1><p className="text-slate-400 text-sm mt-1">Cari dan akses dokumen arsip UKM</p></div>
+      <div><h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Arsip Dokumen</h1><p className="text-slate-600 dark:text-slate-400 text-sm mt-1">Cari dan akses dokumen arsip UKM</p></div>
 
       {/* KTA Warning Banner */}
       {hasKta === false && (
@@ -133,7 +133,7 @@ export default function ArchivesPage() {
           <span className="text-2xl">🪪</span>
           <div className="flex-1">
             <div className="text-sm font-medium text-amber-300">Kartu Tanda Anggota Belum Diunggah</div>
-            <div className="text-xs text-slate-400 mt-0.5">Anda harus mengunggah KTA terlebih dahulu untuk bisa melihat arsip dokumen.</div>
+            <div className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Anda harus mengunggah KTA terlebih dahulu untuk bisa melihat arsip dokumen.</div>
           </div>
           <Button size="sm" onClick={() => setKtaModal(true)}>Upload KTA</Button>
         </div>
@@ -142,41 +142,41 @@ export default function ArchivesPage() {
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
         <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="🔍 Cari arsip..."
-          className="bg-slate-800 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE] flex-1 min-w-48 placeholder-slate-500" />
+          className="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE] flex-1 min-w-48 placeholder-slate-500" />
         <select value={filterCat} onChange={(e) => setFilterCat(e.target.value)}
-          className="bg-slate-800 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE]">
+          className="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE]">
           <option value="">Semua Kategori</option>
           {CATEGORIES.map((c) => <option key={c} value={c}>{c.replace(/_/g," ").toUpperCase()}</option>)}
         </select>
         <select value={filterYear} onChange={(e) => setFilterYear(e.target.value)}
-          className="bg-slate-800 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE]">
+          className="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE]">
           <option value="">Semua Periode</option>
           {availableYears.map((y) => <option key={y} value={y}>Periode {y}</option>)}
         </select>
       </div>
 
       {/* Table */}
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl overflow-hidden">
+      <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-slate-800/80 border-b border-slate-700/50">
+            <thead className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700/50">
               <tr>
                 {["No. Arsip","Judul","Kategori","Periode","Tipe","Divisi","Akses","Aksi"].map((h) => (
-                  <th key={h} className="text-left px-4 py-3 text-slate-400 font-medium text-xs uppercase tracking-wider">{h}</th>
+                  <th key={h} className="text-left px-4 py-3 text-slate-600 dark:text-slate-400 font-medium text-xs uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700/30">
-              {loading ? <tr><td colSpan={8} className="px-4 py-8 text-center text-slate-500">Memuat...</td></tr>
-              : archives.length === 0 ? <tr><td colSpan={8} className="px-4 py-8 text-center text-slate-500">Tidak ada arsip ditemukan.</td></tr>
+              {loading ? <tr><td colSpan={8} className="px-4 py-8 text-center text-slate-500 dark:text-slate-500">Memuat...</td></tr>
+              : archives.length === 0 ? <tr><td colSpan={8} className="px-4 py-8 text-center text-slate-500 dark:text-slate-500">Tidak ada arsip ditemukan.</td></tr>
               : archives.map((a) => (
-                <tr key={a.id} className="hover:bg-slate-700/20 transition-colors">
-                  <td className="px-4 py-3 font-mono text-xs text-slate-400">{a.archive_number}</td>
+                <tr key={a.id} className="hover:bg-white dark:bg-slate-700/20 transition-colors">
+                  <td className="px-4 py-3 font-mono text-xs text-slate-600 dark:text-slate-400">{a.archive_number}</td>
                   <td className="px-4 py-3">
-                    <div className="text-slate-200 font-medium max-w-52 truncate" title={a.title}>{a.title}</div>
-                    {a.description && <div className="text-xs text-slate-500 max-w-52 truncate">{a.description}</div>}
+                    <div className="text-slate-800 dark:text-slate-200 font-medium max-w-52 truncate" title={a.title}>{a.title}</div>
+                    {a.description && <div className="text-xs text-slate-500 dark:text-slate-500 max-w-52 truncate">{a.description}</div>}
                   </td>
-                  <td className="px-4 py-3 text-slate-400 capitalize">{a.category?.replace(/_/g," ")}</td>
+                  <td className="px-4 py-3 text-slate-600 dark:text-slate-400 capitalize">{a.category?.replace(/_/g," ")}</td>
                   <td className="px-4 py-3">
                     <span className="px-2 py-0.5 bg-violet-500/10 text-violet-400 border border-violet-500/20 rounded text-xs font-medium">
                       {a.year}
@@ -187,7 +187,7 @@ export default function ArchivesPage() {
                       {a.drive_type === 'folder' ? '📁 Folder' : '📄 File'}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-slate-400">{a.division || "—"}</td>
+                  <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{a.division || "—"}</td>
                   <td className="px-4 py-3">
                     <div className="flex gap-1 flex-wrap max-w-40" title={a.access_level}>
                       {a.access_level?.split(",").map(r => (
@@ -214,7 +214,7 @@ export default function ArchivesPage() {
             <span className="px-2 py-0.5 bg-violet-500/10 text-violet-400 border border-violet-500/20 rounded text-xs font-medium">
               Periode {previewModal.archive?.year}
             </span>
-            <span className="text-slate-500 capitalize">{previewModal.archive?.category?.replace(/_/g," ")}</span>
+            <span className="text-slate-500 dark:text-slate-500 capitalize">{previewModal.archive?.category?.replace(/_/g," ")}</span>
             <div className="flex gap-1 flex-wrap">
               {previewModal.archive?.access_level?.split(",").map(r => (
                 <span key={r} className="px-2 py-0.5 bg-[#4EA8DE]/10 text-[#4EA8DE] border border-[#4EA8DE]/20 rounded text-[10px] capitalize">{r}</span>
@@ -230,7 +230,7 @@ export default function ArchivesPage() {
               rootFolderName={previewModal.archive?.title}
             />
           ) : (
-            <div className="rounded-lg overflow-hidden border border-slate-700 relative" style={{ height: "520px" }}>
+            <div className="rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 relative" style={{ height: "520px" }}>
               {previewModal.previewUrl && (
                 <>
                   <iframe src={previewModal.previewUrl} className="w-full h-full" title="Document Preview" allow="autoplay" />
@@ -245,14 +245,14 @@ export default function ArchivesPage() {
       {/* Request Access Modal */}
       <Modal isOpen={requestModal.open} onClose={() => setRequestModal({ open: false })} title="Ajukan Permintaan Akses" size="md">
         <form onSubmit={handleRequestAccess} className="space-y-4">
-          <div className="p-3 bg-slate-700/40 rounded-lg">
-            <div className="text-sm font-medium text-slate-200">{requestModal.archive?.title}</div>
-            <div className="text-xs text-slate-500 mt-1">Dokumen ini memerlukan persetujuan admin untuk dapat diakses.</div>
+          <div className="p-3 bg-white dark:bg-slate-700/40 rounded-lg">
+            <div className="text-sm font-medium text-slate-800 dark:text-slate-200">{requestModal.archive?.title}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-500 mt-1">Dokumen ini memerlukan persetujuan admin untuk dapat diakses.</div>
           </div>
           {reqError && <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">{reqError}</div>}
           <Textarea label="Alasan Permintaan Akses" value={reason} onChange={(e) => setReason(e.target.value)}
             placeholder="Jelaskan mengapa Anda memerlukan akses ke dokumen ini..." rows={4} required />
-          <div className="text-xs text-slate-500">Jika disetujui, akses akan diberikan selama 1 x 24 jam (default).</div>
+          <div className="text-xs text-slate-500 dark:text-slate-500">Jika disetujui, akses akan diberikan selama 1 x 24 jam (default).</div>
           <div className="flex gap-3 justify-end">
             <Button type="button" variant="secondary" onClick={() => setRequestModal({ open: false })}>Batal</Button>
             <Button type="submit" disabled={requesting}>{requesting ? "Mengirim..." : "Kirim Permintaan"}</Button>

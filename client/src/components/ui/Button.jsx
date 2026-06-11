@@ -1,10 +1,10 @@
 export default function Button({ children, variant = "primary", size = "md", className = "", ...props }) {
   const variants = {
     primary: "bg-[#28517E] hover:bg-[#4EA8DE] text-white shadow-lg shadow-[#28517E]/25",
-    secondary: "bg-slate-700 hover:bg-slate-600 text-slate-200 border border-slate-600",
+    secondary: "bg-white dark:bg-slate-700 hover:bg-slate-600 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-600",
     danger: "bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/30",
     success: "bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/30",
-    ghost: "hover:bg-slate-700/50 text-slate-400 hover:text-slate-200",
+    ghost: "hover:bg-white dark:bg-slate-700/50 text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:text-slate-200",
   };
   const sizes = {
     sm: "px-3 py-1.5 text-xs rounded-lg",

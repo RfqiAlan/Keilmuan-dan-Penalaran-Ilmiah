@@ -84,19 +84,19 @@ export default function DriveFolderBrowser({ rootFolderId, rootFolderName }) {
         <div className="flex items-center gap-3">
           <button
             onClick={handleBackToFolder}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-700/60 hover:bg-slate-700 border border-slate-600 rounded-lg text-sm text-slate-300 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-700/60 hover:bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-700 dark:text-slate-300 transition-colors"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 4L6 8L10 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
             Kembali
           </button>
-          <div className="flex items-center gap-2 text-sm text-slate-200 font-medium truncate">
+          <div className="flex items-center gap-2 text-sm text-slate-800 dark:text-slate-200 font-medium truncate">
             <FileIcon mimeType={previewFile.mimeType} />
             <span className="truncate">{previewFile.name}</span>
           </div>
         </div>
 
         {/* File preview iframe */}
-        <div className="rounded-lg overflow-hidden border border-slate-700 relative" style={{ height: "520px" }}>
+        <div className="rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 relative" style={{ height: "520px" }}>
           <iframe
             src={previewFile.previewUrl}
             className="w-full h-full"
@@ -112,7 +112,7 @@ export default function DriveFolderBrowser({ rootFolderId, rootFolderName }) {
   return (
     <div className="space-y-3">
       {/* Breadcrumbs */}
-      <div className="flex items-center gap-1 flex-wrap px-1 py-2 bg-slate-800/60 rounded-lg border border-slate-700/50">
+      <div className="flex items-center gap-1 flex-wrap px-1 py-2 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-200 dark:border-slate-700/50">
         {breadcrumbs.map((crumb, i) => (
           <div key={`${crumb.id}-${i}`} className="flex items-center gap-1">
             {i > 0 && <span className="text-slate-600 text-xs">/</span>}
@@ -121,7 +121,7 @@ export default function DriveFolderBrowser({ rootFolderId, rootFolderName }) {
               className={`px-2 py-1 rounded text-xs transition-colors ${
                 i === breadcrumbs.length - 1
                   ? "bg-[#4EA8DE]/10 text-[#4EA8DE] font-medium border border-[#4EA8DE]/20"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:text-slate-200 hover:bg-white dark:bg-slate-700/50"
               }`}
             >
               {i === 0 ? "📁" : ""} {crumb.name}
@@ -135,7 +135,7 @@ export default function DriveFolderBrowser({ rootFolderId, rootFolderName }) {
         <div className="flex items-center justify-center py-16">
           <div className="text-center space-y-3">
             <div className="animate-spin w-8 h-8 border-2 border-[#4EA8DE] border-t-transparent rounded-full mx-auto" />
-            <div className="text-sm text-slate-500">Memuat isi folder...</div>
+            <div className="text-sm text-slate-500 dark:text-slate-500">Memuat isi folder...</div>
           </div>
         </div>
       ) : error ? (
@@ -146,7 +146,7 @@ export default function DriveFolderBrowser({ rootFolderId, rootFolderName }) {
         <div className="flex items-center justify-center py-16">
           <div className="text-center space-y-2">
             <div className="text-4xl">📂</div>
-            <div className="text-slate-400 text-sm">Folder ini kosong</div>
+            <div className="text-slate-600 dark:text-slate-400 text-sm">Folder ini kosong</div>
           </div>
         </div>
       ) : (
@@ -155,8 +155,8 @@ export default function DriveFolderBrowser({ rootFolderId, rootFolderName }) {
             <button
               key={item.id}
               onClick={() => item.isFolder ? handleOpenFolder(item) : handleOpenFile(item)}
-              className="flex items-center gap-3 p-3 rounded-xl border border-slate-700/50 bg-slate-800/40
-                hover:bg-slate-700/50 hover:border-[#4EA8DE]/30 transition-all duration-200
+              className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-700/50 bg-slate-50 dark:bg-slate-800/40
+                hover:bg-white dark:bg-slate-700/50 hover:border-[#4EA8DE]/30 transition-all duration-200
                 text-left group"
             >
               {/* Icon */}
@@ -166,17 +166,17 @@ export default function DriveFolderBrowser({ rootFolderId, rootFolderName }) {
 
               {/* Info */}
               <div className="flex-1 min-w-0">
-                <div className="text-sm text-slate-200 font-medium truncate group-hover:text-[#4EA8DE] transition-colors">
+                <div className="text-sm text-slate-800 dark:text-slate-200 font-medium truncate group-hover:text-[#4EA8DE] transition-colors">
                   {item.name}
                 </div>
                 <div className="flex items-center gap-2 mt-0.5">
                   {item.isFolder ? (
-                    <span className="text-[10px] text-slate-500 uppercase tracking-wider">Folder</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-500 uppercase tracking-wider">Folder</span>
                   ) : (
                     <>
-                      <span className="text-[10px] text-slate-500">{formatFileSize(item.size)}</span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-500">{formatFileSize(item.size)}</span>
                       <span className="text-[10px] text-slate-600">•</span>
-                      <span className="text-[10px] text-slate-500 truncate">{item.mimeType?.split("/").pop()?.split(".").pop()}</span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-500 truncate">{item.mimeType?.split("/").pop()?.split(".").pop()}</span>
                     </>
                   )}
                 </div>

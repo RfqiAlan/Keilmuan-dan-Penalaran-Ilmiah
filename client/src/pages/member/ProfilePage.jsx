@@ -67,17 +67,17 @@ export default function ProfilePage() {
 
   return (
     <div className="space-y-6 max-w-2xl">
-      <div><h1 className="text-2xl font-bold text-slate-100">Profil Saya</h1><p className="text-slate-400 text-sm mt-1">Kelola informasi akun Anda</p></div>
+      <div><h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Profil Saya</h1><p className="text-slate-600 dark:text-slate-400 text-sm mt-1">Kelola informasi akun Anda</p></div>
 
       {/* Profile Info */}
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6">
+      <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl p-6">
         <div className="flex items-center gap-4 mb-6">
           <div className="w-16 h-16 bg-[#28517E]/30 border-2 border-[#4EA8DE]/50 rounded-full flex items-center justify-center text-2xl font-bold text-[#4EA8DE]">
             {user?.name?.charAt(0).toUpperCase()}
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-slate-100">{user?.name}</h2>
-            <div className="text-slate-400 text-sm">{user?.email}</div>
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{user?.name}</h2>
+            <div className="text-slate-600 dark:text-slate-400 text-sm">{user?.email}</div>
             <div className="mt-1"><Badge status={user?.status} label={roleLabels[user?.role]} /></div>
           </div>
         </div>
@@ -88,23 +88,23 @@ export default function ProfilePage() {
         <form onSubmit={handleSaveProfile} className="space-y-4">
           <Input label="Nama Lengkap" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
           <Input label="No. HP" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="08xxxxxxxxxx" />
-          <div className="bg-slate-700/40 rounded-lg p-3">
-            <div className="text-xs text-slate-500 mb-1">Email</div>
-            <div className="text-sm text-slate-300">{user?.email}</div>
+          <div className="bg-white dark:bg-slate-700/40 rounded-lg p-3">
+            <div className="text-xs text-slate-500 dark:text-slate-500 mb-1">Email</div>
+            <div className="text-sm text-slate-700 dark:text-slate-300">{user?.email}</div>
           </div>
           <Button type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Simpan Perubahan"}</Button>
         </form>
       </div>
 
       {/* KTA Section */}
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6">
+      <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="font-semibold text-slate-100 flex items-center gap-2">
+            <h3 className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <span>🪪</span>
               Kartu Tanda Anggota (KTA)
             </h3>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">
               Diperlukan untuk meminjam barang dan melihat arsip dokumen
             </p>
           </div>
@@ -123,7 +123,7 @@ export default function ProfilePage() {
           <div className="space-y-4">
             {/* KTA Preview */}
             <div
-              className="relative rounded-lg overflow-hidden border border-slate-600 cursor-pointer group"
+              className="relative rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 cursor-pointer group"
               onClick={() => setKtaPreviewOpen(!ktaPreviewOpen)}
             >
               {ktaPreviewOpen ? (
@@ -143,7 +143,7 @@ export default function ProfilePage() {
                       e.target.nextSibling.style.display = 'flex';
                     }}
                   />
-                  <div className="w-full h-48 items-center justify-center bg-slate-700/50 text-4xl" style={{ display: 'none' }}>
+                  <div className="w-full h-48 items-center justify-center bg-white dark:bg-slate-700/50 text-4xl" style={{ display: 'none' }}>
                     🪪
                   </div>
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -168,7 +168,7 @@ export default function ProfilePage() {
         ) : (
           <div className="text-center py-6 space-y-3">
             <div className="text-4xl">🪪</div>
-            <div className="text-slate-400 text-sm">Anda belum mengunggah KTA.</div>
+            <div className="text-slate-600 dark:text-slate-400 text-sm">Anda belum mengunggah KTA.</div>
             <Button onClick={() => setKtaModal(true)}>
               Upload KTA Sekarang
             </Button>
@@ -177,11 +177,11 @@ export default function ProfilePage() {
       </div>
 
       {/* Account Info */}
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6">
-        <h3 className="font-semibold text-slate-100 mb-4">Informasi Akun</h3>
+      <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl p-6">
+        <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-4">Informasi Akun</h3>
         <div className="grid grid-cols-2 gap-4 text-sm">
-          <div><div className="text-slate-500">Role</div><div className="text-slate-300 mt-0.5">{roleLabels[user?.role]}</div></div>
-          <div><div className="text-slate-500">Status</div><div className="mt-0.5"><Badge status={user?.status} /></div></div>
+          <div><div className="text-slate-500 dark:text-slate-500">Role</div><div className="text-slate-700 dark:text-slate-300 mt-0.5">{roleLabels[user?.role]}</div></div>
+          <div><div className="text-slate-500 dark:text-slate-500">Status</div><div className="mt-0.5"><Badge status={user?.status} /></div></div>
         </div>
       </div>
 

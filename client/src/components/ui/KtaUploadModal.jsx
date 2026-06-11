@@ -84,7 +84,7 @@ export default function KtaUploadModal({ isOpen, onClose, onSuccess }) {
             <span>🪪</span>
             <span>Kartu Tanda Anggota Diperlukan</span>
           </div>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-600 dark:text-slate-400">
             Anda harus mengunggah foto KTA untuk dapat meminjam barang atau melihat arsip dokumen.
             File yang diunggah akan disimpan di Google Drive.
           </p>
@@ -103,7 +103,7 @@ export default function KtaUploadModal({ isOpen, onClose, onSuccess }) {
             transition-all duration-200
             ${dragOver
               ? "border-[#4EA8DE] bg-[#4EA8DE]/10"
-              : "border-slate-600 hover:border-slate-500 hover:bg-slate-800/50"
+              : "border-slate-300 dark:border-slate-600 hover:border-slate-500 hover:bg-slate-50 dark:bg-slate-800/50"
             }
           `}
           onClick={() => inputRef.current?.click()}
@@ -124,20 +124,20 @@ export default function KtaUploadModal({ isOpen, onClose, onSuccess }) {
               <img
                 src={preview}
                 alt="Preview KTA"
-                className="max-h-52 mx-auto rounded-lg border border-slate-600 shadow-lg"
+                className="max-h-52 mx-auto rounded-lg border border-slate-300 dark:border-slate-600 shadow-lg"
               />
-              <div className="text-sm text-slate-300">{file?.name}</div>
-              <div className="text-xs text-slate-500">
+              <div className="text-sm text-slate-700 dark:text-slate-300">{file?.name}</div>
+              <div className="text-xs text-slate-500 dark:text-slate-500">
                 {(file?.size / 1024 / 1024).toFixed(2)} MB • Klik untuk ganti
               </div>
             </div>
           ) : (
             <div className="space-y-3 py-4">
               <div className="text-4xl">🪪</div>
-              <div className="text-slate-300 font-medium">
+              <div className="text-slate-700 dark:text-slate-300 font-medium">
                 Drag & drop foto KTA di sini
               </div>
-              <div className="text-xs text-slate-500">
+              <div className="text-xs text-slate-500 dark:text-slate-500">
                 atau klik untuk memilih file • JPG, PNG, WEBP • Maks. 5MB
               </div>
             </div>

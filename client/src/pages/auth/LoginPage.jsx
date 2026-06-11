@@ -41,13 +41,13 @@ export default function LoginPage() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-[#28517E] rounded-2xl text-3xl mb-4 shadow-lg shadow-[#28517E]/30">
             📁
           </div>
-          <h1 className="text-2xl font-bold text-slate-100">SIMPAR UKM</h1>
-          <p className="text-slate-400 text-sm mt-1">Kelola peminjaman dan arsip UKM secara digital</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">SIMPAR UKM</h1>
+          <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">Kelola peminjaman dan arsip UKM secara digital</p>
         </div>
 
         {/* Card */}
-        <div className="bg-slate-800/60 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-8 shadow-2xl">
-          <h2 className="text-lg font-semibold text-slate-100 mb-6">Masuk ke Akun</h2>
+        <div className="bg-slate-50 dark:bg-slate-800/60 backdrop-blur-sm border border-slate-200 dark:border-slate-700/50 rounded-2xl p-8 shadow-2xl">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-6">Masuk ke Akun</h2>
 
           {error && (
             <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
@@ -78,15 +78,15 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <p className="text-center text-sm text-slate-400 mt-6">
+          <p className="text-center text-sm text-slate-600 dark:text-slate-400 mt-6">
             Belum punya akun?{" "}
             <Link to="/register" className="text-[#4EA8DE] hover:text-[#F3620F] font-medium">
               Daftar sekarang
             </Link>
           </p>
 
-          <div className="mt-6 p-3 bg-slate-700/40 rounded-lg">
-            <p className="text-xs text-slate-500 text-center">Demo: admin@simpar.id / admin123</p>
+          <div className="mt-6 p-3 bg-white dark:bg-slate-700/40 rounded-lg">
+            <p className="text-xs text-slate-500 dark:text-slate-500 text-center">Demo: admin@simpar.id / admin123</p>
           </div>
         </div>
       </div>

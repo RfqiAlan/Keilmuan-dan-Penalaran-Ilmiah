@@ -24,48 +24,48 @@ export default function MemberDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-100">Selamat datang, {user?.name?.split(" ")[0]}! 👋</h1>
-        <p className="text-slate-400 text-sm mt-1">Kelola peminjaman dan akses dokumen Anda</p>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Selamat datang, {user?.name?.split(" ")[0]}! 👋</h1>
+        <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">Kelola peminjaman dan akses dokumen Anda</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Link to="/items" className="bg-[#28517E]/20 border border-[#4EA8DE]/30 rounded-xl p-5 hover:-translate-y-1 transition-transform duration-200 block">
           <div className="text-2xl mb-2">📦</div>
-          <div className="font-semibold text-slate-200">Lihat Barang</div>
-          <div className="text-xs text-slate-400 mt-1">Ajukan peminjaman</div>
+          <div className="font-semibold text-slate-800 dark:text-slate-200">Lihat Barang</div>
+          <div className="text-xs text-slate-600 dark:text-slate-400 mt-1">Ajukan peminjaman</div>
         </Link>
         <Link to="/archives" className="bg-emerald-600/20 border border-emerald-500/30 rounded-xl p-5 hover:-translate-y-1 transition-transform duration-200 block">
           <div className="text-2xl mb-2">🗂️</div>
-          <div className="font-semibold text-slate-200">Arsip Dokumen</div>
-          <div className="text-xs text-slate-400 mt-1">Lihat dokumen UKM</div>
+          <div className="font-semibold text-slate-800 dark:text-slate-200">Arsip Dokumen</div>
+          <div className="text-xs text-slate-600 dark:text-slate-400 mt-1">Lihat dokumen UKM</div>
         </Link>
         <Link to="/borrowings/my" className="bg-blue-600/20 border border-blue-500/30 rounded-xl p-5 hover:-translate-y-1 transition-transform duration-200 block">
           <div className="text-2xl mb-2">🔄</div>
-          <div className="font-semibold text-slate-200">Peminjaman Saya</div>
-          <div className="text-xs text-slate-400 mt-1">{myBorrowings.length} aktif</div>
+          <div className="font-semibold text-slate-800 dark:text-slate-200">Peminjaman Saya</div>
+          <div className="text-xs text-slate-600 dark:text-slate-400 mt-1">{myBorrowings.length} aktif</div>
         </Link>
         <Link to="/access-requests/my" className="bg-yellow-600/20 border border-yellow-500/30 rounded-xl p-5 hover:-translate-y-1 transition-transform duration-200 block">
           <div className="text-2xl mb-2">🔐</div>
-          <div className="font-semibold text-slate-200">Permintaan Akses</div>
-          <div className="text-xs text-slate-400 mt-1">Kelola akses dokumen</div>
+          <div className="font-semibold text-slate-800 dark:text-slate-200">Permintaan Akses</div>
+          <div className="text-xs text-slate-600 dark:text-slate-400 mt-1">Kelola akses dokumen</div>
         </Link>
       </div>
 
       {/* Active Borrowings */}
       {myBorrowings.length > 0 && (
-        <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-700/50 flex items-center justify-between">
-            <h2 className="font-semibold text-slate-100">Peminjaman Aktif</h2>
+        <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700/50 flex items-center justify-between">
+            <h2 className="font-semibold text-slate-900 dark:text-slate-100">Peminjaman Aktif</h2>
             <Link to="/borrowings/my" className="text-xs text-[#4EA8DE] hover:text-[#F3620F]">Lihat semua →</Link>
           </div>
           <div className="divide-y divide-slate-700/30">
-            {loading ? <div className="px-6 py-4 text-slate-500 text-sm">Memuat...</div>
+            {loading ? <div className="px-6 py-4 text-slate-500 dark:text-slate-500 text-sm">Memuat...</div>
             : myBorrowings.map((b) => (
               <div key={b.id} className="px-6 py-3 flex items-center gap-4">
                 <div className="text-xl">📦</div>
                 <div className="flex-1">
-                  <div className="text-sm font-medium text-slate-200">{b.item_name}</div>
-                  <div className="text-xs text-slate-500">Kembali: {new Date(b.return_date).toLocaleDateString("id-ID")}</div>
+                  <div className="text-sm font-medium text-slate-800 dark:text-slate-200">{b.item_name}</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-500">Kembali: {new Date(b.return_date).toLocaleDateString("id-ID")}</div>
                 </div>
                 <Badge status={b.status} />
               </div>
@@ -76,9 +76,9 @@ export default function MemberDashboard() {
 
       {/* Recent Access Requests */}
       {myRequests.length > 0 && (
-        <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-700/50 flex items-center justify-between">
-            <h2 className="font-semibold text-slate-100">Permintaan Akses Terbaru</h2>
+        <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700/50 flex items-center justify-between">
+            <h2 className="font-semibold text-slate-900 dark:text-slate-100">Permintaan Akses Terbaru</h2>
             <Link to="/access-requests/my" className="text-xs text-[#4EA8DE] hover:text-[#F3620F]">Lihat semua →</Link>
           </div>
           <div className="divide-y divide-slate-700/30">
@@ -86,8 +86,8 @@ export default function MemberDashboard() {
               <div key={r.id} className="px-6 py-3 flex items-center gap-4">
                 <div className="text-xl">🗂️</div>
                 <div className="flex-1">
-                  <div className="text-sm font-medium text-slate-200 truncate">{r.archive_title}</div>
-                  <div className="text-xs text-slate-500">{new Date(r.requested_at).toLocaleDateString("id-ID")}</div>
+                  <div className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">{r.archive_title}</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-500">{new Date(r.requested_at).toLocaleDateString("id-ID")}</div>
                 </div>
                 <Badge status={r.status} />
               </div>

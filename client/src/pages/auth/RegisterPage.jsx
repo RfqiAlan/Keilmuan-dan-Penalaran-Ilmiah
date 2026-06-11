@@ -35,12 +35,12 @@ export default function RegisterPage() {
       <div className="relative w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-[#28517E] rounded-2xl text-3xl mb-4 shadow-lg shadow-[#28517E]/30">📁</div>
-          <h1 className="text-2xl font-bold text-slate-100">SIMPAR UKM</h1>
-          <p className="text-slate-400 text-sm mt-1">Buat akun baru</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">SIMPAR UKM</h1>
+          <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">Buat akun baru</p>
         </div>
 
-        <div className="bg-slate-800/60 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-8 shadow-2xl">
-          <h2 className="text-lg font-semibold text-slate-100 mb-6">Daftar Akun</h2>
+        <div className="bg-slate-50 dark:bg-slate-800/60 backdrop-blur-sm border border-slate-200 dark:border-slate-700/50 rounded-2xl p-8 shadow-2xl">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-6">Daftar Akun</h2>
 
           {error && (
             <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">{error}</div>
@@ -65,7 +65,7 @@ export default function RegisterPage() {
             </Button>
           </form>
 
-          <p className="text-center text-sm text-slate-400 mt-6">
+          <p className="text-center text-sm text-slate-600 dark:text-slate-400 mt-6">
             Sudah punya akun?{" "}
             <Link to="/login" className="text-[#4EA8DE] hover:text-[#F3620F] font-medium">Masuk</Link>
           </p>

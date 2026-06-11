@@ -12,16 +12,16 @@ export default function AppLayout() {
       {/* Main content */}
       <div className="flex-1 lg:ml-64 flex flex-col min-h-screen">
         {/* Top bar (mobile) */}
-        <header className="lg:hidden sticky top-0 z-10 bg-slate-900/80 backdrop-blur-sm border-b border-slate-800 px-4 py-3 flex items-center gap-3">
+        <header className="lg:hidden sticky top-0 z-10 bg-white dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center gap-3">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="text-slate-400 hover:text-slate-200 transition-colors"
+            className="text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:text-slate-200 transition-colors"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <span className="font-bold text-slate-100">SIMPAR UKM</span>
+          <span className="font-bold text-slate-900 dark:text-slate-100">SIMPAR UKM</span>
         </header>
 
         <main className="flex-1 p-6 max-w-7xl mx-auto w-full">

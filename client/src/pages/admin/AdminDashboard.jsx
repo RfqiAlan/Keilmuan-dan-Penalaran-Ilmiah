@@ -26,8 +26,8 @@ export default function AdminDashboard() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-100">Dashboard</h1>
-        <p className="text-slate-400 text-sm mt-1">Ringkasan kondisi sistem SIMPAR UKM</p>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Dashboard</h1>
+        <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">Ringkasan kondisi sistem SIMPAR UKM</p>
       </div>
 
       {/* Stat Cards */}
@@ -46,26 +46,26 @@ export default function AdminDashboard() {
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-700/50">
-          <h2 className="font-semibold text-slate-100">Aktivitas Terbaru</h2>
+      <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl overflow-hidden">
+        <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700/50">
+          <h2 className="font-semibold text-slate-900 dark:text-slate-100">Aktivitas Terbaru</h2>
         </div>
         <div className="divide-y divide-slate-700/30">
           {stats.recent_activity?.length > 0 ? stats.recent_activity.map((log) => (
-            <div key={log.id} className="px-6 py-3 flex items-center gap-4 hover:bg-slate-700/20 transition-colors">
+            <div key={log.id} className="px-6 py-3 flex items-center gap-4 hover:bg-white dark:bg-slate-700/20 transition-colors">
               <div className="w-8 h-8 bg-[#28517E]/20 border border-[#4EA8DE]/30 rounded-full flex items-center justify-center text-xs font-bold text-[#4EA8DE] shrink-0">
                 {log.user_name?.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-slate-200 truncate">
+                <p className="text-sm text-slate-800 dark:text-slate-200 truncate">
                   <span className="font-medium">{log.user_name}</span> — {log.description}
                 </p>
-                <p className="text-xs text-slate-500">{new Date(log.created_at).toLocaleString("id-ID")}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-500">{new Date(log.created_at).toLocaleString("id-ID")}</p>
               </div>
-              <span className="text-xs text-slate-500 shrink-0 capitalize">{log.module}</span>
+              <span className="text-xs text-slate-500 dark:text-slate-500 shrink-0 capitalize">{log.module}</span>
             </div>
           )) : (
-            <div className="px-6 py-8 text-center text-slate-500 text-sm">Belum ada aktivitas.</div>
+            <div className="px-6 py-8 text-center text-slate-500 dark:text-slate-500 text-sm">Belum ada aktivitas.</div>
           )}
         </div>
       </div>

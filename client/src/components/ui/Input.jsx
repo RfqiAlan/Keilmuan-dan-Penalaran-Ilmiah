@@ -1,9 +1,9 @@
 export function Input({ label, error, className = "", ...props }) {
   return (
     <div className="flex flex-col gap-1.5">
-      {label && <label className="text-sm font-medium text-slate-300">{label}</label>}
+      {label && <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{label}</label>}
       <input
-        className={`w-full bg-slate-800/80 border ${error ? "border-red-500" : "border-slate-600"} text-slate-100 rounded-lg px-3 py-2.5 text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#4EA8DE] focus:border-transparent transition-all ${className}`}
+        className={`w-full bg-slate-50 dark:bg-slate-800/80 border ${error ? "border-red-500" : "border-slate-300 dark:border-slate-600"} text-slate-900 dark:text-slate-100 rounded-lg px-3 py-2.5 text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#4EA8DE] focus:border-transparent transition-all ${className}`}
         {...props}
       />
       {error && <p className="text-xs text-red-400">{error}</p>}
@@ -14,9 +14,9 @@ export function Input({ label, error, className = "", ...props }) {
 export function Select({ label, error, className = "", children, ...props }) {
   return (
     <div className="flex flex-col gap-1.5">
-      {label && <label className="text-sm font-medium text-slate-300">{label}</label>}
+      {label && <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{label}</label>}
       <select
-        className={`w-full bg-slate-800/80 border ${error ? "border-red-500" : "border-slate-600"} text-slate-100 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE] focus:border-transparent transition-all ${className}`}
+        className={`w-full bg-slate-50 dark:bg-slate-800/80 border ${error ? "border-red-500" : "border-slate-300 dark:border-slate-600"} text-slate-900 dark:text-slate-100 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE] focus:border-transparent transition-all ${className}`}
         {...props}
       >
         {children}
@@ -29,9 +29,9 @@ export function Select({ label, error, className = "", children, ...props }) {
 export function Textarea({ label, error, className = "", ...props }) {
   return (
     <div className="flex flex-col gap-1.5">
-      {label && <label className="text-sm font-medium text-slate-300">{label}</label>}
+      {label && <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{label}</label>}
       <textarea
-        className={`w-full bg-slate-800/80 border ${error ? "border-red-500" : "border-slate-600"} text-slate-100 rounded-lg px-3 py-2.5 text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#4EA8DE] focus:border-transparent transition-all resize-none ${className}`}
+        className={`w-full bg-slate-50 dark:bg-slate-800/80 border ${error ? "border-red-500" : "border-slate-300 dark:border-slate-600"} text-slate-900 dark:text-slate-100 rounded-lg px-3 py-2.5 text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#4EA8DE] focus:border-transparent transition-all resize-none ${className}`}
         rows={4}
         {...props}
       />

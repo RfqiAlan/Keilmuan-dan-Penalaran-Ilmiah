@@ -1,6 +1,6 @@
 export default function Card({ children, className = "" }) {
   return (
-    <div className={`bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6 ${className}`}>
+    <div className={`bg-slate-50 dark:bg-slate-800/50 backdrop-blur-sm border border-slate-200 dark:border-slate-700/50 rounded-xl p-6 ${className}`}>
       {children}
     </div>
   );
@@ -20,10 +20,10 @@ export function StatCard({ icon, label, value, color = "indigo", trend }) {
     <div className={`bg-gradient-to-br ${cls} border rounded-xl p-5 transition-transform hover:-translate-y-1 duration-200`}>
       <div className="flex items-center justify-between mb-3">
         <span className="text-2xl">{icon}</span>
-        {trend && <span className="text-xs text-slate-400">{trend}</span>}
+        {trend && <span className="text-xs text-slate-600 dark:text-slate-400">{trend}</span>}
       </div>
-      <div className="text-3xl font-bold text-slate-100">{value ?? "—"}</div>
-      <div className="text-sm text-slate-400 mt-1">{label}</div>
+      <div className="text-3xl font-bold text-slate-900 dark:text-slate-100">{value ?? "—"}</div>
+      <div className="text-sm text-slate-600 dark:text-slate-400 mt-1">{label}</div>
     </div>
   );
 }
