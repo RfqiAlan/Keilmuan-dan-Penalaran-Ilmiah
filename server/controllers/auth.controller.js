@@ -2,6 +2,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const pool = require("../config/db");
 const logActivity = require("../middleware/logger");
+const path = require("path");
+const { uploadToDrive } = require("../config/googleDrive");
 
 // POST /api/auth/register
 const register = async (req, res) => {
@@ -12,6 +14,12 @@ const register = async (req, res) => {
   }
   if (password.length < 6) {
     return res.status(400).json({ message: "Password minimal 6 karakter." });
+  }
+  
+  // Role 'admin' doesn't strictly need a KTA, but we'll enforce it for all registrations via the app.
+  // We can skip it if the role is admin and no file is provided, but since they select role, let's just require it.
+  if (!req.file) {
+    return res.status(400).json({ message: "Kartu Tanda Anggota (KTA) wajib diunggah." });
   }
 
   try {
@@ -24,10 +32,24 @@ const register = async (req, res) => {
     const allowedRoles = ["admin", "ketua", "sekretaris", "bendahara", "koordinator", "anggota", "alumni"];
     const userRole = allowedRoles.includes(role) ? role : "anggota";
 
+    // Upload KTA to Google Drive
+    const ext = path.extname(req.file.originalname) || ".jpg";
+    const fileName = `KTA_${name.replace(/\s+/g, "_")}_${Date.now()}${ext}`;
+    const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID || null;
+
+    const driveResult = await uploadToDrive(
+      req.file.buffer,
+      fileName,
+      req.file.mimetype,
+      folderId
+    );
+
+    const ktaDriveId = driveResult.fileId;
+
     const result = await pool.query(
-      `INSERT INTO users (name, email, password, phone, role)
-       VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, phone, role, status, created_at`,
-      [name, email, hashedPassword, phone || null, userRole]
+      `INSERT INTO users (name, email, password, phone, role, kta_drive_id)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, name, email, phone, role, status, created_at`,
+      [name, email, hashedPassword, phone || null, userRole, ktaDriveId]
     );
 
     const user = result.rows[0];

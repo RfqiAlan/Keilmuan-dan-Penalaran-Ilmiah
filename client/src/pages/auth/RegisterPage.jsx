@@ -7,6 +7,7 @@ import Button from "../../components/ui/Button";
 export default function RegisterPage() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ name: "", email: "", password: "", phone: "", role: "anggota" });
+  const [ktaFile, setKtaFile] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -14,9 +15,18 @@ export default function RegisterPage() {
     e.preventDefault();
     setError("");
     if (form.password.length < 6) { setError("Password minimal 6 karakter."); return; }
+    if (!ktaFile) { setError("Harap unggah Kartu Tanda Anggota (KTA)."); return; }
+    
     setLoading(true);
+
+    const formData = new FormData();
+    Object.keys(form).forEach(key => formData.append(key, form[key]));
+    formData.append("kta_file", ktaFile);
+
     try {
-      await api.post("/auth/register", form);
+      await api.post("/auth/register", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       navigate("/login", { state: { message: "Registrasi berhasil! Silakan login." } });
     } catch (err) {
       setError(err.response?.data?.message || "Registrasi gagal.");
@@ -60,7 +70,25 @@ export default function RegisterPage() {
               <option value="koordinator">Koordinator Divisi</option>
               <option value="alumni">Alumni</option>
             </Select>
-            <Button type="submit" className="w-full mt-2" size="lg" disabled={loading}>
+            <div>
+              <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+                Upload KTA (JPG/PNG/WEBP, Max 5MB) <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(e) => setKtaFile(e.target.files[0])}
+                className="w-full text-sm text-slate-500 dark:text-slate-400
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-lg file:border-0
+                  file:text-sm file:font-medium
+                  file:bg-[#4EA8DE]/10 file:text-[#4EA8DE]
+                  hover:file:bg-[#4EA8DE]/20
+                  cursor-pointer transition-colors"
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full mt-4" size="lg" disabled={loading}>
               {loading ? "Memuat..." : "Daftar"}
             </Button>
           </form>

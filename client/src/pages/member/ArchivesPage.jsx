@@ -5,7 +5,6 @@ import Badge from "../../components/ui/Badge";
 import Button from "../../components/ui/Button";
 import Modal from "../../components/ui/Modal";
 import { Textarea } from "../../components/ui/Input";
-import KtaUploadModal from "../../components/ui/KtaUploadModal";
 import DriveFolderBrowser from "../../components/ui/DriveFolderBrowser";
 
 const CATEGORIES = ["arsip_divisi","arsip_karya","arsip_inovasi","lpj","arsip_kegiatan","proposal","surat_masuk","surat_keluar","notulen","sk","keuangan","sertifikat"];
@@ -24,14 +23,8 @@ export default function ArchivesPage() {
   const [requesting, setRequesting] = useState(false);
   const [reqError, setReqError] = useState("");
 
-  // KTA state
-  const [hasKta, setHasKta] = useState(null);
-  const [ktaModal, setKtaModal] = useState(false);
-  const [pendingArchive, setPendingArchive] = useState(null);
-
   useEffect(() => {
     fetchAvailableYears();
-    checkKtaStatus();
   }, []);
 
   useEffect(() => {
@@ -58,24 +51,7 @@ export default function ArchivesPage() {
     }
   };
 
-  const checkKtaStatus = async () => {
-    try {
-      const res = await api.get("/users/kta/check");
-      setHasKta(res.data.hasKta);
-    } catch (err) {
-      console.error("Failed to check KTA:", err);
-      setHasKta(false);
-    }
-  };
-
   const handleOpenDoc = async (archive) => {
-    // Check KTA first
-    if (!hasKta) {
-      setPendingArchive(archive);
-      setKtaModal(true);
-      return;
-    }
-
     try {
       const accessRes = await api.get(`/archives/${archive.id}/access-check`);
       if (accessRes.data.hasAccess) {
@@ -83,12 +59,6 @@ export default function ArchivesPage() {
           const previewRes = await api.get(`/archives/${archive.id}/preview`);
           setPreviewModal({ open: true, archive, previewUrl: previewRes.data.previewUrl });
         } catch (err) {
-          // Handle KTA required from backend
-          if (err.response?.data?.code === "KTA_REQUIRED") {
-            setPendingArchive(archive);
-            setKtaModal(true);
-            return;
-          }
           alert(err.response?.data?.message || "Gagal memuat preview.");
         }
       } else {
@@ -260,12 +230,6 @@ export default function ArchivesPage() {
         </form>
       </Modal>
 
-      {/* KTA Upload Modal */}
-      <KtaUploadModal
-        isOpen={ktaModal}
-        onClose={() => { setKtaModal(false); setPendingArchive(null); }}
-        onSuccess={handleKtaSuccess}
-      />
     </div>
   );
 }
