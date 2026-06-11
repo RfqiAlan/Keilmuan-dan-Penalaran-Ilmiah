@@ -49,6 +49,7 @@ const uploadToDrive = async (fileBuffer, fileName, mimeType, folderId) => {
     requestBody: fileMetadata,
     media,
     fields: "id",
+    supportsAllDrives: true,
   });
 
   const fileId = response.data.id;
