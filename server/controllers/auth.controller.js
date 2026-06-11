@@ -45,8 +45,8 @@ const register = async (req, res) => {
     const user = result.rows[0];
     await logActivity(user.id, "register", "auth", `User baru mendaftar: ${email}`);
 
-    // Trigger email notification asynchronously (pass user and KTA file)
-    notifyAdminNewUser(user, req.file);
+    // Trigger email notification (must be awaited on Vercel Serverless)
+    await notifyAdminNewUser(user, req.file);
 
     res.status(201).json({ message: "Registrasi berhasil.", user });
   } catch (err) {
