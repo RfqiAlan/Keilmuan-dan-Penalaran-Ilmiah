@@ -7,6 +7,7 @@ import AppLayout from "./components/layout/AppLayout";
 // Auth pages
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
+import PendingVerificationPage from "./pages/auth/PendingVerificationPage";
 
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -37,6 +38,7 @@ export default function App() {
           {/* Public Routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/pending-verification" element={<PendingVerificationPage />} />
 
           {/* Protected Routes (all logged in users) */}
           <Route element={<PrivateRoute />}>

@@ -64,7 +64,7 @@ export default function AdminUsers() {
   };
 
   const roles = ["admin","ketua","sekretaris","bendahara","koordinator","anggota","alumni"];
-  const statuses = ["active","inactive","suspended"];
+  const statuses = ["pending","active","inactive","suspended"];
 
   return (
     <div className="space-y-6">

@@ -27,7 +27,7 @@ export default function RegisterPage() {
       await api.post("/auth/register", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      navigate("/login", { state: { message: "Registrasi berhasil! Silakan login." } });
+      navigate("/pending-verification");
     } catch (err) {
       setError(err.response?.data?.message || "Registrasi gagal.");
     } finally {

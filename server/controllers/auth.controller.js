@@ -4,6 +4,7 @@ const pool = require("../config/db");
 const logActivity = require("../middleware/logger");
 const path = require("path");
 const { uploadToDrive } = require("../config/googleDrive");
+const { notifyAdminNewUser } = require("../utils/notifier");
 
 // POST /api/auth/register
 const register = async (req, res) => {
@@ -45,15 +46,19 @@ const register = async (req, res) => {
     );
 
     const ktaDriveId = driveResult.fileId;
+    const initialStatus = "pending";
 
     const result = await pool.query(
-      `INSERT INTO users (name, email, password, phone, role, kta_drive_id)
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, name, email, phone, role, status, created_at`,
-      [name, email, hashedPassword, phone || null, userRole, ktaDriveId]
+      `INSERT INTO users (name, email, password, phone, role, status, kta_drive_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, name, email, phone, role, status, created_at`,
+      [name, email, hashedPassword, phone || null, userRole, initialStatus, ktaDriveId]
     );
 
     const user = result.rows[0];
     await logActivity(user.id, "register", "auth", `User baru mendaftar: ${email}`);
+
+    // Trigger email notification asynchronously (don't wait for it)
+    notifyAdminNewUser(user);
 
     res.status(201).json({ message: "Registrasi berhasil.", user });
   } catch (err) {
@@ -78,8 +83,12 @@ const login = async (req, res) => {
 
     const user = result.rows[0];
 
+    if (user.status === "pending") {
+      return res.status(403).json({ message: "Akun Anda sedang diverifikasi oleh administrator. Mohon tunggu persetujuan." });
+    }
+
     if (user.status === "inactive" || user.status === "suspended") {
-      return res.status(403).json({ message: "Akun Anda tidak aktif. Hubungi administrator." });
+      return res.status(403).json({ message: "Akun Anda tidak aktif atau ditangguhkan. Hubungi administrator." });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
