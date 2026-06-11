@@ -5,6 +5,7 @@ import Badge from "../../components/ui/Badge";
 import Button from "../../components/ui/Button";
 import Modal from "../../components/ui/Modal";
 import { Textarea } from "../../components/ui/Input";
+import KtaUploadModal from "../../components/ui/KtaUploadModal";
 
 const CATEGORIES = ["arsip_divisi","arsip_karya","arsip_inovasi","lpj","arsip_kegiatan","proposal","surat_masuk","surat_keluar","notulen","sk","keuangan","sertifikat"];
 
@@ -15,11 +16,26 @@ export default function ArchivesPage() {
   const [search, setSearch] = useState("");
   const [filterCat, setFilterCat] = useState("");
   const [filterYear, setFilterYear] = useState("");
+  const [availableYears, setAvailableYears] = useState([]);
   const [previewModal, setPreviewModal] = useState({ open: false, archive: null, previewUrl: null });
   const [requestModal, setRequestModal] = useState({ open: false, archive: null });
   const [reason, setReason] = useState("");
   const [requesting, setRequesting] = useState(false);
   const [reqError, setReqError] = useState("");
+
+  // KTA state
+  const [hasKta, setHasKta] = useState(null);
+  const [ktaModal, setKtaModal] = useState(false);
+  const [pendingArchive, setPendingArchive] = useState(null);
+
+  useEffect(() => {
+    fetchAvailableYears();
+    checkKtaStatus();
+  }, []);
+
+  useEffect(() => {
+    fetchArchives();
+  }, [search, filterCat, filterYear]);
 
   const fetchArchives = () => {
     setLoading(true);
@@ -30,14 +46,50 @@ export default function ArchivesPage() {
     api.get(`/archives?${params}`).then((r) => setArchives(r.data.archives)).finally(() => setLoading(false));
   };
 
-  useEffect(() => { fetchArchives(); }, [search, filterCat, filterYear]);
+  const fetchAvailableYears = async () => {
+    try {
+      const res = await api.get("/archives/years");
+      setAvailableYears(res.data.years || []);
+    } catch (err) {
+      console.error("Failed to fetch years:", err);
+      // Fallback to generated years
+      setAvailableYears(Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i));
+    }
+  };
+
+  const checkKtaStatus = async () => {
+    try {
+      const res = await api.get("/users/kta/check");
+      setHasKta(res.data.hasKta);
+    } catch (err) {
+      console.error("Failed to check KTA:", err);
+      setHasKta(false);
+    }
+  };
 
   const handleOpenDoc = async (archive) => {
+    // Check KTA first
+    if (!hasKta) {
+      setPendingArchive(archive);
+      setKtaModal(true);
+      return;
+    }
+
     try {
       const accessRes = await api.get(`/archives/${archive.id}/access-check`);
       if (accessRes.data.hasAccess) {
-        const previewRes = await api.get(`/archives/${archive.id}/preview`);
-        setPreviewModal({ open: true, archive, previewUrl: previewRes.data.previewUrl });
+        try {
+          const previewRes = await api.get(`/archives/${archive.id}/preview`);
+          setPreviewModal({ open: true, archive, previewUrl: previewRes.data.previewUrl });
+        } catch (err) {
+          // Handle KTA required from backend
+          if (err.response?.data?.code === "KTA_REQUIRED") {
+            setPendingArchive(archive);
+            setKtaModal(true);
+            return;
+          }
+          alert(err.response?.data?.message || "Gagal memuat preview.");
+        }
       } else {
         setReason(""); setReqError("");
         setRequestModal({ open: true, archive });
@@ -60,12 +112,33 @@ export default function ArchivesPage() {
     } finally { setRequesting(false); }
   };
 
-  const years = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i);
+  const handleKtaSuccess = () => {
+    setHasKta(true);
+    if (pendingArchive) {
+      setTimeout(() => {
+        handleOpenDoc(pendingArchive);
+        setPendingArchive(null);
+      }, 300);
+    }
+  };
 
   return (
     <div className="space-y-6">
       <div><h1 className="text-2xl font-bold text-slate-100">Arsip Dokumen</h1><p className="text-slate-400 text-sm mt-1">Cari dan akses dokumen arsip UKM</p></div>
 
+      {/* KTA Warning Banner */}
+      {hasKta === false && (
+        <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center gap-3">
+          <span className="text-2xl">🪪</span>
+          <div className="flex-1">
+            <div className="text-sm font-medium text-amber-300">Kartu Tanda Anggota Belum Diunggah</div>
+            <div className="text-xs text-slate-400 mt-0.5">Anda harus mengunggah KTA terlebih dahulu untuk bisa melihat arsip dokumen.</div>
+          </div>
+          <Button size="sm" onClick={() => setKtaModal(true)}>Upload KTA</Button>
+        </div>
+      )}
+
+      {/* Filters */}
       <div className="flex flex-wrap gap-3">
         <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="🔍 Cari arsip..."
           className="bg-slate-800 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE] flex-1 min-w-48 placeholder-slate-500" />
@@ -76,17 +149,18 @@ export default function ArchivesPage() {
         </select>
         <select value={filterYear} onChange={(e) => setFilterYear(e.target.value)}
           className="bg-slate-800 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE]">
-          <option value="">Semua Tahun</option>
-          {years.map((y) => <option key={y} value={y}>{y}</option>)}
+          <option value="">Semua Periode</option>
+          {availableYears.map((y) => <option key={y} value={y}>Periode {y}</option>)}
         </select>
       </div>
 
+      {/* Table */}
       <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-slate-800/80 border-b border-slate-700/50">
               <tr>
-                {["No. Arsip","Judul","Kategori","Tahun","Tipe","Divisi","Akses","Aksi"].map((h) => (
+                {["No. Arsip","Judul","Kategori","Periode","Tipe","Divisi","Akses","Aksi"].map((h) => (
                   <th key={h} className="text-left px-4 py-3 text-slate-400 font-medium text-xs uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
@@ -102,7 +176,11 @@ export default function ArchivesPage() {
                     {a.description && <div className="text-xs text-slate-500 max-w-52 truncate">{a.description}</div>}
                   </td>
                   <td className="px-4 py-3 text-slate-400 capitalize">{a.category?.replace(/_/g," ")}</td>
-                  <td className="px-4 py-3 text-slate-300">{a.year}</td>
+                  <td className="px-4 py-3">
+                    <span className="px-2 py-0.5 bg-violet-500/10 text-violet-400 border border-violet-500/20 rounded text-xs font-medium">
+                      {a.year}
+                    </span>
+                  </td>
                   <td className="px-4 py-3">
                     <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${a.drive_type === 'folder' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}`}>
                       {a.drive_type === 'folder' ? '📁 Folder' : '📄 File'}
@@ -132,7 +210,9 @@ export default function ArchivesPage() {
       <Modal isOpen={previewModal.open} onClose={() => setPreviewModal({ open: false })} title={previewModal.archive?.title || "Preview Dokumen"} size="xl">
         <div className="space-y-3">
           <div className="flex items-center flex-wrap gap-4 text-sm">
-            <span className="text-slate-500">{previewModal.archive?.year}</span>
+            <span className="px-2 py-0.5 bg-violet-500/10 text-violet-400 border border-violet-500/20 rounded text-xs font-medium">
+              Periode {previewModal.archive?.year}
+            </span>
             <span className="text-slate-500 capitalize">{previewModal.archive?.category?.replace(/_/g," ")}</span>
             <div className="flex gap-1 flex-wrap">
               {previewModal.archive?.access_level?.split(",").map(r => (
@@ -173,6 +253,13 @@ export default function ArchivesPage() {
           </div>
         </form>
       </Modal>
+
+      {/* KTA Upload Modal */}
+      <KtaUploadModal
+        isOpen={ktaModal}
+        onClose={() => { setKtaModal(false); setPendingArchive(null); }}
+        onSuccess={handleKtaSuccess}
+      />
     </div>
   );
 }

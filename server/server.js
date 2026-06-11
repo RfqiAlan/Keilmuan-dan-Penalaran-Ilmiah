@@ -14,6 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.use("/api/auth",           require("./routes/auth.routes"));
+app.use("/api/users",          require("./routes/kta.routes"));
 app.use("/api/users",          require("./routes/user.routes"));
 app.use("/api/items",          require("./routes/item.routes"));
 app.use("/api/borrowings",     require("./routes/borrowing.routes"));

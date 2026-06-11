@@ -5,6 +5,7 @@ import Badge from "../../components/ui/Badge";
 import Button from "../../components/ui/Button";
 import Modal from "../../components/ui/Modal";
 import { Input, Select, Textarea } from "../../components/ui/Input";
+import KtaUploadModal from "../../components/ui/KtaUploadModal";
 
 export default function ItemsPage() {
   const [items, setItems] = useState([]);
@@ -17,6 +18,16 @@ export default function ItemsPage() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  // KTA state
+  const [hasKta, setHasKta] = useState(null); // null = loading, true/false
+  const [ktaModal, setKtaModal] = useState(false);
+  const [pendingItem, setPendingItem] = useState(null); // item waiting for KTA
+
+  useEffect(() => {
+    fetchItems();
+    checkKtaStatus();
+  }, [search, filterCat]);
+
   const fetchItems = () => {
     setLoading(true);
     const params = new URLSearchParams({ status: "available" });
@@ -25,9 +36,24 @@ export default function ItemsPage() {
     api.get(`/items?${params}`).then((r) => setItems(r.data.items)).finally(() => setLoading(false));
   };
 
-  useEffect(() => { fetchItems(); }, [search, filterCat]);
+  const checkKtaStatus = async () => {
+    try {
+      const res = await api.get("/users/kta/check");
+      setHasKta(res.data.hasKta);
+    } catch (err) {
+      console.error("Failed to check KTA:", err);
+      setHasKta(false);
+    }
+  };
 
   const openBorrow = (item) => {
+    // Check KTA first
+    if (!hasKta) {
+      setPendingItem(item);
+      setKtaModal(true);
+      return;
+    }
+
     const today = new Date().toISOString().split("T")[0];
     const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0];
     setForm({ item_id: item.id, quantity: 1, borrow_date: today, return_date: tomorrow, purpose: "" });
@@ -42,8 +68,25 @@ export default function ItemsPage() {
       setBorrowModal({ open: false });
       navigate("/borrowings/my");
     } catch (err) {
+      // Handle KTA required error from backend
+      if (err.response?.data?.code === "KTA_REQUIRED") {
+        setBorrowModal({ open: false });
+        setKtaModal(true);
+        return;
+      }
       setError(err.response?.data?.message || "Gagal mengajukan peminjaman.");
     } finally { setSaving(false); }
+  };
+
+  const handleKtaSuccess = () => {
+    setHasKta(true);
+    // If there was a pending item, open the borrow modal
+    if (pendingItem) {
+      setTimeout(() => {
+        openBorrow(pendingItem);
+        setPendingItem(null);
+      }, 300);
+    }
   };
 
   const categories = ["elektronik","dokumentasi","perlengkapan_acara","buku","seragam","properti_kegiatan","alat_tulis","lainnya"];
@@ -51,6 +94,18 @@ export default function ItemsPage() {
   return (
     <div className="space-y-6">
       <div><h1 className="text-2xl font-bold text-slate-100">Daftar Barang</h1><p className="text-slate-400 text-sm mt-1">Pilih barang yang ingin dipinjam</p></div>
+
+      {/* KTA Warning Banner */}
+      {hasKta === false && (
+        <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center gap-3">
+          <span className="text-2xl">🪪</span>
+          <div className="flex-1">
+            <div className="text-sm font-medium text-amber-300">Kartu Tanda Anggota Belum Diunggah</div>
+            <div className="text-xs text-slate-400 mt-0.5">Anda harus mengunggah KTA terlebih dahulu untuk bisa meminjam barang.</div>
+          </div>
+          <Button size="sm" onClick={() => setKtaModal(true)}>Upload KTA</Button>
+        </div>
+      )}
 
       <div className="flex flex-wrap gap-3">
         <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="🔍 Cari barang..."
@@ -111,6 +166,13 @@ export default function ItemsPage() {
           </div>
         </form>
       </Modal>
+
+      {/* KTA Upload Modal */}
+      <KtaUploadModal
+        isOpen={ktaModal}
+        onClose={() => { setKtaModal(false); setPendingItem(null); }}
+        onSuccess={handleKtaSuccess}
+      />
     </div>
   );
 }
