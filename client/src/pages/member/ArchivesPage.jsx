@@ -35,6 +35,7 @@ export default function ArchivesPage() {
   const [search, setSearch] = useState("");
   const [filterCat, setFilterCat] = useState("");
   const [filterYear, setFilterYear] = useState("");
+  const [filterType, setFilterType] = useState("");
   const [availableYears, setAvailableYears] = useState([]);
   const [previewModal, setPreviewModal] = useState({ open: false, archive: null, previewUrl: null });
   const [requestModal, setRequestModal] = useState({ open: false, archive: null });
@@ -48,7 +49,7 @@ export default function ArchivesPage() {
 
   useEffect(() => {
     fetchArchives();
-  }, [search, filterCat, filterYear]);
+  }, [search, filterCat, filterYear, filterType]);
 
   const fetchArchives = () => {
     setLoading(true);
@@ -56,6 +57,7 @@ export default function ArchivesPage() {
     if (search) params.set("search", search);
     if (filterCat) params.set("category", filterCat);
     if (filterYear) params.set("year", filterYear);
+    if (filterType) params.set("drive_type", filterType);
     api.get(`/archives?${params}`)
       .then((r) => setArchives(r.data.archives || []))
       .catch(() => setArchives([]))
@@ -132,10 +134,20 @@ export default function ArchivesPage() {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari judul arsip atau nomor dokumen..."
+              placeholder="Cari judul arsip, nomor dokumen, divisi, atau kata kunci..."
               className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0284c7] placeholder-slate-400 shadow-xs"
             />
           </div>
+
+          <select
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value)}
+            className="cursor-pointer bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0284c7] shadow-xs"
+          >
+            <option value="">Semua Format</option>
+            <option value="file">📄 File Dokumen</option>
+            <option value="folder">📁 Folder Berkas</option>
+          </select>
 
           <select
             value={filterYear}
@@ -168,15 +180,16 @@ export default function ArchivesPage() {
           icon={Archive}
           title="Dokumen Tidak Ditemukan"
           description={
-            search || filterCat || filterYear
+            search || filterType || filterCat || filterYear
               ? "Tidak ada arsip dokumen yang cocok dengan filter atau kata kunci yang dipilih."
               : "Belum ada dokumen arsip yang diunggah ke dalam sistem."
           }
-          actionLabel={search || filterCat || filterYear ? "Reset Filter" : undefined}
+          actionLabel={search || filterType || filterCat || filterYear ? "Reset Filter" : undefined}
           onAction={
-            search || filterCat || filterYear
+            search || filterType || filterCat || filterYear
               ? () => {
                   setSearch("");
+                  setFilterType("");
                   setFilterCat("");
                   setFilterYear("");
                 }

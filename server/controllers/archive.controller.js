@@ -7,7 +7,7 @@ const DUAL_APPROVAL_CATEGORIES = ["sk", "lpj", "arsip_karya"];
 // GET /api/archives
 const getAllArchives = async (req, res) => {
   try {
-    const { category, year, search, approval_status } = req.query;
+    const { category, year, search, approval_status, drive_type } = req.query;
     const userRole = req.user.role;
     let query = `
       SELECT a.*, u.name AS uploaded_by_name,
@@ -45,9 +45,13 @@ const getAllArchives = async (req, res) => {
       }
     }
     if (year) { params.push(parseInt(year)); query += ` AND a.year = $${params.length}`; }
+    if (drive_type) {
+      params.push(drive_type);
+      query += ` AND a.drive_type = $${params.length}`;
+    }
     if (search) {
       params.push(`%${search}%`);
-      query += ` AND (a.title ILIKE $${params.length} OR a.archive_number ILIKE $${params.length})`;
+      query += ` AND (a.title ILIKE $${params.length} OR a.archive_number ILIKE $${params.length} OR a.description ILIKE $${params.length} OR a.division ILIKE $${params.length})`;
     }
 
     query += " ORDER BY a.year DESC, a.created_at DESC";

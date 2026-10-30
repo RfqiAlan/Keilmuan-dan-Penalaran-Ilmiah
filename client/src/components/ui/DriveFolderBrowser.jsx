@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Search, X, Folder, FileText, ArrowLeft } from "lucide-react";
 import api from "../../api/axios";
 
 // Icons
@@ -37,6 +38,8 @@ export default function DriveFolderBrowser({ rootFolderId, rootFolderName }) {
   const [error, setError] = useState("");
   const [breadcrumbs, setBreadcrumbs] = useState([{ id: rootFolderId, name: rootFolderName || "Root" }]);
   const [previewFile, setPreviewFile] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [typeFilter, setTypeFilter] = useState("all"); // 'all' | 'folder' | 'file'
 
   const currentFolderId = breadcrumbs[breadcrumbs.length - 1].id;
 
@@ -61,11 +64,15 @@ export default function DriveFolderBrowser({ rootFolderId, rootFolderName }) {
 
   const handleOpenFolder = (folder) => {
     setBreadcrumbs((prev) => [...prev, { id: folder.id, name: folder.name }]);
+    setSearchQuery("");
+    setTypeFilter("all");
   };
 
   const handleBreadcrumbClick = (index) => {
     setBreadcrumbs((prev) => prev.slice(0, index + 1));
     setPreviewFile(null);
+    setSearchQuery("");
+    setTypeFilter("all");
   };
 
   const handleOpenFile = (file) => {
@@ -75,6 +82,21 @@ export default function DriveFolderBrowser({ rootFolderId, rootFolderName }) {
   const handleBackToFolder = () => {
     setPreviewFile(null);
   };
+
+  const folderCount = items.filter((i) => i.isFolder).length;
+  const fileCount = items.filter((i) => !i.isFolder).length;
+
+  const filteredItems = items.filter((item) => {
+    if (typeFilter === "folder" && !item.isFolder) return false;
+    if (typeFilter === "file" && item.isFolder) return false;
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      const matchName = item.name?.toLowerCase().includes(q);
+      const matchMime = item.mimeType ? item.mimeType.toLowerCase().includes(q) : false;
+      return matchName || matchMime;
+    }
+    return true;
+  });
 
   // If previewing a file
   if (previewFile) {
@@ -130,6 +152,69 @@ export default function DriveFolderBrowser({ rootFolderId, rootFolderName }) {
         ))}
       </div>
 
+      {/* Search & Filter Bar */}
+      {!loading && !error && items.length > 0 && (
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Cari berkas atau folder di dalam folder ini..."
+              className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-lg pl-9 pr-8 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#0284c7] placeholder-slate-400 transition-all"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="cursor-pointer absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                title="Hapus pencarian"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {/* Type Filter Pills */}
+          <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-lg border border-slate-200 dark:border-slate-700/60 shrink-0 text-xs">
+            <button
+              type="button"
+              onClick={() => setTypeFilter("all")}
+              className={`cursor-pointer px-2.5 py-1 rounded-md font-medium transition-colors ${
+                typeFilter === "all"
+                  ? "bg-white dark:bg-slate-700 text-[#0284c7] dark:text-[#38bdf8] shadow-xs"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+              }`}
+            >
+              Semua ({items.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setTypeFilter("folder")}
+              className={`cursor-pointer px-2.5 py-1 rounded-md font-medium transition-colors ${
+                typeFilter === "folder"
+                  ? "bg-white dark:bg-slate-700 text-[#0284c7] dark:text-[#38bdf8] shadow-xs"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+              }`}
+            >
+              📁 Folder ({folderCount})
+            </button>
+            <button
+              type="button"
+              onClick={() => setTypeFilter("file")}
+              className={`cursor-pointer px-2.5 py-1 rounded-md font-medium transition-colors ${
+                typeFilter === "file"
+                  ? "bg-white dark:bg-slate-700 text-[#0284c7] dark:text-[#38bdf8] shadow-xs"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+              }`}
+            >
+              📄 File ({fileCount})
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Content */}
       {loading ? (
         <div className="flex items-center justify-center py-16">
@@ -149,9 +234,30 @@ export default function DriveFolderBrowser({ rootFolderId, rootFolderName }) {
             <div className="text-slate-600 dark:text-slate-400 text-sm">Folder ini kosong</div>
           </div>
         </div>
+      ) : filteredItems.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-12 text-center space-y-2 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
+          <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400">
+            <Search className="w-5 h-5" />
+          </div>
+          <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+            Tidak ada berkas atau folder ditemukan
+          </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm">
+            {searchQuery.trim()
+              ? `Tidak ditemukan berkas atau folder yang cocok dengan kata kunci "${searchQuery}".`
+              : "Tidak ada item pada filter tipe yang dipilih."}
+          </p>
+          <button
+            type="button"
+            onClick={() => { setSearchQuery(""); setTypeFilter("all"); }}
+            className="cursor-pointer text-xs text-[#0284c7] dark:text-[#38bdf8] hover:underline font-semibold mt-1"
+          >
+            Reset Pencarian & Filter
+          </button>
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-          {items.map((item) => (
+          {filteredItems.map((item) => (
             <button
               key={item.id}
               onClick={() => item.isFolder ? handleOpenFolder(item) : handleOpenFile(item)}
@@ -199,10 +305,23 @@ export default function DriveFolderBrowser({ rootFolderId, rootFolderName }) {
         </div>
       )}
 
-      {/* Item count */}
+      {/* Item count & Footer */}
       {!loading && items.length > 0 && (
-        <div className="text-xs text-slate-600 text-right px-1">
-          {items.filter((i) => i.isFolder).length} folder, {items.filter((i) => !i.isFolder).length} file
+        <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between px-1 pt-1 border-t border-slate-100 dark:border-slate-800">
+          <span>
+            {searchQuery.trim() || typeFilter !== "all"
+              ? `Menampilkan ${filteredItems.length} dari total ${items.length} item`
+              : `${folderCount} folder, ${fileCount} file`}
+          </span>
+          {(searchQuery.trim() || typeFilter !== "all") && (
+            <button
+              type="button"
+              onClick={() => { setSearchQuery(""); setTypeFilter("all"); }}
+              className="cursor-pointer text-xs text-[#0284c7] dark:text-[#38bdf8] hover:underline font-medium"
+            >
+              Tampilkan Semua ({items.length})
+            </button>
+          )}
         </div>
       )}
     </div>

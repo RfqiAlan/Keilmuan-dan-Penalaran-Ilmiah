@@ -54,6 +54,7 @@ export default function AdminArchives() {
   const [search, setSearch] = useState("");
   const [filterCat, setFilterCat] = useState("");
   const [filterYear, setFilterYear] = useState("");
+  const [filterType, setFilterType] = useState("");
   const [filterApproval, setFilterApproval] = useState("");
   const [availableYears, setAvailableYears] = useState([]);
   const [modal, setModal] = useState({ open: false, mode: "create", archive: null });
@@ -70,6 +71,7 @@ export default function AdminArchives() {
     if (search) params.set("search", search);
     if (filterCat) params.set("category", filterCat);
     if (filterYear) params.set("year", filterYear);
+    if (filterType) params.set("drive_type", filterType);
     if (filterApproval) params.set("approval_status", filterApproval);
     api.get(`/archives?${params}`)
       .then((r) => setArchives(r.data.archives || []))
@@ -93,7 +95,7 @@ export default function AdminArchives() {
 
   useEffect(() => {
     fetchArchives();
-  }, [search, filterCat, filterYear, filterApproval]);
+  }, [search, filterCat, filterYear, filterType, filterApproval]);
 
   const openCreate = () => {
     setForm({
@@ -231,10 +233,20 @@ export default function AdminArchives() {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Cari judul arsip atau nomor dokumen..."
+            placeholder="Cari judul arsip, nomor dokumen, divisi, atau kata kunci..."
             className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-xl pl-10 pr-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0284c7] placeholder-slate-400 shadow-xs"
           />
         </div>
+
+        <select
+          value={filterType}
+          onChange={(e) => setFilterType(e.target.value)}
+          className="cursor-pointer bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0284c7] shadow-xs"
+        >
+          <option value="">Semua Format</option>
+          <option value="file">📄 File Dokumen</option>
+          <option value="folder">📁 Folder Berkas</option>
+        </select>
 
         <select
           value={filterCat}
@@ -283,17 +295,18 @@ export default function AdminArchives() {
           icon={Archive}
           title="Tidak Ada Data Arsip"
           description={
-            search || filterCat || filterYear || filterApproval
+            search || filterType || filterCat || filterYear || filterApproval
               ? "Tidak ada arsip dokumen yang cocok dengan filter yang dipilih."
               : "Belum ada dokumen arsip yang diunggah ke sistem."
           }
           actionLabel={
-            search || filterCat || filterYear || filterApproval ? "Reset Filter" : "Unggah Arsip Baru"
+            search || filterType || filterCat || filterYear || filterApproval ? "Reset Filter" : "Unggah Arsip Baru"
           }
           onAction={
-            search || filterCat || filterYear || filterApproval
+            search || filterType || filterCat || filterYear || filterApproval
               ? () => {
                   setSearch("");
+                  setFilterType("");
                   setFilterCat("");
                   setFilterYear("");
                   setFilterApproval("");
