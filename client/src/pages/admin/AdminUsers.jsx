@@ -16,6 +16,8 @@ export default function AdminUsers() {
   const [editModal, setEditModal] = useState({ open: false, mode: "create", user: null });
   const [delModal, setDelModal] = useState({ open: false, user: null });
   const [form, setForm] = useState({});
+  const [ktaFile, setKtaFile] = useState(null);
+  const [ktaPreview, setKtaPreview] = useState(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const { showToast } = useToast();
@@ -35,14 +37,40 @@ export default function AdminUsers() {
 
   const openCreate = () => {
     setForm({ name: "", email: "", password: "", phone: "", role: "anggota", status: "active" });
+    setKtaFile(null);
+    setKtaPreview(null);
     setError("");
     setEditModal({ open: true, mode: "create", user: null });
   };
 
   const openEdit = (user) => {
     setForm({ name: user.name, phone: user.phone || "", role: user.role, status: user.status });
+    setKtaFile(null);
+    setKtaPreview(null);
     setError("");
     setEditModal({ open: true, mode: "edit", user });
+  };
+
+  const handleKtaChange = (file) => {
+    if (!file) {
+      setKtaFile(null);
+      setKtaPreview(null);
+      return;
+    }
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      setError("Format file KTA harus berupa gambar (JPG, PNG, atau WEBP).");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Ukuran file KTA maksimal 5MB.");
+      return;
+    }
+    setError("");
+    setKtaFile(file);
+    const reader = new FileReader();
+    reader.onload = (e) => setKtaPreview(e.target.result);
+    reader.readAsDataURL(file);
   };
 
   const handleSave = async (e) => {
@@ -56,13 +84,33 @@ export default function AdminUsers() {
           setSaving(false);
           return;
         }
-        await api.post("/auth/register", form);
+        if (!ktaFile) {
+          setError("Kartu Tanda Anggota (KTA) wajib diunggah.");
+          setSaving(false);
+          return;
+        }
+
+        const formData = new FormData();
+        Object.keys(form).forEach((key) => formData.append(key, form[key]));
+        formData.append("kta_file", ktaFile);
+
+        const res = await api.post("/auth/register", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+
+        // Jika admin memilih status selain 'pending' (misal 'active'), update statusnya langsung
+        if (form.status && form.status !== "pending" && res.data.user?.id) {
+          await api.put(`/users/${res.data.user.id}`, { status: form.status });
+        }
+
         showToast("Pengguna baru berhasil ditambahkan!", "success");
       } else {
         await api.put(`/users/${editModal.user.id}`, form);
         showToast("Data pengguna berhasil diperbarui!", "success");
       }
       setEditModal({ open: false, user: null });
+      setKtaFile(null);
+      setKtaPreview(null);
       fetchUsers();
     } catch (err) {
       const msg = err.response?.data?.message || "Gagal menyimpan data pengguna.";
@@ -211,7 +259,7 @@ export default function AdminUsers() {
         isOpen={editModal.open}
         onClose={() => setEditModal({ open: false, user: null })}
         title={editModal.mode === "create" ? "Tambah Pengguna Baru" : "Edit Profil Pengguna"}
-        size="sm"
+        size="md"
       >
         <form onSubmit={handleSave} className="space-y-4">
           {error && (
@@ -219,61 +267,118 @@ export default function AdminUsers() {
               {error}
             </div>
           )}
-          <Input
-            label="Nama Lengkap"
-            value={form.name || ""}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            placeholder="Contoh: Budi Santoso"
-            required
-          />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="sm:col-span-2">
+              <Input
+                label="Nama Lengkap"
+                value={form.name || ""}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                placeholder="Contoh: Budi Santoso"
+                required
+              />
+            </div>
+
+            {editModal.mode === "create" && (
+              <>
+                <Input
+                  label="Alamat Email"
+                  type="email"
+                  value={form.email || ""}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  placeholder="nama@email.com"
+                  required
+                />
+                <Input
+                  label="Kata Sandi"
+                  type="password"
+                  value={form.password || ""}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  required
+                  placeholder="Minimal 6 karakter"
+                />
+              </>
+            )}
+
+            <Input
+              label="Nomor WhatsApp / HP"
+              value={form.phone || ""}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              placeholder="08123456789"
+            />
+
+            <Select
+              label="Role Pengguna"
+              value={form.role || "anggota"}
+              onChange={(e) => setForm({ ...form, role: e.target.value })}
+            >
+              {roles.map((r) => (
+                <option key={r} value={r}>
+                  {r.toUpperCase()}
+                </option>
+              ))}
+            </Select>
+
+            <div className="sm:col-span-2">
+              <Select
+                label="Status Akun"
+                value={form.status || "active"}
+                onChange={(e) => setForm({ ...form, status: e.target.value })}
+              >
+                {statuses.map((s) => (
+                  <option key={s} value={s}>
+                    {s.toUpperCase()}
+                  </option>
+                ))}
+              </Select>
+            </div>
+          </div>
+
           {editModal.mode === "create" && (
-            <>
-              <Input
-                label="Alamat Email"
-                type="email"
-                value={form.email || ""}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                placeholder="nama@email.com"
-                required
-              />
-              <Input
-                label="Kata Sandi"
-                type="password"
-                value={form.password || ""}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                required
-                placeholder="Minimal 6 karakter"
-              />
-            </>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                Kartu Tanda Anggota (KTA) <span className="text-rose-500">*</span>
+              </label>
+              <div className="border border-dashed border-slate-300 dark:border-slate-600 rounded-xl p-3.5 bg-slate-50/60 dark:bg-slate-700/20">
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={(e) => handleKtaChange(e.target.files[0])}
+                  className="w-full text-xs text-slate-700 dark:text-slate-300
+                    file:mr-3 file:py-1.5 file:px-3
+                    file:rounded-lg file:border-0
+                    file:text-xs file:font-semibold
+                    file:bg-sky-50 dark:file:bg-sky-950/60
+                    file:text-[#0284c7] dark:file:text-[#38bdf8]
+                    hover:file:bg-sky-100 dark:hover:file:bg-sky-900/60
+                    cursor-pointer transition-colors"
+                  required
+                />
+                <div className="flex items-center justify-between gap-2 mt-2 text-[11px] text-slate-500 dark:text-slate-400">
+                  <span>Format: JPG, PNG, WEBP (Maksimal 5MB)</span>
+                  <span className="text-rose-500 font-semibold">Wajib diunggah</span>
+                </div>
+                {ktaPreview && (
+                  <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-600/50 flex items-center gap-3">
+                    <img
+                      src={ktaPreview}
+                      alt="Pratinjau KTA"
+                      className="h-16 w-24 object-cover rounded-lg border border-slate-200 dark:border-slate-600 shadow-xs"
+                    />
+                    <div className="text-xs">
+                      <div className="font-medium text-slate-800 dark:text-slate-200 truncate max-w-xs">
+                        {ktaFile?.name}
+                      </div>
+                      <div className="text-emerald-600 dark:text-emerald-400 font-semibold text-[11px] mt-0.5">
+                        ✓ File KTA siap diunggah
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           )}
-          <Input
-            label="Nomor WhatsApp / HP"
-            value={form.phone || ""}
-            onChange={(e) => setForm({ ...form, phone: e.target.value })}
-            placeholder="08123456789"
-          />
-          <Select
-            label="Role Pengguna"
-            value={form.role || "anggota"}
-            onChange={(e) => setForm({ ...form, role: e.target.value })}
-          >
-            {roles.map((r) => (
-              <option key={r} value={r}>
-                {r.toUpperCase()}
-              </option>
-            ))}
-          </Select>
-          <Select
-            label="Status Akun"
-            value={form.status || "active"}
-            onChange={(e) => setForm({ ...form, status: e.target.value })}
-          >
-            {statuses.map((s) => (
-              <option key={s} value={s}>
-                {s.toUpperCase()}
-              </option>
-            ))}
-          </Select>
+
           <div className="flex gap-3 justify-end pt-2">
             <Button
               type="button"
