@@ -366,25 +366,34 @@ const listDriveFolder = async (req, res) => {
 
     const response = await drive.files.list({
       q: `'${folderId}' in parents AND trashed = false`,
-      fields: "files(id, name, mimeType, size, createdTime, modifiedTime, iconLink, thumbnailLink)",
+      fields: "files(id, name, mimeType, size, createdTime, modifiedTime, iconLink, thumbnailLink, shortcutDetails)",
       orderBy: "folder,name",
       pageSize: 200,
     });
 
-    const items = response.data.files.map((file) => ({
-      id: file.id,
-      name: file.name,
-      mimeType: file.mimeType,
-      isFolder: file.mimeType === "application/vnd.google-apps.folder",
-      size: file.size ? parseInt(file.size) : null,
-      createdTime: file.createdTime,
-      modifiedTime: file.modifiedTime,
-      iconLink: file.iconLink,
-      thumbnailLink: file.thumbnailLink,
-      previewUrl: file.mimeType === "application/vnd.google-apps.folder"
-        ? null
-        : `https://drive.google.com/file/d/${file.id}/preview`,
-    }));
+    const items = response.data.files.map((file) => {
+      const isShortcut = file.mimeType === "application/vnd.google-apps.shortcut";
+      const targetId = isShortcut && file.shortcutDetails?.targetId ? file.shortcutDetails.targetId : file.id;
+      const targetMimeType = isShortcut && file.shortcutDetails?.targetMimeType ? file.shortcutDetails.targetMimeType : file.mimeType;
+      const isFolder = targetMimeType === "application/vnd.google-apps.folder";
+
+      return {
+        id: targetId,
+        shortcutId: isShortcut ? file.id : null,
+        name: file.name,
+        mimeType: targetMimeType,
+        isFolder,
+        isShortcut,
+        size: file.size ? parseInt(file.size) : null,
+        createdTime: file.createdTime,
+        modifiedTime: file.modifiedTime,
+        iconLink: file.iconLink,
+        thumbnailLink: file.thumbnailLink,
+        previewUrl: isFolder
+          ? null
+          : `https://drive.google.com/file/d/${targetId}/preview`,
+      };
+    });
 
     // Sort: folders first, then files, both alphabetically
     items.sort((a, b) => {

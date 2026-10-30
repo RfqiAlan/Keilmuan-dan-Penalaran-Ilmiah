@@ -15,8 +15,8 @@ const FileIcon = ({ mimeType }) => {
     if (mimeType.includes("image")) return "🖼️";
     if (mimeType.includes("video")) return "🎬";
     if (mimeType.includes("audio")) return "🎵";
-    if (mimeType.includes("spreadsheet") || mimeType.includes("excel")) return "📊";
-    if (mimeType.includes("presentation") || mimeType.includes("powerpoint")) return "📽️";
+    if (mimeType.includes("spreadsheet") || mimeType.includes("excel") || mimeType.includes("sheet")) return "📊";
+    if (mimeType.includes("presentation") || mimeType.includes("powerpoint") || mimeType.includes("slide")) return "📽️";
     if (mimeType.includes("document") || mimeType.includes("word")) return "📝";
     if (mimeType.includes("zip") || mimeType.includes("archive") || mimeType.includes("compressed")) return "📦";
     return "📄";
@@ -171,12 +171,16 @@ export default function DriveFolderBrowser({ rootFolderId, rootFolderName }) {
                 </div>
                 <div className="flex items-center gap-2 mt-0.5">
                   {item.isFolder ? (
-                    <span className="text-[10px] text-slate-500 dark:text-slate-500 uppercase tracking-wider font-medium">Folder</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-500 uppercase tracking-wider font-medium">
+                      Folder {item.isShortcut ? "• Pintasan" : ""}
+                    </span>
                   ) : (
                     <>
                       <span className="text-[10px] text-slate-500 dark:text-slate-500">{formatFileSize(item.size)}</span>
                       <span className="text-[10px] text-slate-400" aria-hidden="true">•</span>
-                      <span className="text-[10px] text-slate-500 dark:text-slate-500 truncate">{item.mimeType?.split("/").pop()?.split(".").pop()}</span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-500 truncate">
+                        {item.isShortcut ? "Pintasan • " : ""}{item.mimeType?.split("/").pop()?.split(".").pop()}
+                      </span>
                     </>
                   )}
                 </div>

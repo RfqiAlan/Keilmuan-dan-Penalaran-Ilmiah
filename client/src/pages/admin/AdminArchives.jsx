@@ -585,13 +585,19 @@ export default function AdminArchives() {
             onChange={(e) => setForm({ ...form, division: e.target.value })}
             placeholder="Contoh: BPH, Divisi Humas, Divisi Riset"
           />
-          <Input
-            label="Link Google Drive / File ID"
-            value={form.drive_file_id || ""}
-            onChange={(e) => setForm({ ...form, drive_file_id: e.target.value })}
-            required
-            placeholder="Paste link Google Drive atau File ID"
-          />
+          <div>
+            <Input
+              label="Link Google Drive / File ID"
+              value={form.drive_file_id || ""}
+              onChange={(e) => setForm({ ...form, drive_file_id: e.target.value })}
+              required
+              placeholder="https://drive.google.com/file/d/... atau https://drive.google.com/drive/folders/..."
+            />
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+              💡 <strong>Link File:</strong> langsung membuka pratinjau dokumen (PDF/Doc). <br />
+              📂 <strong>Link Folder:</strong> menampilkan penjelajah berkas interaktif untuk membuka seluruh isi folder.
+            </p>
+          </div>
           <Textarea
             label="Deskripsi & Ringkasan"
             value={form.description || ""}
