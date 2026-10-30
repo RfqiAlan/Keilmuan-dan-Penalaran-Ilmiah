@@ -1,26 +1,30 @@
 export default function Card({ children, className = "" }) {
   return (
-    <div className={`bg-slate-50 dark:bg-slate-800/50 backdrop-blur-sm border border-slate-200 dark:border-slate-700/50 rounded-xl p-6 ${className}`}>
+    <div className={`bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/60 rounded-xl p-6 shadow-sm ${className}`}>
       {children}
     </div>
   );
 }
 
-export function StatCard({ icon, label, value, color = "indigo", trend }) {
+export function StatCard({ icon: Icon, label, value, color = "indigo", trend }) {
   const colors = {
-    indigo: "from-[#28517E]/20 to-[#28517E]/10 border-[#4EA8DE]/30 text-[#4EA8DE]",
-    green:  "from-emerald-500/20 to-emerald-600/10 border-emerald-500/30 text-emerald-400",
-    yellow: "from-yellow-500/20 to-yellow-600/10 border-yellow-500/30 text-yellow-400",
-    red:    "from-red-500/20 to-red-600/10 border-red-500/30 text-red-400",
-    blue:   "from-blue-500/20 to-blue-600/10 border-blue-500/30 text-blue-400",
-    orange: "from-orange-500/20 to-orange-600/10 border-orange-500/30 text-orange-400",
+    indigo: "bg-sky-50/80 dark:bg-sky-950/20 border-sky-200 dark:border-sky-500/30 text-[#0284c7] dark:text-[#38bdf8]",
+    green:  "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-500/30 text-emerald-800 dark:text-emerald-300",
+    yellow: "bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-500/30 text-amber-800 dark:text-amber-300",
+    red:    "bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-500/30 text-rose-800 dark:text-rose-300",
+    blue:   "bg-sky-50 dark:bg-sky-950/20 border-sky-200 dark:border-sky-500/30 text-sky-800 dark:text-sky-300",
+    orange: "bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-500/30 text-orange-800 dark:text-orange-300",
   };
   const cls = colors[color] || colors.indigo;
+  const isComponent = typeof Icon === "function" || (typeof Icon === "object" && Icon !== null && "$$typeof" in Icon);
+
   return (
-    <div className={`bg-gradient-to-br ${cls} border rounded-xl p-5 transition-transform hover:-translate-y-1 duration-200`}>
+    <div className={`${cls} border rounded-xl p-5 transition-colors duration-150`}>
       <div className="flex items-center justify-between mb-3">
-        <span className="text-2xl">{icon}</span>
-        {trend && <span className="text-xs text-slate-600 dark:text-slate-400">{trend}</span>}
+        <div className="w-10 h-10 rounded-lg bg-white/70 dark:bg-slate-800/70 flex items-center justify-center text-xl shrink-0" aria-hidden="true">
+          {isComponent ? <Icon className="w-5 h-5" /> : Icon}
+        </div>
+        {trend && <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">{trend}</span>}
       </div>
       <div className="text-3xl font-bold text-slate-900 dark:text-slate-100">{value ?? "—"}</div>
       <div className="text-sm text-slate-600 dark:text-slate-400 mt-1">{label}</div>

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { ToastProvider } from "./contexts/ToastContext";
 import { PrivateRoute, RoleRoute } from "./routes/ProtectedRoute";
 import AppLayout from "./components/layout/AppLayout";
 
@@ -34,45 +35,47 @@ export default function App() {
     <ThemeProvider>
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
-          {/* Public Routes */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/pending-verification" element={<PendingVerificationPage />} />
+          <ToastProvider>
+            <Routes>
+            {/* Public Routes */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/pending-verification" element={<PendingVerificationPage />} />
 
-          {/* Protected Routes (all logged in users) */}
-          <Route element={<PrivateRoute />}>
-            <Route element={<AppLayout />}>
+            {/* Protected Routes (all logged in users) */}
+            <Route element={<PrivateRoute />}>
+              <Route element={<AppLayout />}>
 
-              {/* Admin Routes */}
-              <Route element={<RoleRoute roles={ADMIN_ROLES} />}>
-                <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                <Route path="/admin/items" element={<AdminItems />} />
-                <Route path="/admin/borrowings" element={<AdminBorrowings />} />
-                <Route path="/admin/archives" element={<AdminArchives />} />
-                <Route path="/admin/access-requests" element={<AdminAccessRequests />} />
-                <Route path="/admin/activity-logs" element={<AdminActivityLogs />} />
-                <Route path="/admin/reports" element={<AdminReports />} />
+                {/* Admin Routes */}
+                <Route element={<RoleRoute roles={ADMIN_ROLES} />}>
+                  <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                  <Route path="/admin/items" element={<AdminItems />} />
+                  <Route path="/admin/borrowings" element={<AdminBorrowings />} />
+                  <Route path="/admin/archives" element={<AdminArchives />} />
+                  <Route path="/admin/access-requests" element={<AdminAccessRequests />} />
+                  <Route path="/admin/activity-logs" element={<AdminActivityLogs />} />
+                  <Route path="/admin/reports" element={<AdminReports />} />
+                </Route>
+                <Route element={<RoleRoute roles={["admin"]} />}>
+                  <Route path="/admin/users" element={<AdminUsers />} />
+                </Route>
+
+                {/* Member Routes */}
+                <Route path="/dashboard" element={<MemberDashboard />} />
+                <Route path="/items" element={<ItemsPage />} />
+                <Route path="/borrowings/my" element={<MyBorrowingsPage />} />
+                <Route path="/archives" element={<ArchivesPage />} />
+                <Route path="/access-requests/my" element={<MyAccessRequestsPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
               </Route>
-              <Route element={<RoleRoute roles={["admin"]} />}>
-                <Route path="/admin/users" element={<AdminUsers />} />
-              </Route>
-
-              {/* Member Routes */}
-              <Route path="/dashboard" element={<MemberDashboard />} />
-              <Route path="/items" element={<ItemsPage />} />
-              <Route path="/borrowings/my" element={<MyBorrowingsPage />} />
-              <Route path="/archives" element={<ArchivesPage />} />
-              <Route path="/access-requests/my" element={<MyAccessRequestsPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
             </Route>
-          </Route>
 
-          {/* Default Redirects */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </AuthProvider>
+            {/* Default Redirects */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Routes>
+          </ToastProvider>
+        </AuthProvider>
       </BrowserRouter>
     </ThemeProvider>
   );

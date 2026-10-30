@@ -1,27 +1,27 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary-50: #e8f0f8;
-  --color-primary-100: #d1e1f1;
-  --color-primary-200: #a3c3e3;
-  --color-primary-300: #75a5d5;
-  --color-primary-400: #4EA8DE;
-  --color-primary-500: #28517E;
-  --color-primary-600: #203f63;
-  --color-primary-700: #1a3350;
-  --color-primary-800: #13263c;
-  --color-primary-900: #0d1a29;
+  --color-primary-50: #f0f9ff;
+  --color-primary-100: #e0f2fe;
+  --color-primary-200: #bae6fd;
+  --color-primary-300: #7dd3fc;
+  --color-primary-400: #38bdf8;
+  --color-primary-500: #0284c7;
+  --color-primary-600: #0369a1;
+  --color-primary-700: #075985;
+  --color-primary-800: #0c4a6e;
+  --color-primary-900: #082f49;
 
-  --color-accent: #F3620F;
-  --color-accent-light: #f5813f;
-  --color-accent-dark: #c24e0c;
+  --color-accent: #f97316;
+  --color-accent-light: #fb923c;
+  --color-accent-dark: #ea580c;
 
-  --color-surface: #0d1a29;
-  --color-surface-2: #13263c;
-  --color-surface-3: #1a3350;
-  --color-border: #1a3350;
-  --color-text-muted: #8ba4bf;
-  --color-light: #F8F9FA;
+  --color-surface: #0f172a;
+  --color-surface-2: #1e293b;
+  --color-surface-3: #334155;
+  --color-border: #334155;
+  --color-text-muted: #64748b;
+  --color-light: #f8fafc;
 
   --font-sans: "Inter", system-ui, sans-serif;
 
@@ -37,15 +37,15 @@
 
   body {
     font-family: var(--font-sans);
-    background-color: #F8F9FA;
-    color: #0d1a29;
+    background-color: #f8fafc;
+    color: #0f172a;
     -webkit-font-smoothing: antialiased;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   .dark body {
-    background-color: #0d1a29;
-    color: #F8F9FA;
+    background-color: #0f172a;
+    color: #f8fafc;
   }
 
   ::-webkit-scrollbar {
@@ -53,10 +53,27 @@
     height: 6px;
   }
   ::-webkit-scrollbar-track { background: #e2e8f0; }
-  .dark ::-webkit-scrollbar-track { background: #13263c; }
+  .dark ::-webkit-scrollbar-track { background: #1e293b; }
   ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-  .dark ::-webkit-scrollbar-thumb { background: #1a3350; border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: #4EA8DE; }
+  .dark ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #0284c7; }
+
+  /* Antislop Human & Affordance Essentials */
+  button, [role="button"], select, a[href] {
+    cursor: pointer;
+  }
+  button:disabled, [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
 @custom-variant dark (&:where(.dark, .dark *));

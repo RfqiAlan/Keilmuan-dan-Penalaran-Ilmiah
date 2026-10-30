@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { CreditCard, UploadCloud } from "lucide-react";
 import Modal from "./Modal";
 import Button from "./Button";
 import api from "../../api/axios";
@@ -79,19 +80,19 @@ export default function KtaUploadModal({ isOpen, onClose, onSuccess }) {
     <Modal isOpen={isOpen} onClose={handleClose} title="Upload Kartu Tanda Anggota (KTA)" size="md">
       <div className="space-y-4">
         {/* Info banner */}
-        <div className="p-3 bg-[#4EA8DE]/10 border border-[#4EA8DE]/30 rounded-lg text-sm text-[#4EA8DE]">
-          <div className="flex items-center gap-2 font-medium mb-1">
-            <span>🪪</span>
+        <div className="p-3.5 bg-sky-50 dark:bg-sky-950/40 border border-sky-100 dark:border-sky-900/50 rounded-xl text-sm">
+          <div className="flex items-center gap-2 font-semibold text-[#0284c7] dark:text-[#38bdf8] mb-1">
+            <CreditCard className="w-4 h-4 shrink-0" />
             <span>Kartu Tanda Anggota Diperlukan</span>
           </div>
-          <p className="text-xs text-slate-600 dark:text-slate-400">
+          <p className="text-xs text-slate-600 dark:text-slate-300">
             Anda harus mengunggah foto KTA untuk dapat meminjam barang atau melihat arsip dokumen.
-            File yang diunggah akan disimpan di Google Drive.
+            File yang diunggah akan disimpan dengan aman di Google Drive UKM.
           </p>
         </div>
 
         {error && (
-          <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+          <div className="p-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-lg text-red-600 dark:text-red-400 text-sm font-medium">
             {error}
           </div>
         )}
@@ -102,8 +103,8 @@ export default function KtaUploadModal({ isOpen, onClose, onSuccess }) {
             relative border-2 border-dashed rounded-xl p-6 text-center cursor-pointer
             transition-all duration-200
             ${dragOver
-              ? "border-[#4EA8DE] bg-[#4EA8DE]/10"
-              : "border-slate-300 dark:border-slate-600 hover:border-slate-500 hover:bg-slate-50 dark:bg-slate-800/50"
+              ? "border-[#0284c7] bg-sky-50 dark:bg-sky-950/20"
+              : "border-slate-300 dark:border-slate-600 hover:border-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50"
             }
           `}
           onClick={() => inputRef.current?.click()}
@@ -124,21 +125,23 @@ export default function KtaUploadModal({ isOpen, onClose, onSuccess }) {
               <img
                 src={preview}
                 alt="Preview KTA"
-                className="max-h-52 mx-auto rounded-lg border border-slate-300 dark:border-slate-600 shadow-lg"
+                className="max-h-52 mx-auto rounded-lg border border-slate-300 dark:border-slate-600 shadow-md"
               />
-              <div className="text-sm text-slate-700 dark:text-slate-300">{file?.name}</div>
-              <div className="text-xs text-slate-500 dark:text-slate-500">
-                {(file?.size / 1024 / 1024).toFixed(2)} MB • Klik untuk ganti
+              <div className="text-sm font-medium text-slate-800 dark:text-slate-200">{file?.name}</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400">
+                {(file?.size / 1024 / 1024).toFixed(2)} MB • Klik untuk mengganti
               </div>
             </div>
           ) : (
-            <div className="space-y-3 py-4">
-              <div className="text-4xl">🪪</div>
-              <div className="text-slate-700 dark:text-slate-300 font-medium">
-                Drag & drop foto KTA di sini
+            <div className="space-y-2.5 py-4">
+              <div className="w-12 h-12 mx-auto rounded-full bg-sky-50 dark:bg-sky-950/40 text-[#0284c7] dark:text-[#38bdf8] flex items-center justify-center">
+                <UploadCloud className="w-6 h-6 stroke-[1.75]" />
               </div>
-              <div className="text-xs text-slate-500 dark:text-slate-500">
-                atau klik untuk memilih file • JPG, PNG, WEBP • Maks. 5MB
+              <div className="text-slate-800 dark:text-slate-200 font-medium text-sm">
+                Tarik & letakkan foto KTA di sini
+              </div>
+              <div className="text-xs text-slate-500 dark:text-slate-400">
+                atau klik untuk memilih berkas • JPG, PNG, WEBP • Maksimal 5MB
               </div>
             </div>
           )}
@@ -159,7 +162,7 @@ export default function KtaUploadModal({ isOpen, onClose, onSuccess }) {
                 Mengunggah...
               </span>
             ) : (
-              "Upload KTA"
+              "Unggah KTA"
             )}
           </Button>
         </div>

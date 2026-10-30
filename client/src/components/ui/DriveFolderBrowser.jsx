@@ -4,7 +4,7 @@ import api from "../../api/axios";
 // Icons
 const FolderIcon = () => (
   <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-    <path d="M4 10C4 8.89543 4.89543 8 6 8H16L20 12H34C35.1046 12 36 12.8954 36 14V30C36 31.1046 35.1046 32 34 32H6C4.89543 32 4 31.1046 4 30V10Z" fill="#4EA8DE" fillOpacity="0.2" stroke="#4EA8DE" strokeWidth="1.5"/>
+    <path d="M4 10C4 8.89543 4.89543 8 6 8H16L20 12H34C35.1046 12 36 12.8954 36 14V30C36 31.1046 35.1046 32 34 32H6C4.89543 32 4 31.1046 4 30V10Z" fill="#0284c7" fillOpacity="0.15" stroke="#0284c7" strokeWidth="1.5"/>
   </svg>
 );
 
@@ -84,9 +84,9 @@ export default function DriveFolderBrowser({ rootFolderId, rootFolderName }) {
         <div className="flex items-center gap-3">
           <button
             onClick={handleBackToFolder}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-700/60 hover:bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-700 dark:text-slate-300 transition-colors"
+            className="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-slate-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0284c7]"
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 4L6 8L10 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 4L6 8L10 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
             Kembali
           </button>
           <div className="flex items-center gap-2 text-sm text-slate-800 dark:text-slate-200 font-medium truncate">
@@ -118,10 +118,10 @@ export default function DriveFolderBrowser({ rootFolderId, rootFolderName }) {
             {i > 0 && <span className="text-slate-600 text-xs">/</span>}
             <button
               onClick={() => handleBreadcrumbClick(i)}
-              className={`px-2 py-1 rounded text-xs transition-colors ${
+              className={`cursor-pointer px-2.5 py-1.5 rounded-lg text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0284c7] ${
                 i === breadcrumbs.length - 1
-                  ? "bg-[#4EA8DE]/10 text-[#4EA8DE] font-medium border border-[#4EA8DE]/20"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:text-slate-200 hover:bg-white dark:bg-slate-700/50"
+                  ? "bg-[#0284c7]/10 dark:bg-[#0284c7]/20 text-[#0284c7] dark:text-[#38bdf8] font-semibold border border-[#0284c7]/20 dark:border-[#38bdf8]/30"
+                  : "text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/50"
               }`}
             >
               {i === 0 ? "📁" : ""} {crumb.name}
@@ -134,18 +134,18 @@ export default function DriveFolderBrowser({ rootFolderId, rootFolderName }) {
       {loading ? (
         <div className="flex items-center justify-center py-16">
           <div className="text-center space-y-3">
-            <div className="animate-spin w-8 h-8 border-2 border-[#4EA8DE] border-t-transparent rounded-full mx-auto" />
+            <div className="animate-spin w-8 h-8 border-2 border-[#0284c7] border-t-transparent rounded-full mx-auto" />
             <div className="text-sm text-slate-500 dark:text-slate-500">Memuat isi folder...</div>
           </div>
         </div>
       ) : error ? (
-        <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm text-center">
+        <div className="p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-lg text-red-600 dark:text-red-400 text-sm text-center font-medium">
           {error}
         </div>
       ) : items.length === 0 ? (
         <div className="flex items-center justify-center py-16">
           <div className="text-center space-y-2">
-            <div className="text-4xl">📂</div>
+            <div className="text-4xl" aria-hidden="true">📂</div>
             <div className="text-slate-600 dark:text-slate-400 text-sm">Folder ini kosong</div>
           </div>
         </div>
@@ -155,9 +155,9 @@ export default function DriveFolderBrowser({ rootFolderId, rootFolderName }) {
             <button
               key={item.id}
               onClick={() => item.isFolder ? handleOpenFolder(item) : handleOpenFile(item)}
-              className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-700/50 bg-slate-50 dark:bg-slate-800/40
-                hover:bg-white dark:bg-slate-700/50 hover:border-[#4EA8DE]/30 transition-all duration-200
-                text-left group"
+              className="cursor-pointer flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-700/60 bg-white dark:bg-slate-800/80
+                hover:bg-slate-50 dark:hover:bg-slate-700/60 hover:border-[#0284c7]/40 transition-all duration-150
+                text-left group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0284c7]"
             >
               {/* Icon */}
               <div className="flex-shrink-0">
@@ -166,16 +166,16 @@ export default function DriveFolderBrowser({ rootFolderId, rootFolderName }) {
 
               {/* Info */}
               <div className="flex-1 min-w-0">
-                <div className="text-sm text-slate-800 dark:text-slate-200 font-medium truncate group-hover:text-[#4EA8DE] transition-colors">
+                <div className="text-sm text-slate-800 dark:text-slate-200 font-medium truncate group-hover:text-[#0284c7] transition-colors">
                   {item.name}
                 </div>
                 <div className="flex items-center gap-2 mt-0.5">
                   {item.isFolder ? (
-                    <span className="text-[10px] text-slate-500 dark:text-slate-500 uppercase tracking-wider">Folder</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-500 uppercase tracking-wider font-medium">Folder</span>
                   ) : (
                     <>
                       <span className="text-[10px] text-slate-500 dark:text-slate-500">{formatFileSize(item.size)}</span>
-                      <span className="text-[10px] text-slate-600">•</span>
+                      <span className="text-[10px] text-slate-400" aria-hidden="true">•</span>
                       <span className="text-[10px] text-slate-500 dark:text-slate-500 truncate">{item.mimeType?.split("/").pop()?.split(".").pop()}</span>
                     </>
                   )}
@@ -183,11 +183,11 @@ export default function DriveFolderBrowser({ rootFolderId, rootFolderName }) {
               </div>
 
               {/* Arrow */}
-              <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex-shrink-0 opacity-70 sm:opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity">
                 {item.isFolder ? (
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4L10 8L6 12" stroke="#4EA8DE" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 4L10 8L6 12" stroke="#0284c7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 ) : (
-                  <span className="text-[10px] text-[#4EA8DE] font-medium">Preview</span>
+                  <span className="text-[10px] text-[#0284c7] dark:text-[#38bdf8] font-semibold">Preview</span>
                 )}
               </div>
             </button>

@@ -31,14 +31,14 @@ export default function LoginPage() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#28517E]/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#4EA8DE]/10 rounded-full blur-3xl" />
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#0284c7]/10 rounded-full blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#38bdf8]/15 rounded-full blur-3xl" />
       </div>
 
       <div className="relative w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-[#28517E] rounded-2xl text-3xl mb-4 shadow-lg shadow-[#28517E]/30">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-[#0284c7] text-white rounded-2xl text-3xl mb-4 shadow-lg shadow-[#0284c7]/25" aria-hidden="true">
             📁
           </div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">SIMPAR UKM</h1>
@@ -46,11 +46,11 @@ export default function LoginPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-slate-50 dark:bg-slate-800/60 backdrop-blur-sm border border-slate-200 dark:border-slate-700/50 rounded-2xl p-8 shadow-2xl">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 shadow-xl">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-6">Masuk ke Akun</h2>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+            <div className="mb-4 p-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-lg text-red-600 dark:text-red-400 text-sm font-medium">
               {error}
             </div>
           )}
@@ -80,13 +80,13 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-slate-600 dark:text-slate-400 mt-6">
             Belum punya akun?{" "}
-            <Link to="/register" className="text-[#4EA8DE] hover:text-[#F3620F] font-medium">
+            <Link to="/register" className="cursor-pointer text-[#0284c7] dark:text-[#38bdf8] hover:text-[#f97316] dark:hover:text-[#f97316] font-semibold underline-offset-2 hover:underline">
               Daftar sekarang
             </Link>
           </p>
 
-          <div className="mt-6 p-3 bg-white dark:bg-slate-700/40 rounded-lg">
-            <p className="text-xs text-slate-500 dark:text-slate-500 text-center">Demo: admin@simpar.id / admin123</p>
+          <div className="mt-6 p-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 rounded-lg">
+            <p className="text-xs text-slate-600 dark:text-slate-400 text-center font-medium">Demo: admin@simpar.id / admin123</p>
           </div>
         </div>
       </div>

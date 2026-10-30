@@ -6,8 +6,8 @@ export default function PendingVerificationPage() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4">
       {/* Decorative background blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#28517E]/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#4EA8DE]/10 rounded-full blur-3xl" />
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#0284c7]/10 rounded-full blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#38bdf8]/15 rounded-full blur-3xl" />
       </div>
 
       <div className="relative w-full max-w-md text-center">
@@ -22,11 +22,11 @@ export default function PendingVerificationPage() {
           </p>
         </div>
 
-        <div className="bg-slate-50 dark:bg-slate-800/60 backdrop-blur-sm border border-slate-200 dark:border-slate-700/50 rounded-2xl p-6 shadow-2xl space-y-6">
-          <div className="p-4 bg-[#4EA8DE]/10 border border-[#4EA8DE]/30 rounded-xl flex items-start gap-3 text-left">
-            <span className="text-xl">ℹ️</span>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+          <div className="p-4 bg-[#0284c7]/10 border border-[#0284c7]/20 rounded-xl flex items-start gap-3 text-left">
+            <span className="text-xl" aria-hidden="true">ℹ️</span>
             <div>
-              <div className="text-sm font-semibold text-[#28517E] dark:text-[#4EA8DE] mb-1">Apa selanjutnya?</div>
+              <div className="text-sm font-semibold text-[#0284c7] dark:text-[#38bdf8] mb-1">Apa selanjutnya?</div>
               <div className="text-xs text-slate-600 dark:text-slate-400">
                 Hubungi administrator atau pengurus UKM jika Anda memerlukan akses segera.
               </div>

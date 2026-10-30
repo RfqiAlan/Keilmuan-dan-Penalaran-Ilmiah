@@ -1,4 +1,16 @@
 import { useEffect, useState } from "react";
+import {
+  Search,
+  Plus,
+  Eye,
+  Check,
+  Edit,
+  Trash2,
+  Archive,
+  Folder,
+  FileText,
+  AlertTriangle,
+} from "lucide-react";
 import api from "../../api/axios";
 import { useAuth } from "../../contexts/AuthContext";
 import Badge from "../../components/ui/Badge";
@@ -6,20 +18,37 @@ import Button from "../../components/ui/Button";
 import Modal from "../../components/ui/Modal";
 import { Input, Select, Textarea } from "../../components/ui/Input";
 import DriveFolderBrowser from "../../components/ui/DriveFolderBrowser";
+import { SkeletonTable } from "../../components/ui/Skeleton";
+import EmptyState from "../../components/ui/EmptyState";
+import { useToast } from "../../contexts/ToastContext";
 
-const CATEGORIES = ["arsip_divisi","arsip_karya","arsip_inovasi","lpj","arsip_kegiatan","proposal","surat_masuk","surat_keluar","notulen","sk","keuangan","sertifikat"];
+const CATEGORIES = [
+  "arsip_divisi",
+  "arsip_karya",
+  "arsip_inovasi",
+  "lpj",
+  "arsip_kegiatan",
+  "proposal",
+  "surat_masuk",
+  "surat_keluar",
+  "notulen",
+  "sk",
+  "keuangan",
+  "sertifikat",
+];
 const ROLES = ["admin", "ketua", "sekretaris", "bendahara", "koordinator", "anggota", "alumni"];
 const DUAL_APPROVAL_CATEGORIES = ["sk", "lpj", "arsip_karya"];
 
 const APPROVAL_LABELS = {
-  draft: { label: "Draft", color: "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20" },
-  approved_admin: { label: "Menunggu Sekretaris", color: "bg-amber-500/10 text-amber-400 border-amber-500/20" },
-  approved_sekum: { label: "Menunggu Admin", color: "bg-amber-500/10 text-amber-400 border-amber-500/20" },
-  approved: { label: "Disetujui", color: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
+  draft: { label: "Draft", color: "bg-slate-100 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-600" },
+  approved_admin: { label: "Menunggu Sekretaris", color: "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800" },
+  approved_sekum: { label: "Menunggu Admin", color: "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800" },
+  approved: { label: "Disetujui", color: "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800" },
 };
 
 export default function AdminArchives() {
   const { user } = useAuth();
+  const { showToast } = useToast();
   const [archives, setArchives] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -28,6 +57,7 @@ export default function AdminArchives() {
   const [filterApproval, setFilterApproval] = useState("");
   const [availableYears, setAvailableYears] = useState([]);
   const [modal, setModal] = useState({ open: false, mode: "create", archive: null });
+  const [delModal, setDelModal] = useState({ open: false, archive: null });
   const [previewModal, setPreviewModal] = useState({ open: false, archive: null });
   const [approveModal, setApproveModal] = useState({ open: false, archive: null });
   const [form, setForm] = useState({});
@@ -41,7 +71,10 @@ export default function AdminArchives() {
     if (filterCat) params.set("category", filterCat);
     if (filterYear) params.set("year", filterYear);
     if (filterApproval) params.set("approval_status", filterApproval);
-    api.get(`/archives?${params}`).then((r) => setArchives(r.data.archives)).finally(() => setLoading(false));
+    api.get(`/archives?${params}`)
+      .then((r) => setArchives(r.data.archives || []))
+      .catch(() => setArchives([]))
+      .finally(() => setLoading(false));
   };
 
   const fetchAvailableYears = async () => {
@@ -54,33 +87,70 @@ export default function AdminArchives() {
     }
   };
 
-  useEffect(() => { fetchAvailableYears(); }, []);
-  useEffect(() => { fetchArchives(); }, [search, filterCat, filterYear, filterApproval]);
+  useEffect(() => {
+    fetchAvailableYears();
+  }, []);
+
+  useEffect(() => {
+    fetchArchives();
+  }, [search, filterCat, filterYear, filterApproval]);
 
   const openCreate = () => {
-    setForm({ archive_number: "", title: "", year: new Date().getFullYear(), category: "lpj", division: "", description: "", drive_file_id: "", access_level: "admin" });
+    setForm({
+      archive_number: "",
+      title: "",
+      year: new Date().getFullYear(),
+      category: "lpj",
+      division: "",
+      description: "",
+      drive_file_id: "",
+      access_level: "admin",
+    });
     setError("");
     setModal({ open: true, mode: "create", archive: null });
   };
 
-  const openEdit = (archive) => { setForm({ ...archive }); setError(""); setModal({ open: true, mode: "edit", archive }); };
+  const openEdit = (archive) => {
+    setForm({ ...archive });
+    setError("");
+    setModal({ open: true, mode: "edit", archive });
+  };
 
   const handleSave = async (e) => {
     e.preventDefault();
-    setSaving(true); setError("");
+    setSaving(true);
+    setError("");
     try {
-      if (modal.mode === "create") await api.post("/archives", form);
-      else await api.put(`/archives/${modal.archive.id}`, form);
-      setModal({ open: false }); fetchArchives(); fetchAvailableYears();
+      if (modal.mode === "create") {
+        await api.post("/archives", form);
+        showToast("Dokumen arsip baru berhasil ditambahkan!", "success");
+      } else {
+        await api.put(`/archives/${modal.archive.id}`, form);
+        showToast("Data arsip berhasil diperbarui!", "success");
+      }
+      setModal({ open: false, archive: null });
+      fetchArchives();
+      fetchAvailableYears();
     } catch (err) {
-      setError(err.response?.data?.message || "Gagal menyimpan.");
-    } finally { setSaving(false); }
+      const msg = err.response?.data?.message || "Gagal menyimpan arsip.";
+      setError(msg);
+      showToast(msg, "error");
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleDelete = async (archive) => {
-    if (!confirm(`Hapus arsip "${archive.title}"?`)) return;
-    try { await api.delete(`/archives/${archive.id}`); fetchArchives(); }
-    catch (err) { alert(err.response?.data?.message || "Gagal menghapus."); }
+  const handleDelete = async () => {
+    if (!delModal.archive) return;
+    try {
+      await api.delete(`/archives/${delModal.archive.id}`);
+      showToast("Arsip dokumen berhasil dihapus!", "success");
+      setDelModal({ open: false, archive: null });
+      fetchArchives();
+    } catch (err) {
+      const msg = err.response?.data?.message || "Gagal menghapus arsip.";
+      showToast(msg, "error");
+    }
   };
 
   const handleRoleToggle = (role) => {
@@ -93,15 +163,19 @@ export default function AdminArchives() {
     setForm({ ...form, access_level: roles.join(",") });
   };
 
-  const openPreview = (archive) => { setPreviewModal({ open: true, archive }); };
+  const openPreview = (archive) => {
+    setPreviewModal({ open: true, archive });
+  };
 
   const handleApprove = async (archive) => {
     try {
       await api.put(`/archives/${archive.id}/approve`);
+      showToast("Persetujuan arsip berhasil dicatat!", "success");
       fetchArchives();
-      setApproveModal({ open: false });
+      setApproveModal({ open: false, archive: null });
     } catch (err) {
-      alert(err.response?.data?.message || "Gagal menyetujui arsip.");
+      const msg = err.response?.data?.message || "Gagal menyetujui arsip.";
+      showToast(msg, "error");
     }
   };
 
@@ -109,163 +183,348 @@ export default function AdminArchives() {
   const canApprove = (archive) => {
     if (archive.approval_status === "approved") return false;
     if (!DUAL_APPROVAL_CATEGORIES.includes(archive.category)) return false;
-    if (user.role === "admin" && !archive.approved_by_admin) return true;
-    if (user.role === "sekretaris" && !archive.approved_by_sekum) return true;
+    if (user?.role === "admin" && !archive.approved_by_admin) return true;
+    if (user?.role === "sekretaris" && !archive.approved_by_sekum) return true;
     return false;
   };
 
-  const years = availableYears.length > 0 ? availableYears : Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i);
+  const years =
+    availableYears.length > 0
+      ? availableYears
+      : Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i);
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div><h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Manajemen Arsip</h1><p className="text-slate-600 dark:text-slate-400 text-sm mt-1">Kelola dokumen arsip UKM</p></div>
-        <Button onClick={openCreate}>+ Tambah Arsip</Button>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+            Manajemen Arsip
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">
+            Kelola berkas resmi, dokumen digital, dan persetujuan arsip UKM
+          </p>
+        </div>
+        <Button onClick={openCreate}>
+          <Plus className="w-4 h-4 mr-1.5" />
+          Tambah Arsip
+        </Button>
       </div>
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
-        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="🔍 Cari arsip..."
-          className="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE] flex-1 min-w-48 placeholder-slate-500" />
-        <select value={filterCat} onChange={(e) => setFilterCat(e.target.value)}
-          className="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE]">
+        <div className="relative flex-1 min-w-48">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Cari judul arsip atau nomor dokumen..."
+            className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-xl pl-10 pr-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0284c7] placeholder-slate-400 shadow-xs"
+          />
+        </div>
+
+        <select
+          value={filterCat}
+          onChange={(e) => setFilterCat(e.target.value)}
+          className="cursor-pointer bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0284c7] shadow-xs"
+        >
           <option value="">Semua Kategori</option>
-          {CATEGORIES.map((c) => <option key={c} value={c}>{c.replace(/_/g, " ").toUpperCase()}</option>)}
+          {CATEGORIES.map((c) => (
+            <option key={c} value={c}>
+              {c.replace(/_/g, " ").toUpperCase()}
+            </option>
+          ))}
         </select>
-        <select value={filterYear} onChange={(e) => setFilterYear(e.target.value)}
-          className="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE]">
+
+        <select
+          value={filterYear}
+          onChange={(e) => setFilterYear(e.target.value)}
+          className="cursor-pointer bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0284c7] shadow-xs"
+        >
           <option value="">Semua Periode</option>
-          {years.map((y) => <option key={y} value={y}>Periode {y}</option>)}
+          {years.map((y) => (
+            <option key={y} value={y}>
+              Periode {y}
+            </option>
+          ))}
         </select>
-        <select value={filterApproval} onChange={(e) => setFilterApproval(e.target.value)}
-          className="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4EA8DE]">
-          <option value="">Semua Status</option>
+
+        <select
+          value={filterApproval}
+          onChange={(e) => setFilterApproval(e.target.value)}
+          className="cursor-pointer bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0284c7] shadow-xs"
+        >
+          <option value="">Semua Status Persetujuan</option>
           <option value="draft">Draft</option>
           <option value="approved_admin">Menunggu Sekretaris</option>
           <option value="approved_sekum">Menunggu Admin</option>
-          <option value="approved">Disetujui</option>
+          <option value="approved">Disetujui Penuh</option>
         </select>
       </div>
 
       {/* Table */}
-      <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700/50">
-              <tr>
-                {["No. Arsip","Judul","Kategori","Periode","Tipe","Status","Akses","Aksi"].map((h) => (
-                  <th key={h} className="text-left px-4 py-3 text-slate-600 dark:text-slate-400 font-medium text-xs uppercase tracking-wider">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-700/30">
-              {loading ? (
-                <tr><td colSpan={8} className="px-4 py-8 text-center text-slate-500 dark:text-slate-500">Memuat...</td></tr>
-              ) : archives.length === 0 ? (
-                <tr><td colSpan={8} className="px-4 py-8 text-center text-slate-500 dark:text-slate-500">Tidak ada data arsip.</td></tr>
-              ) : archives.map((a) => {
-                const approvalInfo = APPROVAL_LABELS[a.approval_status] || APPROVAL_LABELS.approved;
-                const needsDual = DUAL_APPROVAL_CATEGORIES.includes(a.category);
+      {loading ? (
+        <SkeletonTable rows={6} cols={8} />
+      ) : archives.length === 0 ? (
+        <EmptyState
+          icon={Archive}
+          title="Tidak Ada Data Arsip"
+          description={
+            search || filterCat || filterYear || filterApproval
+              ? "Tidak ada arsip dokumen yang cocok dengan filter yang dipilih."
+              : "Belum ada dokumen arsip yang diunggah ke sistem."
+          }
+          actionLabel={
+            search || filterCat || filterYear || filterApproval ? "Reset Filter" : "Unggah Arsip Baru"
+          }
+          onAction={
+            search || filterCat || filterYear || filterApproval
+              ? () => {
+                  setSearch("");
+                  setFilterCat("");
+                  setFilterYear("");
+                  setFilterApproval("");
+                }
+              : openCreate
+          }
+        />
+      ) : (
+        <div className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl overflow-hidden shadow-xs">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50 dark:bg-slate-800/90 border-b border-slate-200 dark:border-slate-700/60">
+                <tr>
+                  {["No. Arsip", "Judul", "Kategori", "Periode", "Tipe", "Status", "Akses", "Aksi"].map(
+                    (h) => (
+                      <th
+                        key={h}
+                        className="text-left px-4 py-3 text-slate-600 dark:text-slate-400 font-semibold text-xs uppercase tracking-wider"
+                      >
+                        {h}
+                      </th>
+                    )
+                  )}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-700/40">
+                {archives.map((a) => {
+                  const approvalInfo = APPROVAL_LABELS[a.approval_status] || APPROVAL_LABELS.approved;
+                  const needsDual = DUAL_APPROVAL_CATEGORIES.includes(a.category);
 
-                return (
-                  <tr key={a.id} className="hover:bg-white dark:bg-slate-700/20 transition-colors">
-                    <td className="px-4 py-3 font-mono text-xs text-slate-600 dark:text-slate-400">{a.archive_number}</td>
-                    <td className="px-4 py-3 text-slate-800 dark:text-slate-200 font-medium max-w-48 truncate" title={a.title}>{a.title}</td>
-                    <td className="px-4 py-3 text-slate-600 dark:text-slate-400 capitalize">{a.category?.replace(/_/g, " ")}</td>
-                    <td className="px-4 py-3">
-                      <span className="px-2 py-0.5 bg-violet-500/10 text-violet-400 border border-violet-500/20 rounded text-xs font-medium">
-                        {a.year}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${a.drive_type === 'folder' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}`}>
-                        {a.drive_type === 'folder' ? '📁 Folder' : '📄 File'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="space-y-1">
-                        <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-medium border ${approvalInfo.color}`}>
-                          {approvalInfo.label}
+                  return (
+                    <tr
+                      key={a.id}
+                      className="hover:bg-slate-50/70 dark:hover:bg-slate-700/30 transition-colors"
+                    >
+                      <td className="px-4 py-3.5 font-mono text-xs text-slate-500 dark:text-slate-400">
+                        {a.archive_number}
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <div
+                          className="text-slate-900 dark:text-slate-100 font-medium max-w-48 truncate"
+                          title={a.title}
+                        >
+                          {a.title}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3.5 text-slate-600 dark:text-slate-300 capitalize text-xs">
+                        {a.category?.replace(/_/g, " ")}
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <span className="px-2 py-0.5 bg-sky-50 dark:bg-sky-950/40 text-[#0284c7] dark:text-[#38bdf8] border border-sky-200 dark:border-sky-800 rounded text-xs font-medium">
+                          {a.year}
                         </span>
-                        {needsDual && a.approval_status !== "approved" && (
-                          <div className="flex gap-1 flex-wrap">
-                            {a.approved_by_admin && (
-                              <span className="px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400 rounded text-[9px]" title={`Admin: ${a.admin_approver_name}`}>
-                                ✓ Admin
-                              </span>
-                            )}
-                            {a.approved_by_sekum && (
-                              <span className="px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400 rounded text-[9px]" title={`Sekretaris: ${a.sekum_approver_name}`}>
-                                ✓ Sekum
-                              </span>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex gap-1 flex-wrap max-w-40" title={a.access_level}>
-                        {a.access_level?.split(",").map(r => (
-                          <span key={r} className="px-2 py-0.5 bg-[#4EA8DE]/10 text-[#4EA8DE] border border-[#4EA8DE]/20 rounded text-[10px] capitalize">{r}</span>
-                        ))}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-1">
-                        <Button size="sm" variant="ghost" onClick={() => openPreview(a)}>👁️</Button>
-                        {canApprove(a) && (
-                          <Button size="sm" variant="ghost" onClick={() => setApproveModal({ open: true, archive: a })}
-                            className="!text-emerald-400 hover:!bg-emerald-500/10">
-                            ✓
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium ${
+                            a.drive_type === "folder"
+                              ? "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800"
+                              : "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800"
+                          }`}
+                        >
+                          {a.drive_type === "folder" ? (
+                            <>
+                              <Folder className="w-3.5 h-3.5" /> Folder
+                            </>
+                          ) : (
+                            <>
+                              <FileText className="w-3.5 h-3.5" /> File
+                            </>
+                          )}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <div className="space-y-1">
+                          <span
+                            className={`inline-block px-2 py-0.5 rounded text-[10px] font-medium border ${approvalInfo.color}`}
+                          >
+                            {approvalInfo.label}
+                          </span>
+                          {needsDual && a.approval_status !== "approved" && (
+                            <div className="flex gap-1 flex-wrap">
+                              {a.approved_by_admin && (
+                                <span
+                                  className="px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 rounded text-[9px] font-medium"
+                                  title={`Admin: ${a.admin_approver_name}`}
+                                >
+                                  ✓ Admin
+                                </span>
+                              )}
+                              {a.approved_by_sekum && (
+                                <span
+                                  className="px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 rounded text-[9px] font-medium"
+                                  title={`Sekretaris: ${a.sekum_approver_name}`}
+                                >
+                                  ✓ Sekum
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <div className="flex gap-1 flex-wrap max-w-40" title={a.access_level}>
+                          {a.access_level?.split(",").map((r) => (
+                            <span
+                              key={r}
+                              className="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600 rounded text-[10px] capitalize font-medium"
+                            >
+                              {r}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <div className="flex items-center gap-1.5">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => openPreview(a)}
+                            title="Pratinjau Dokumen"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
                           </Button>
-                        )}
-                        <Button size="sm" variant="secondary" onClick={() => openEdit(a)}>Edit</Button>
-                        <Button size="sm" variant="danger" onClick={() => handleDelete(a)}>Hapus</Button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                          {canApprove(a) && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => setApproveModal({ open: true, archive: a })}
+                              className="!text-emerald-600 dark:!text-emerald-400 hover:!bg-emerald-50 dark:hover:!bg-emerald-950/30"
+                              title="Setujui Arsip"
+                            >
+                              <Check className="w-3.5 h-3.5" />
+                            </Button>
+                          )}
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => openEdit(a)}
+                            title="Edit Data Arsip"
+                          >
+                            <Edit className="w-3.5 h-3.5" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="danger"
+                            onClick={() => setDelModal({ open: true, archive: a })}
+                            title="Hapus Arsip"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Create/Edit Modal */}
-      <Modal isOpen={modal.open} onClose={() => setModal({ open: false })} title={modal.mode === "create" ? "Tambah Arsip" : "Edit Arsip"} size="lg">
+      <Modal
+        isOpen={modal.open}
+        onClose={() => setModal({ open: false, archive: null })}
+        title={modal.mode === "create" ? "Tambah Arsip Dokumen" : "Edit Arsip Dokumen"}
+        size="lg"
+      >
         <form onSubmit={handleSave} className="space-y-4">
-          {error && <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">{error}</div>}
-
-          {/* Dual approval info */}
-          {modal.mode === "create" && DUAL_APPROVAL_CATEGORIES.includes(form.category) && (
-            <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg text-xs text-amber-400">
-              ⚠️ Kategori <strong>{form.category?.replace(/_/g, " ").toUpperCase()}</strong> memerlukan persetujuan dari <strong>Admin</strong> dan <strong>Sekretaris</strong> sebelum bisa diakses oleh anggota.
+          {error && (
+            <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-600 dark:text-red-400 text-sm">
+              {error}
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-4">
-            <Input label="Nomor Arsip" value={form.archive_number || ""} onChange={(e) => setForm({ ...form, archive_number: e.target.value })} required />
-            <Input label="Periode (Tahun)" type="number" value={form.year || ""} onChange={(e) => setForm({ ...form, year: e.target.value })} required placeholder="Contoh: 2024" />
+          {modal.mode === "create" && DUAL_APPROVAL_CATEGORIES.includes(form.category) && (
+            <div className="p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-xl text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2.5">
+              <AlertTriangle className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
+              <div>
+                Kategori{" "}
+                <strong>{form.category?.replace(/_/g, " ").toUpperCase()}</strong> memerlukan
+                persetujuan ganda dari <strong>Admin</strong> dan <strong>Sekretaris</strong> sebelum
+                bisa diakses oleh anggota biasa.
+              </div>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="Nomor Arsip"
+              value={form.archive_number || ""}
+              onChange={(e) => setForm({ ...form, archive_number: e.target.value })}
+              placeholder="Contoh: ARS-2024-001"
+              required
+            />
+            <Input
+              label="Periode (Tahun)"
+              type="number"
+              value={form.year || ""}
+              onChange={(e) => setForm({ ...form, year: e.target.value })}
+              required
+              placeholder="Contoh: 2024"
+            />
           </div>
-          <Input label="Judul Dokumen" value={form.title || ""} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
-          <div className="grid grid-cols-2 gap-4">
-            <Select label="Kategori" value={form.category || "lpj"} onChange={(e) => setForm({ ...form, category: e.target.value })}>
-              {CATEGORIES.map((c) => <option key={c} value={c}>{c.replace(/_/g, " ").toUpperCase()}</option>)}
+          <Input
+            label="Judul Dokumen"
+            value={form.title || ""}
+            onChange={(e) => setForm({ ...form, title: e.target.value })}
+            placeholder="Contoh: Laporan Pertanggungjawaban Musker 2024"
+            required
+          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Select
+              label="Kategori"
+              value={form.category || "lpj"}
+              onChange={(e) => setForm({ ...form, category: e.target.value })}
+            >
+              {CATEGORIES.map((c) => (
+                <option key={c} value={c}>
+                  {c.replace(/_/g, " ").toUpperCase()}
+                </option>
+              ))}
             </Select>
             <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Akses Role</label>
-              <div className="bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-600 rounded-lg p-3 grid grid-cols-2 gap-2 h-32 overflow-y-auto">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                Hak Akses Role
+              </label>
+              <div className="bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-600 rounded-xl p-3 grid grid-cols-2 gap-2 h-32 overflow-y-auto">
                 {ROLES.map((role) => {
                   const isChecked = (form.access_level || "").split(",").includes(role);
                   const isDisabled = role === "admin";
                   return (
-                    <label key={role} className={`flex items-center gap-2 text-sm ${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}>
+                    <label
+                      key={role}
+                      className={`flex items-center gap-2 text-xs font-medium ${
+                        isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+                      }`}
+                    >
                       <input
                         type="checkbox"
                         checked={isChecked}
                         disabled={isDisabled}
                         onChange={() => handleRoleToggle(role)}
-                        className="rounded border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-[#4EA8DE] focus:ring-[#4EA8DE]"
+                        className="rounded border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-[#0284c7] focus:ring-[#0284c7]"
                       />
                       <span className="text-slate-800 dark:text-slate-200 capitalize">{role}</span>
                     </label>
@@ -274,63 +533,162 @@ export default function AdminArchives() {
               </div>
             </div>
           </div>
-          <Input label="Divisi" value={form.division || ""} onChange={(e) => setForm({ ...form, division: e.target.value })} placeholder="Contoh: Pengurus, Divisi Media" />
-          <Input label="Link Google Drive" value={form.drive_file_id || ""} onChange={(e) => setForm({ ...form, drive_file_id: e.target.value })} required placeholder="Paste link Google Drive atau File ID" />
-          <Textarea label="Deskripsi" value={form.description || ""} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} />
+          <Input
+            label="Divisi Terkait"
+            value={form.division || ""}
+            onChange={(e) => setForm({ ...form, division: e.target.value })}
+            placeholder="Contoh: BPH, Divisi Humas, Divisi Riset"
+          />
+          <Input
+            label="Link Google Drive / File ID"
+            value={form.drive_file_id || ""}
+            onChange={(e) => setForm({ ...form, drive_file_id: e.target.value })}
+            required
+            placeholder="Paste link Google Drive atau File ID"
+          />
+          <Textarea
+            label="Deskripsi & Ringkasan"
+            value={form.description || ""}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            placeholder="Ringkasan isi dokumen arsip..."
+            rows={3}
+          />
           <div className="flex gap-3 justify-end pt-2">
-            <Button type="button" variant="secondary" onClick={() => setModal({ open: false })}>Batal</Button>
-            <Button type="submit" disabled={saving}>{saving ? "Menyimpan..." : "Simpan"}</Button>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setModal({ open: false, archive: null })}
+            >
+              Batal
+            </Button>
+            <Button type="submit" disabled={saving}>
+              {saving ? "Menyimpan Dokumen..." : "Simpan Arsip"}
+            </Button>
           </div>
         </form>
       </Modal>
 
+      {/* Delete Modal */}
+      <Modal
+        isOpen={delModal.open}
+        onClose={() => setDelModal({ open: false, archive: null })}
+        title="Konfirmasi Hapus Arsip"
+        size="sm"
+      >
+        <p className="text-slate-700 dark:text-slate-300 mb-6 text-sm">
+          Apakah Anda yakin ingin menghapus arsip dokumen{" "}
+          <strong className="text-slate-900 dark:text-slate-100">
+            {delModal.archive?.title}
+          </strong>
+          ? File di Google Drive tidak akan terhapus, namun catatan di sistem akan dihapus permanen.
+        </p>
+        <div className="flex gap-3 justify-end">
+          <Button
+            variant="secondary"
+            onClick={() => setDelModal({ open: false, archive: null })}
+          >
+            Batal
+          </Button>
+          <Button variant="danger" onClick={handleDelete}>
+            Hapus
+          </Button>
+        </div>
+      </Modal>
+
       {/* Approve Modal */}
-      <Modal isOpen={approveModal.open} onClose={() => setApproveModal({ open: false })} title="Konfirmasi Persetujuan Arsip" size="md">
+      <Modal
+        isOpen={approveModal.open}
+        onClose={() => setApproveModal({ open: false, archive: null })}
+        title="Konfirmasi Persetujuan Arsip"
+        size="md"
+      >
         {approveModal.archive && (
           <div className="space-y-4">
-            <div className="p-4 bg-white dark:bg-slate-700/40 rounded-lg space-y-2">
-              <div className="text-sm font-medium text-slate-800 dark:text-slate-200">{approveModal.archive.title}</div>
-              <div className="flex flex-wrap gap-2 text-xs">
-                <span className="text-slate-500 dark:text-slate-500">Kategori: <span className="text-slate-700 dark:text-slate-300 capitalize">{approveModal.archive.category?.replace(/_/g, " ")}</span></span>
-                <span className="text-slate-500 dark:text-slate-500">Periode: <span className="text-slate-700 dark:text-slate-300">{approveModal.archive.year}</span></span>
+            <div className="p-4 bg-sky-50 dark:bg-slate-700/40 rounded-xl space-y-2 border border-sky-100 dark:border-slate-600">
+              <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                {approveModal.archive.title}
               </div>
-              <div className="text-xs text-slate-500 dark:text-slate-500">Diunggah oleh: <span className="text-slate-700 dark:text-slate-300">{approveModal.archive.uploaded_by_name}</span></div>
+              <div className="flex flex-wrap gap-2 text-xs">
+                <span className="text-slate-500 dark:text-slate-400">
+                  Kategori:{" "}
+                  <span className="text-slate-800 dark:text-slate-200 capitalize font-medium">
+                    {approveModal.archive.category?.replace(/_/g, " ")}
+                  </span>
+                </span>
+                <span className="text-slate-500 dark:text-slate-400">
+                  Periode:{" "}
+                  <span className="text-slate-800 dark:text-slate-200 font-medium">
+                    {approveModal.archive.year}
+                  </span>
+                </span>
+              </div>
+              <div className="text-xs text-slate-500 dark:text-slate-400">
+                Diunggah oleh:{" "}
+                <span className="text-slate-800 dark:text-slate-200 font-medium">
+                  {approveModal.archive.uploaded_by_name}
+                </span>
+              </div>
             </div>
 
             {/* Approval progress */}
             <div className="space-y-2">
-              <div className="text-sm font-medium text-slate-700 dark:text-slate-300">Status Persetujuan:</div>
+              <div className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                Status Persetujuan:
+              </div>
               <div className="grid grid-cols-2 gap-3">
-                <div className={`p-3 rounded-lg border ${approveModal.archive.approved_by_admin ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600'}`}>
-                  <div className="text-xs text-slate-500 dark:text-slate-500 mb-1">Admin</div>
+                <div
+                  className={`p-3 rounded-xl border ${
+                    approveModal.archive.approved_by_admin
+                      ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800"
+                      : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+                  }`}
+                >
+                  <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">Admin</div>
                   {approveModal.archive.approved_by_admin ? (
-                    <div className="text-sm text-emerald-400 font-medium">✓ {approveModal.archive.admin_approver_name}</div>
+                    <div className="text-xs text-emerald-700 dark:text-emerald-400 font-medium flex items-center gap-1">
+                      <Check className="w-3.5 h-3.5" /> {approveModal.archive.admin_approver_name}
+                    </div>
                   ) : (
-                    <div className="text-sm text-slate-600 dark:text-slate-400">Belum disetujui</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">Belum disetujui</div>
                   )}
                 </div>
-                <div className={`p-3 rounded-lg border ${approveModal.archive.approved_by_sekum ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600'}`}>
-                  <div className="text-xs text-slate-500 dark:text-slate-500 mb-1">Sekretaris</div>
+                <div
+                  className={`p-3 rounded-xl border ${
+                    approveModal.archive.approved_by_sekum
+                      ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800"
+                      : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+                  }`}
+                >
+                  <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">Sekretaris</div>
                   {approveModal.archive.approved_by_sekum ? (
-                    <div className="text-sm text-emerald-400 font-medium">✓ {approveModal.archive.sekum_approver_name}</div>
+                    <div className="text-xs text-emerald-700 dark:text-emerald-400 font-medium flex items-center gap-1">
+                      <Check className="w-3.5 h-3.5" /> {approveModal.archive.sekum_approver_name}
+                    </div>
                   ) : (
-                    <div className="text-sm text-slate-600 dark:text-slate-400">Belum disetujui</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">Belum disetujui</div>
                   )}
                 </div>
               </div>
             </div>
 
-            <div className="p-3 bg-[#4EA8DE]/10 border border-[#4EA8DE]/30 rounded-lg text-xs text-[#4EA8DE]">
-              Anda akan menyetujui arsip ini sebagai <strong>{user.role === "admin" ? "Admin" : "Sekretaris"}</strong>.
-              {(!approveModal.archive.approved_by_admin && !approveModal.archive.approved_by_sekum)
-                ? " Arsip masih memerlukan persetujuan dari pihak lainnya setelah ini."
-                : " Setelah ini arsip akan disetujui sepenuhnya dan dapat diakses oleh anggota."}
+            <div className="p-3 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 rounded-xl text-xs text-sky-800 dark:text-sky-300">
+              Anda akan menyetujui arsip ini sebagai{" "}
+              <strong>{user?.role === "admin" ? "Admin" : "Sekretaris"}</strong>.
+              {!approveModal.archive.approved_by_admin && !approveModal.archive.approved_by_sekum
+                ? " Dokumen masih memerlukan persetujuan dari pihak satu lagi sebelum dapat diakses anggota."
+                : " Setelah ini dokumen akan disetujui penuh dan dapat diakses anggota berhak."}
             </div>
 
-            <div className="flex gap-3 justify-end">
-              <Button variant="secondary" onClick={() => setApproveModal({ open: false })}>Batal</Button>
+            <div className="flex gap-3 justify-end pt-2">
+              <Button
+                variant="secondary"
+                onClick={() => setApproveModal({ open: false, archive: null })}
+              >
+                Batal
+              </Button>
               <Button onClick={() => handleApprove(approveModal.archive)}>
-                Setujui Arsip
+                <Check className="w-4 h-4 mr-1.5" />
+                Setujui Dokumen
               </Button>
             </div>
           </div>
@@ -338,46 +696,75 @@ export default function AdminArchives() {
       </Modal>
 
       {/* Preview Modal */}
-      <Modal isOpen={previewModal.open} onClose={() => setPreviewModal({ open: false })} title={previewModal.archive?.title || "Preview Dokumen"} size="xl">
+      <Modal
+        isOpen={previewModal.open}
+        onClose={() => setPreviewModal({ open: false, archive: null })}
+        title={previewModal.archive?.title || "Preview Dokumen"}
+        size="xl"
+      >
         {previewModal.archive && (
-          <div className="space-y-3">
-            <div className="grid grid-cols-3 gap-3 text-sm">
-              <div><span className="text-slate-500 dark:text-slate-500">Kategori:</span> <span className="text-slate-800 dark:text-slate-200 capitalize">{previewModal.archive.category?.replace(/_/g," ")}</span></div>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
               <div>
-                <span className="text-slate-500 dark:text-slate-500">Periode:</span>{" "}
-                <span className="px-2 py-0.5 bg-violet-500/10 text-violet-400 border border-violet-500/20 rounded text-xs font-medium">
+                <span className="text-slate-500 dark:text-slate-400">Kategori:</span>{" "}
+                <span className="text-slate-800 dark:text-slate-200 capitalize font-medium">
+                  {previewModal.archive.category?.replace(/_/g, " ")}
+                </span>
+              </div>
+              <div>
+                <span className="text-slate-500 dark:text-slate-400">Periode:</span>{" "}
+                <span className="px-2 py-0.5 bg-sky-50 dark:bg-sky-950/40 text-[#0284c7] dark:text-[#38bdf8] border border-sky-200 dark:border-sky-800 rounded font-medium">
                   {previewModal.archive.year}
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 dark:text-slate-500">Status:</span>{" "}
-                <span className={`px-2 py-0.5 rounded text-[10px] font-medium border ${(APPROVAL_LABELS[previewModal.archive.approval_status] || APPROVAL_LABELS.approved).color}`}>
-                  {(APPROVAL_LABELS[previewModal.archive.approval_status] || APPROVAL_LABELS.approved).label}
+                <span className="text-slate-500 dark:text-slate-400">Status:</span>{" "}
+                <span
+                  className={`px-2 py-0.5 rounded font-medium border ${
+                    (APPROVAL_LABELS[previewModal.archive.approval_status] || APPROVAL_LABELS.approved)
+                      .color
+                  }`}
+                >
+                  {
+                    (APPROVAL_LABELS[previewModal.archive.approval_status] || APPROVAL_LABELS.approved)
+                      .label
+                  }
                 </span>
               </div>
-              <div className="col-span-3">
-                <span className="text-slate-500 dark:text-slate-500 mr-2">Akses:</span>
+              <div className="sm:col-span-3">
+                <span className="text-slate-500 dark:text-slate-400 mr-2">Hak Akses:</span>
                 <div className="inline-flex gap-1 flex-wrap">
-                  {previewModal.archive.access_level?.split(",").map(r => (
-                    <span key={r} className="px-2 py-0.5 bg-[#4EA8DE]/10 text-[#4EA8DE] border border-[#4EA8DE]/20 rounded text-[10px] capitalize">{r}</span>
+                  {previewModal.archive.access_level?.split(",").map((r) => (
+                    <span
+                      key={r}
+                      className="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600 rounded capitalize font-medium"
+                    >
+                      {r}
+                    </span>
                   ))}
                 </div>
               </div>
             </div>
-            {previewModal.archive.drive_type === 'folder' ? (
+            {previewModal.archive.drive_type === "folder" ? (
               <DriveFolderBrowser
                 rootFolderId={previewModal.archive.drive_file_id}
                 rootFolderName={previewModal.archive.title}
               />
             ) : (
-              <div className="rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 relative" style={{ height: "500px" }}>
+              <div
+                className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 relative shadow-inner bg-slate-900"
+                style={{ height: "520px" }}
+              >
                 <iframe
                   src={`https://drive.google.com/file/d/${previewModal.archive.drive_file_id}/preview`}
                   className="w-full h-full"
                   title="Document Preview"
                   allow="autoplay"
                 />
-                <div className="absolute top-0 right-0 w-16 h-16 z-10 bg-transparent cursor-not-allowed" title="Pop-out dibatasi" />
+                <div
+                  className="absolute top-0 right-0 w-16 h-16 z-10 bg-transparent cursor-not-allowed"
+                  title="Pop-out dibatasi"
+                />
               </div>
             )}
           </div>

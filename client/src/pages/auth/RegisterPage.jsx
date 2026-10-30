@@ -38,22 +38,22 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#28517E]/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#4EA8DE]/10 rounded-full blur-3xl" />
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#0284c7]/10 rounded-full blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#38bdf8]/15 rounded-full blur-3xl" />
       </div>
 
       <div className="relative w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-[#28517E] rounded-2xl text-3xl mb-4 shadow-lg shadow-[#28517E]/30">📁</div>
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-[#0284c7] text-white rounded-2xl text-3xl mb-4 shadow-lg shadow-[#0284c7]/25" aria-hidden="true">📁</div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">SIMPAR UKM</h1>
           <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">Buat akun baru</p>
         </div>
 
-        <div className="bg-slate-50 dark:bg-slate-800/60 backdrop-blur-sm border border-slate-200 dark:border-slate-700/50 rounded-2xl p-8 shadow-2xl">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 shadow-xl">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-6">Daftar Akun</h2>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">{error}</div>
+            <div className="mb-4 p-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-lg text-red-600 dark:text-red-400 text-sm font-medium">{error}</div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -71,19 +71,20 @@ export default function RegisterPage() {
               <option value="alumni">Alumni</option>
             </Select>
             <div>
-              <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-                Upload KTA (JPG/PNG/WEBP, Max 5MB) <span className="text-red-400">*</span>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                Upload KTA (JPG/PNG/WEBP, Max 5MB) <span className="text-red-600 dark:text-red-400" aria-hidden="true">*</span>
               </label>
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 onChange={(e) => setKtaFile(e.target.files[0])}
-                className="w-full text-sm text-slate-500 dark:text-slate-400
+                className="w-full text-sm text-slate-700 dark:text-slate-300
                   file:mr-4 file:py-2 file:px-4
                   file:rounded-lg file:border-0
-                  file:text-sm file:font-medium
-                  file:bg-[#4EA8DE]/10 file:text-[#4EA8DE]
-                  hover:file:bg-[#4EA8DE]/20
+                  file:text-sm file:font-semibold
+                  file:bg-[#0284c7]/10 dark:file:bg-[#0284c7]/20
+                  file:text-[#0284c7] dark:file:text-[#38bdf8]
+                  hover:file:bg-[#0284c7]/20 dark:hover:file:bg-[#0284c7]/30
                   cursor-pointer transition-colors"
                 required
               />
@@ -95,7 +96,7 @@ export default function RegisterPage() {
 
           <p className="text-center text-sm text-slate-600 dark:text-slate-400 mt-6">
             Sudah punya akun?{" "}
-            <Link to="/login" className="text-[#4EA8DE] hover:text-[#F3620F] font-medium">Masuk</Link>
+            <Link to="/login" className="cursor-pointer text-[#0284c7] dark:text-[#38bdf8] hover:text-[#f97316] dark:hover:text-[#f97316] font-semibold underline-offset-2 hover:underline">Masuk</Link>
           </p>
         </div>
       </div>
