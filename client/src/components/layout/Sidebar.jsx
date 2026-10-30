@@ -22,7 +22,7 @@ import api from "../../api/axios";
 
 const adminNav = [
   { to: "/admin/dashboard",      icon: LayoutDashboard, label: "Dashboard" },
-  { to: "/admin/users",          icon: Users,           label: "Pengguna" },
+  { to: "/admin/users",          icon: Users,           label: "Pengguna", roles: ["admin"] },
   { to: "/admin/items",          icon: Package,         label: "Barang" },
   { to: "/admin/borrowings",     icon: RefreshCw,       label: "Peminjaman" },
   { to: "/admin/archives",       icon: Archive,         label: "Arsip" },
@@ -52,7 +52,9 @@ export default function Sidebar({ isOpen, onClose }) {
   const location = useLocation();
   const [badges, setBadges] = useState({});
   const isAdmin = ["admin", "ketua", "sekretaris"].includes(user?.role);
-  const navItems = isAdmin ? adminNav : memberNav;
+  const navItems = (isAdmin ? adminNav : memberNav).filter(
+    (item) => !item.roles || item.roles.includes(user?.role)
+  );
 
   useEffect(() => {
     if (!user) return;
