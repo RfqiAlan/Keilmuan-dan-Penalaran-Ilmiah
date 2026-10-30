@@ -1,4 +1,5 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
@@ -17,6 +18,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTheme } from "../../contexts/ThemeContext";
+import api from "../../api/axios";
 
 const adminNav = [
   { to: "/admin/dashboard",      icon: LayoutDashboard, label: "Dashboard" },
@@ -47,8 +49,24 @@ export default function Sidebar({ isOpen, onClose }) {
   const { user, logout } = useAuth();
   const { isDarkMode, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [badges, setBadges] = useState({});
   const isAdmin = ["admin", "ketua", "sekretaris"].includes(user?.role);
   const navItems = isAdmin ? adminNav : memberNav;
+
+  useEffect(() => {
+    if (!user) return;
+    fetchBadges();
+  }, [user, location.pathname]);
+
+  const fetchBadges = async () => {
+    try {
+      const res = await api.get("/dashboard/badges");
+      setBadges(res.data || {});
+    } catch (err) {
+      // Diamkan kegagalan badge agar navigasi tidak terganggu
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -107,13 +125,15 @@ export default function Sidebar({ isOpen, onClose }) {
           </div>
           {navItems.map((item) => {
             const Icon = item.icon;
+            const count = badges[item.to] || 0;
+
             return (
               <NavLink
                 key={item.to}
                 to={item.to}
                 onClick={onClose}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 mb-0.5 cursor-pointer ${
+                  `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 mb-1 cursor-pointer ${
                     isActive
                       ? "bg-[#0284c7]/10 dark:bg-[#0284c7]/20 text-[#0284c7] dark:text-[#38bdf8] border border-[#0284c7]/20 dark:border-[#38bdf8]/30 font-semibold"
                       : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200"
@@ -121,7 +141,15 @@ export default function Sidebar({ isOpen, onClose }) {
                 }
               >
                 <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />
-                <span>{item.label}</span>
+                <span className="flex-1 truncate">{item.label}</span>
+                {count > 0 && (
+                  <span
+                    className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[11px] font-bold rounded-full bg-[#0284c7] text-white shadow-xs shrink-0"
+                    title={`${count} item memerlukan perhatian`}
+                  >
+                    {count > 99 ? "99+" : count}
+                  </span>
+                )}
               </NavLink>
             );
           })}

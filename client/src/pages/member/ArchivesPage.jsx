@@ -155,6 +155,7 @@ export default function ArchivesPage() {
           categories={CATEGORIES}
           selected={filterCat}
           onSelect={setFilterCat}
+          multiple={true}
           allLabel="Semua Kategori"
         />
       </div>

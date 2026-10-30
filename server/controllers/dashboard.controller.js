@@ -35,4 +35,47 @@ const getDashboardSummary = async (req, res) => {
   }
 };
 
-module.exports = { getDashboardSummary };
+// GET /api/dashboard/badges
+const getBadgesCount = async (req, res) => {
+  try {
+    const userRole = req.user.role;
+    const userId = req.user.id;
+
+    if (["admin", "ketua", "sekretaris"].includes(userRole)) {
+      const [accessReqs, borrowings, users, archives] = await Promise.all([
+        pool.query("SELECT COUNT(*) AS count FROM access_requests WHERE status = 'pending'"),
+        pool.query("SELECT COUNT(*) AS count FROM borrowings WHERE status = 'pending'"),
+        pool.query("SELECT COUNT(*) AS count FROM users WHERE status = 'pending'"),
+        pool.query("SELECT COUNT(*) AS count FROM archives WHERE approval_status != 'approved'"),
+      ]);
+
+      return res.json({
+        "/admin/access-requests": parseInt(accessReqs.rows[0].count, 10) || 0,
+        "/admin/borrowings": parseInt(borrowings.rows[0].count, 10) || 0,
+        "/admin/users": parseInt(users.rows[0].count, 10) || 0,
+        "/admin/archives": parseInt(archives.rows[0].count, 10) || 0,
+      });
+    } else {
+      const [myBorrowings, myAccessReqs] = await Promise.all([
+        pool.query(
+          "SELECT COUNT(*) AS count FROM borrowings WHERE user_id = $1 AND status IN ('borrowed', 'late')",
+          [userId]
+        ),
+        pool.query(
+          "SELECT COUNT(*) AS count FROM access_requests WHERE user_id = $1 AND status = 'pending'",
+          [userId]
+        ),
+      ]);
+
+      return res.json({
+        "/borrowings/my": parseInt(myBorrowings.rows[0].count, 10) || 0,
+        "/access-requests/my": parseInt(myAccessReqs.rows[0].count, 10) || 0,
+      });
+    }
+  } catch (err) {
+    console.error("Failed to get badges count:", err);
+    res.status(500).json({ message: "Server error." });
+  }
+};
+
+module.exports = { getDashboardSummary, getBadgesCount };

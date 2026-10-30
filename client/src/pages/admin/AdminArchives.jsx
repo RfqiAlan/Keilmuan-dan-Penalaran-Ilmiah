@@ -116,8 +116,22 @@ export default function AdminArchives() {
     setModal({ open: true, mode: "edit", archive });
   };
 
+  const handleCategoryToggle = (cat) => {
+    let cats = form.category ? form.category.split(",").map((c) => c.trim()).filter(Boolean) : [];
+    if (cats.includes(cat)) {
+      cats = cats.filter((c) => c !== cat);
+    } else {
+      cats.push(cat);
+    }
+    setForm({ ...form, category: cats.join(",") });
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
+    if (!form.category || !form.category.trim()) {
+      setError("Pilih minimal satu kategori dokumen.");
+      return;
+    }
     setSaving(true);
     setError("");
     try {
@@ -456,17 +470,18 @@ export default function AdminArchives() {
             </div>
           )}
 
-          {modal.mode === "create" && DUAL_APPROVAL_CATEGORIES.includes(form.category) && (
-            <div className="p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-xl text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2.5">
-              <AlertTriangle className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
-              <div>
-                Kategori{" "}
-                <strong>{form.category?.replace(/_/g, " ").toUpperCase()}</strong> memerlukan
-                persetujuan ganda dari <strong>Admin</strong> dan <strong>Sekretaris</strong> sebelum
-                bisa diakses oleh anggota biasa.
+          {modal.mode === "create" &&
+            (form.category || "")
+              .split(",")
+              .map((c) => c.trim())
+              .some((c) => DUAL_APPROVAL_CATEGORIES.includes(c)) && (
+              <div className="p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-xl text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2.5">
+                <AlertTriangle className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
+                <div>
+                  Kategori arsip yang dipilih mencakup kategori dokumen sensitif (<strong>SK / LPJ / Karya</strong>) yang memerlukan persetujuan ganda dari <strong>Admin</strong> dan <strong>Sekretaris</strong> sebelum bisa diakses oleh anggota biasa.
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
@@ -493,22 +508,53 @@ export default function AdminArchives() {
             required
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Select
-              label="Kategori"
-              value={form.category || "lpj"}
-              onChange={(e) => setForm({ ...form, category: e.target.value })}
-            >
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {c.replace(/_/g, " ").toUpperCase()}
-                </option>
-              ))}
-            </Select>
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  Kategori Dokumen <span className="text-rose-500">*</span>
+                </label>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                  (Bisa pilih lebih dari 1)
+                </span>
+              </div>
+              <div className="bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-600 rounded-xl p-3 flex flex-wrap gap-1.5 h-36 overflow-y-auto">
+                {CATEGORIES.map((c) => {
+                  const isChecked = (form.category || "")
+                    .split(",")
+                    .map((item) => item.trim())
+                    .includes(c);
+                  return (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => handleCategoryToggle(c)}
+                      className={`cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0284c7] ${
+                        isChecked
+                          ? "bg-[#0284c7] text-white shadow-xs font-semibold"
+                          : "bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600/60"
+                      }`}
+                    >
+                      <span
+                        className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center text-[9px] transition-colors ${
+                          isChecked
+                            ? "border-white bg-white text-[#0284c7] font-bold"
+                            : "border-slate-400 dark:border-slate-500"
+                        }`}
+                      >
+                        {isChecked ? "✓" : ""}
+                      </span>
+                      <span className="capitalize">{c.replace(/_/g, " ")}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Hak Akses Role
               </label>
-              <div className="bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-600 rounded-xl p-3 grid grid-cols-2 gap-2 h-32 overflow-y-auto">
+              <div className="bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-600 rounded-xl p-3 grid grid-cols-2 gap-2 h-36 overflow-y-auto">
                 {ROLES.map((role) => {
                   const isChecked = (form.access_level || "").split(",").includes(role);
                   const isDisabled = role === "admin";

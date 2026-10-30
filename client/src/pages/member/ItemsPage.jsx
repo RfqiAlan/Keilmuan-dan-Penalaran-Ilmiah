@@ -97,6 +97,7 @@ export default function ItemsPage() {
           categories={categories}
           selected={filterCat}
           onSelect={setFilterCat}
+          multiple={true}
           allLabel="Semua Kategori"
         />
       </div>

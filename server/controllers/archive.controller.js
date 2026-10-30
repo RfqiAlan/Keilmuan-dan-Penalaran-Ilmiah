@@ -31,7 +31,19 @@ const getAllArchives = async (req, res) => {
       query += ` AND a.approval_status = $${params.length}`;
     }
 
-    if (category) { params.push(category); query += ` AND a.category = $${params.length}`; }
+    if (category) {
+      const cats = category.split(",").map((c) => c.trim()).filter(Boolean);
+      if (cats.length === 1) {
+        params.push(`%${cats[0]}%`);
+        query += ` AND a.category ILIKE $${params.length}`;
+      } else if (cats.length > 1) {
+        const orClauses = cats.map((c) => {
+          params.push(`%${c}%`);
+          return `a.category ILIKE $${params.length}`;
+        });
+        query += ` AND (${orClauses.join(" OR ")})`;
+      }
+    }
     if (year) { params.push(parseInt(year)); query += ` AND a.year = $${params.length}`; }
     if (search) {
       params.push(`%${search}%`);
@@ -129,22 +141,24 @@ const extractDriveInfo = (input) => {
 
 // POST /api/archives
 const createArchive = async (req, res) => {
-  const { archive_number, title, year, category, division, description, drive_file_id, preview_url, access_level } = req.body;
+  let { archive_number, title, year, category, division, description, drive_file_id, preview_url, access_level } = req.body;
 
+  const categoryStr = Array.isArray(category) ? category.join(",") : (category || "");
   const driveInfo = extractDriveInfo(drive_file_id);
-  if (!archive_number || !title || !year || !category || !driveInfo.id) {
+  if (!archive_number || !title || !year || !categoryStr || !driveInfo.id) {
     return res.status(400).json({ message: "Nomor arsip, judul, tahun, kategori, dan Link Google Drive wajib diisi." });
   }
 
   // Determine approval status based on category
-  const needsDualApproval = DUAL_APPROVAL_CATEGORIES.includes(category);
+  const categoryList = categoryStr.split(",").map((c) => c.trim()).filter(Boolean);
+  const needsDualApproval = categoryList.some((c) => DUAL_APPROVAL_CATEGORIES.includes(c));
   const approvalStatus = needsDualApproval ? "draft" : "approved";
 
   try {
     const result = await pool.query(
       `INSERT INTO archives (archive_number, title, year, category, division, description, drive_file_id, preview_url, access_level, drive_type, uploaded_by, approval_status)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
-      [archive_number, title, parseInt(year), category, division, description, driveInfo.id, preview_url, access_level || "admin", driveInfo.type, req.user.id, approvalStatus]
+      [archive_number, title, parseInt(year), categoryStr, division, description, driveInfo.id, preview_url, access_level || "admin", driveInfo.type, req.user.id, approvalStatus]
     );
     await logActivity(req.user.id, "unggah_arsip", "archives", `Arsip baru: ${title} (${year})${needsDualApproval ? " [Perlu dual-approval]" : ""}`);
     res.status(201).json({ message: "Arsip berhasil ditambahkan.", archive: result.rows[0] });
@@ -157,7 +171,8 @@ const createArchive = async (req, res) => {
 
 // PUT /api/archives/:id
 const updateArchive = async (req, res) => {
-  const { title, year, category, division, description, drive_file_id, preview_url, access_level } = req.body;
+  let { title, year, category, division, description, drive_file_id, preview_url, access_level } = req.body;
+  const categoryStr = category !== undefined ? (Array.isArray(category) ? category.join(",") : category) : undefined;
   const driveInfo = drive_file_id ? extractDriveInfo(drive_file_id) : { id: null, type: null };
   try {
     const result = await pool.query(
@@ -173,7 +188,7 @@ const updateArchive = async (req, res) => {
         drive_type    = COALESCE($9, drive_type),
         updated_at    = NOW()
        WHERE id = $10 RETURNING *`,
-      [title, year, category, division, description, driveInfo.id, preview_url, access_level, driveInfo.type, req.params.id]
+      [title, year, categoryStr, division, description, driveInfo.id, preview_url, access_level, driveInfo.type, req.params.id]
     );
     if (result.rows.length === 0) return res.status(404).json({ message: "Arsip tidak ditemukan." });
     res.json({ message: "Arsip diperbarui.", archive: result.rows[0] });

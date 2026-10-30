@@ -8,7 +8,19 @@ const getAllItems = async (req, res) => {
     let query = "SELECT * FROM items WHERE 1=1";
     const params = [];
 
-    if (category) { params.push(category); query += ` AND category = $${params.length}`; }
+    if (category) {
+      const cats = category.split(",").map((c) => c.trim()).filter(Boolean);
+      if (cats.length === 1) {
+        params.push(`%${cats[0]}%`);
+        query += ` AND category ILIKE $${params.length}`;
+      } else if (cats.length > 1) {
+        const orClauses = cats.map((c) => {
+          params.push(`%${c}%`);
+          return `category ILIKE $${params.length}`;
+        });
+        query += ` AND (${orClauses.join(" OR ")})`;
+      }
+    }
     if (status) { params.push(status); query += ` AND status = $${params.length}`; }
     if (search) {
       params.push(`%${search}%`);
