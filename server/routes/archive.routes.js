@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const {
   getAllArchives, getAvailableYears, getPendingArchives, getArchiveById,
-  createArchive, updateArchive, deleteArchive, approveArchive,
+  createArchive, updateArchive, deleteArchive, approveArchive, approveAllArchives,
   checkAccess, getPreview, listDriveFolder,
 } = require("../controllers/archive.controller");
 const verifyToken = require("../middleware/auth");
@@ -12,6 +12,11 @@ router.get("/", verifyToken, getAllArchives);
 router.get("/years", verifyToken, getAvailableYears);
 router.get("/pending", verifyToken, requireRole("admin", "sekretaris"), getPendingArchives);
 router.get("/drive/folder/:folderId", verifyToken, listDriveFolder);
+
+// Batch approval (must be before :id routes)
+router.put("/approve-all", verifyToken, requireRole("admin", "sekretaris"), approveAllArchives);
+router.post("/approve-all", verifyToken, requireRole("admin", "sekretaris"), approveAllArchives);
+
 router.get("/:id/access-check", verifyToken, checkAccess);
 router.get("/:id/preview", verifyToken, getPreview);
 router.get("/:id", verifyToken, getArchiveById);

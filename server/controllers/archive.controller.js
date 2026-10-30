@@ -281,6 +281,75 @@ const approveArchive = async (req, res) => {
   }
 };
 
+// PUT & POST /api/archives/approve-all — Batch approve all pending archives by admin or sekretaris
+const approveAllArchives = async (req, res) => {
+  const userRole = req.user.role;
+  const userId = req.user.id;
+
+  if (!["admin", "sekretaris"].includes(userRole)) {
+    return res.status(403).json({ message: "Hanya admin atau sekretaris yang dapat menyetujui arsip." });
+  }
+
+  try {
+    let query;
+    if (userRole === "admin") {
+      query = `
+        UPDATE archives
+        SET
+          approved_by_admin = $1,
+          admin_approved_at = NOW(),
+          approval_status = CASE
+            WHEN approved_by_sekum IS NOT NULL THEN 'approved'
+            ELSE 'approved_admin'
+          END,
+          updated_at = NOW()
+        WHERE approval_status != 'approved' AND approved_by_admin IS NULL
+        RETURNING id, title, approval_status
+      `;
+    } else {
+      query = `
+        UPDATE archives
+        SET
+          approved_by_sekum = $1,
+          sekum_approved_at = NOW(),
+          approval_status = CASE
+            WHEN approved_by_admin IS NOT NULL THEN 'approved'
+            ELSE 'approved_sekum'
+          END,
+          updated_at = NOW()
+        WHERE approval_status != 'approved' AND approved_by_sekum IS NULL
+        RETURNING id, title, approval_status
+      `;
+    }
+
+    const result = await pool.query(query, [userId]);
+    const count = result.rowCount;
+
+    if (count === 0) {
+      return res.json({
+        message: "Tidak ada dokumen arsip yang menunggu persetujuan Anda saat ini.",
+        count: 0,
+      });
+    }
+
+    await logActivity(
+      userId,
+      "approve_arsip",
+      "archives",
+      `${userRole === "admin" ? "Admin" : "Sekretaris"} menyetujui sekaligus ${count} dokumen arsip`
+    );
+
+    res.json({
+      message: `Berhasil menyetujui seluruh (${count}) dokumen arsip.`,
+      count,
+      archives: result.rows,
+    });
+  } catch (err) {
+    console.error("approveAllArchives error:", err);
+    res.status(500).json({ message: "Gagal memproses persetujuan massal arsip." });
+  }
+};
+
 // GET /api/archives/:id/access-check
 const checkAccess = async (req, res) => {
   try {
@@ -416,6 +485,6 @@ const listDriveFolder = async (req, res) => {
 
 module.exports = {
   getAllArchives, getAvailableYears, getPendingArchives, getArchiveById,
-  createArchive, updateArchive, deleteArchive, approveArchive,
+  createArchive, updateArchive, deleteArchive, approveArchive, approveAllArchives,
   checkAccess, getPreview, listDriveFolder,
 };

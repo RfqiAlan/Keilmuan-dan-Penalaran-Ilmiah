@@ -4,6 +4,7 @@ import {
   Plus,
   Eye,
   Check,
+  CheckCheck,
   Edit,
   Trash2,
   Archive,
@@ -61,9 +62,22 @@ export default function AdminArchives() {
   const [delModal, setDelModal] = useState({ open: false, archive: null });
   const [previewModal, setPreviewModal] = useState({ open: false, archive: null });
   const [approveModal, setApproveModal] = useState({ open: false, archive: null });
+  const [batchApproveModal, setBatchApproveModal] = useState(false);
+  const [batchApproving, setBatchApproving] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
   const [form, setForm] = useState({});
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  const fetchPendingCount = async () => {
+    if (!["admin", "sekretaris"].includes(user?.role)) return;
+    try {
+      const res = await api.get("/archives/pending");
+      setPendingCount(res.data.total || 0);
+    } catch (err) {
+      // ignore
+    }
+  };
 
   const fetchArchives = () => {
     setLoading(true);
@@ -77,6 +91,7 @@ export default function AdminArchives() {
       .then((r) => setArchives(r.data.archives || []))
       .catch(() => setArchives([]))
       .finally(() => setLoading(false));
+    fetchPendingCount();
   };
 
   const fetchAvailableYears = async () => {
@@ -91,7 +106,8 @@ export default function AdminArchives() {
 
   useEffect(() => {
     fetchAvailableYears();
-  }, []);
+    fetchPendingCount();
+  }, [user?.role]);
 
   useEffect(() => {
     fetchArchives();
@@ -195,6 +211,22 @@ export default function AdminArchives() {
     }
   };
 
+  const handleBatchApprove = async () => {
+    setBatchApproving(true);
+    try {
+      const res = await api.put("/archives/approve-all");
+      showToast(res.data.message || "Semua persetujuan arsip berhasil disetujui!", "success");
+      setBatchApproveModal(false);
+      fetchArchives();
+      fetchPendingCount();
+    } catch (err) {
+      const msg = err.response?.data?.message || "Gagal menyetujui semua arsip.";
+      showToast(msg, "error");
+    } finally {
+      setBatchApproving(false);
+    }
+  };
+
   // Check if current user can approve this archive
   const canApprove = (archive) => {
     if (archive.approval_status === "approved") return false;
@@ -220,10 +252,30 @@ export default function AdminArchives() {
             Kelola berkas resmi, dokumen digital, dan persetujuan arsip UKM
           </p>
         </div>
-        <Button onClick={openCreate}>
-          <Plus className="w-4 h-4 mr-1.5" />
-          Tambah Arsip
-        </Button>
+        <div className="flex items-center gap-2.5 flex-wrap">
+          {["admin", "sekretaris"].includes(user?.role) && (
+            <Button
+              variant="outline"
+              onClick={() => setBatchApproveModal(true)}
+              disabled={batchApproving || pendingCount === 0}
+              className={`border-emerald-600/40 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 ${
+                pendingCount > 0 ? "font-semibold shadow-xs" : "opacity-60"
+              }`}
+              title={
+                pendingCount > 0
+                  ? `Setujui sekaligus ${pendingCount} dokumen arsip yang menunggu persetujuan`
+                  : "Tidak ada arsip yang menunggu persetujuan Anda saat ini"
+              }
+            >
+              <CheckCheck className="w-4 h-4 mr-1.5 text-emerald-600 dark:text-emerald-400" />
+              Setujui Semua Persetujuan {pendingCount > 0 ? `(${pendingCount})` : ""}
+            </Button>
+          )}
+          <Button onClick={openCreate}>
+            <Plus className="w-4 h-4 mr-1.5" />
+            Tambah Arsip
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -758,6 +810,55 @@ export default function AdminArchives() {
             </div>
           </div>
         )}
+      </Modal>
+
+      {/* Batch Approve Modal */}
+      <Modal
+        isOpen={batchApproveModal}
+        onClose={() => !batchApproving && setBatchApproveModal(false)}
+        title="Setujui Semua Persetujuan Arsip"
+      >
+        <div className="space-y-4">
+          <div className="p-3.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl text-xs text-emerald-900 dark:text-emerald-200 space-y-1.5">
+            <div className="flex items-center gap-2 font-semibold text-emerald-800 dark:text-emerald-300">
+              <CheckCheck className="w-4 h-4" />
+              <span>Konfirmasi Persetujuan Massal</span>
+            </div>
+            <p>
+              Anda akan menyetujui sekaligus <strong>{pendingCount} dokumen arsip</strong> yang sedang menunggu persetujuan dari <strong>{user?.role === "admin" ? "Admin" : "Sekretaris"}</strong>.
+            </p>
+            <p className="text-[11px] text-emerald-700 dark:text-emerald-300/80">
+              Dokumen yang sudah disetujui pihak lain akan langsung berstatus <em>Disetujui Penuh</em> dan dapat diakses anggota berhak.
+            </p>
+          </div>
+
+          <div className="flex gap-3 justify-end pt-2">
+            <Button
+              variant="secondary"
+              onClick={() => setBatchApproveModal(false)}
+              disabled={batchApproving}
+            >
+              Batal
+            </Button>
+            <Button
+              onClick={handleBatchApprove}
+              disabled={batchApproving || pendingCount === 0}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              {batchApproving ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+                  <span>Memproses...</span>
+                </div>
+              ) : (
+                <>
+                  <CheckCheck className="w-4 h-4 mr-1.5" />
+                  Ya, Setujui Semua ({pendingCount})
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
       </Modal>
 
       {/* Preview Modal */}
