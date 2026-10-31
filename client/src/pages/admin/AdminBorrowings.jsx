@@ -74,8 +74,8 @@ export default function AdminBorrowings() {
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-3">
-        <div className="relative flex-1 min-w-48">
+      <div className="flex flex-wrap gap-2.5 sm:gap-3">
+        <div className="relative w-full sm:w-auto sm:flex-1 min-w-[200px]">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             value={search}
@@ -88,7 +88,7 @@ export default function AdminBorrowings() {
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="cursor-pointer bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0284c7] shadow-xs"
+          className="cursor-pointer bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0284c7] shadow-xs w-full sm:w-auto"
         >
           <option value="">Semua Status</option>
           {["pending", "approved", "borrowed", "returned", "rejected", "late", "cancelled"].map((s) => (
@@ -123,7 +123,7 @@ export default function AdminBorrowings() {
       ) : (
         <div className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl overflow-hidden shadow-xs">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm min-w-[720px]">
               <thead className="bg-slate-50 dark:bg-slate-800/90 border-b border-slate-200 dark:border-slate-700/60">
                 <tr>
                   {["Peminjam", "Barang", "Jml", "Tgl Pinjam", "Tgl Kembali", "Status", "Aksi"].map((h) => (

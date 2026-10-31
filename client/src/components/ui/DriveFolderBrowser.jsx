@@ -118,7 +118,7 @@ export default function DriveFolderBrowser({ rootFolderId, rootFolderName }) {
         </div>
 
         {/* File preview iframe */}
-        <div className="rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 relative" style={{ height: "520px" }}>
+        <div className="rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 relative h-[55vh] sm:h-[520px]">
           <iframe
             src={previewFile.previewUrl}
             className="w-full h-full"
@@ -177,7 +177,7 @@ export default function DriveFolderBrowser({ rootFolderId, rootFolderName }) {
           </div>
 
           {/* Type Filter Pills */}
-          <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-lg border border-slate-200 dark:border-slate-700/60 shrink-0 text-xs">
+          <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-lg border border-slate-200 dark:border-slate-700/60 shrink-0 text-xs overflow-x-auto max-w-full">
             <button
               type="button"
               onClick={() => setTypeFilter("all")}

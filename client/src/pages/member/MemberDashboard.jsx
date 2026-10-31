@@ -31,34 +31,34 @@ export default function MemberDashboard() {
         <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">Kelola peminjaman barang dan akses dokumen Anda</p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Link to="/items" className="group bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 hover:border-[#0284c7] transition-all duration-200 shadow-sm block">
-          <div className="w-10 h-10 rounded-lg bg-sky-50 dark:bg-sky-950/40 text-[#0284c7] dark:text-[#38bdf8] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
-            <Package className="w-5 h-5" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <Link to="/items" className="group bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-3.5 sm:p-5 hover:border-[#0284c7] transition-all duration-200 shadow-sm block">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-sky-50 dark:bg-sky-950/40 text-[#0284c7] dark:text-[#38bdf8] flex items-center justify-center mb-2.5 sm:mb-3 group-hover:scale-105 transition-transform">
+            <Package className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <div className="font-semibold text-slate-900 dark:text-slate-100 group-hover:text-[#0284c7] transition-colors">Lihat Barang</div>
-          <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">Ajukan peminjaman</div>
+          <div className="font-semibold text-sm sm:text-base text-slate-900 dark:text-slate-100 group-hover:text-[#0284c7] transition-colors truncate">Lihat Barang</div>
+          <div className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1 truncate">Ajukan peminjaman</div>
         </Link>
-        <Link to="/archives" className="group bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 hover:border-emerald-500 transition-all duration-200 shadow-sm block">
-          <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
-            <Archive className="w-5 h-5" />
+        <Link to="/archives" className="group bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-3.5 sm:p-5 hover:border-emerald-500 transition-all duration-200 shadow-sm block">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-2.5 sm:mb-3 group-hover:scale-105 transition-transform">
+            <Archive className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <div className="font-semibold text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 transition-colors">Arsip Dokumen</div>
-          <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">Lihat dokumen UKM</div>
+          <div className="font-semibold text-sm sm:text-base text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 transition-colors truncate">Arsip Dokumen</div>
+          <div className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1 truncate">Lihat dokumen UKM</div>
         </Link>
-        <Link to="/borrowings/my" className="group bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 hover:border-sky-500 transition-all duration-200 shadow-sm block">
-          <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
-            <RefreshCw className="w-5 h-5" />
+        <Link to="/borrowings/my" className="group bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-3.5 sm:p-5 hover:border-sky-500 transition-all duration-200 shadow-sm block">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-2.5 sm:mb-3 group-hover:scale-105 transition-transform">
+            <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <div className="font-semibold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 transition-colors">Peminjaman Saya</div>
-          <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">{loading ? "..." : `${myBorrowings.length} aktif`}</div>
+          <div className="font-semibold text-sm sm:text-base text-slate-900 dark:text-slate-100 group-hover:text-blue-600 transition-colors truncate">Peminjaman Saya</div>
+          <div className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1 truncate">{loading ? "..." : `${myBorrowings.length} aktif`}</div>
         </Link>
-        <Link to="/access-requests/my" className="group bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 hover:border-amber-500 transition-all duration-200 shadow-sm block">
-          <div className="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
-            <KeyRound className="w-5 h-5" />
+        <Link to="/access-requests/my" className="group bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-3.5 sm:p-5 hover:border-amber-500 transition-all duration-200 shadow-sm block">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-2.5 sm:mb-3 group-hover:scale-105 transition-transform">
+            <KeyRound className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <div className="font-semibold text-slate-900 dark:text-slate-100 group-hover:text-amber-600 transition-colors">Permintaan Akses</div>
-          <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">{loading ? "..." : `${myRequests.length} diajukan`}</div>
+          <div className="font-semibold text-sm sm:text-base text-slate-900 dark:text-slate-100 group-hover:text-amber-600 transition-colors truncate">Permintaan Akses</div>
+          <div className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1 truncate">{loading ? "..." : `${myRequests.length} diajukan`}</div>
         </Link>
       </div>
 

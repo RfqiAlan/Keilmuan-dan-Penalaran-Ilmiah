@@ -27,7 +27,7 @@ export default function Modal({ isOpen, onClose, title, children, size = "md" })
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -35,22 +35,22 @@ export default function Modal({ isOpen, onClose, title, children, size = "md" })
     >
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" aria-hidden="true" />
       <div
-        className={`relative w-full ${sizes[size]} max-h-[90vh] flex flex-col bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl animate-fade-in`}
+        className={`relative w-full ${sizes[size]} max-h-[92dvh] sm:max-h-[90vh] flex flex-col bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl animate-fade-in`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-slate-200 dark:border-slate-700">
-          <h2 id="modal-title" className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+        <div className="flex items-center justify-between p-3.5 sm:p-5 border-b border-slate-200 dark:border-slate-700">
+          <h2 id="modal-title" className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100 truncate pr-2">
             {title}
           </h2>
           <button
             onClick={onClose}
             aria-label="Tutup dialog"
-            className="cursor-pointer p-2 -mr-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors text-xl leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0284c7]"
+            className="cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center -mr-1.5 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors text-2xl leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0284c7]"
           >
             &times;
           </button>
         </div>
-        <div className="p-4 sm:p-6 overflow-y-auto flex-1">{children}</div>
+        <div className="p-3.5 sm:p-6 overflow-y-auto flex-1">{children}</div>
       </div>
     </div>
   );

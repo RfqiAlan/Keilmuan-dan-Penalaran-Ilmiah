@@ -94,16 +94,16 @@ export default function ProfilePage() {
       </div>
 
       {/* Profile Info */}
-      <div className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-6 shadow-xs">
-        <div className="flex items-center gap-4 mb-6">
-          <div className="w-16 h-16 bg-sky-100 dark:bg-sky-950/60 border-2 border-sky-300 dark:border-sky-800 rounded-full flex items-center justify-center text-2xl font-bold text-[#0284c7] dark:text-[#38bdf8] shrink-0">
+      <div className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-4 sm:p-6 shadow-xs">
+        <div className="flex items-center gap-3.5 sm:gap-4 mb-5 sm:mb-6">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 bg-sky-100 dark:bg-sky-950/60 border-2 border-sky-300 dark:border-sky-800 rounded-full flex items-center justify-center text-xl sm:text-2xl font-bold text-[#0284c7] dark:text-[#38bdf8] shrink-0">
             {user?.name?.charAt(0).toUpperCase()}
           </div>
-          <div>
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+          <div className="min-w-0">
+            <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100 truncate">
               {user?.name}
             </h2>
-            <div className="text-slate-500 dark:text-slate-400 text-xs">
+            <div className="text-slate-500 dark:text-slate-400 text-xs truncate">
               {user?.email}
             </div>
             <div className="mt-1.5">
@@ -146,8 +146,8 @@ export default function ProfilePage() {
       </div>
 
       {/* KTA Section */}
-      <div className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-6 shadow-xs">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-4 sm:p-6 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div>
             <h3 className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <CreditCard className="w-5 h-5 text-[#0284c7] dark:text-[#38bdf8]" />
@@ -158,7 +158,7 @@ export default function ProfilePage() {
             </p>
           </div>
           {ktaInfo?.hasKta && (
-            <span className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 rounded-full text-xs font-medium flex items-center gap-1">
+            <span className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 rounded-full text-xs font-medium flex items-center gap-1 w-fit">
               <CheckCircle2 className="w-3.5 h-3.5" /> Terverifikasi
             </span>
           )}

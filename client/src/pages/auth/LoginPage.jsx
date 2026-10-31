@@ -46,7 +46,7 @@ export default function LoginPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 shadow-xl">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-8 shadow-xl">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-6">Masuk ke Akun</h2>
 
           {error && (

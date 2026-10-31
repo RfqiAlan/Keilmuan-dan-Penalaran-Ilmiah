@@ -19,15 +19,15 @@ export function StatCard({ icon: Icon, label, value, color = "indigo", trend }) 
   const isComponent = typeof Icon === "function" || (typeof Icon === "object" && Icon !== null && "$$typeof" in Icon);
 
   return (
-    <div className={`${cls} border rounded-xl p-5 transition-colors duration-150`}>
-      <div className="flex items-center justify-between mb-3">
-        <div className="w-10 h-10 rounded-lg bg-white/70 dark:bg-slate-800/70 flex items-center justify-center text-xl shrink-0" aria-hidden="true">
-          {isComponent ? <Icon className="w-5 h-5" /> : Icon}
+    <div className={`${cls} border rounded-xl p-3.5 sm:p-5 transition-colors duration-150`}>
+      <div className="flex items-center justify-between mb-2 sm:mb-3">
+        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-white/70 dark:bg-slate-800/70 flex items-center justify-center text-lg sm:text-xl shrink-0" aria-hidden="true">
+          {isComponent ? <Icon className="w-4 h-4 sm:w-5 sm:h-5" /> : Icon}
         </div>
-        {trend && <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">{trend}</span>}
+        {trend && <span className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 font-medium">{trend}</span>}
       </div>
-      <div className="text-3xl font-bold text-slate-900 dark:text-slate-100">{value ?? "—"}</div>
-      <div className="text-sm text-slate-600 dark:text-slate-400 mt-1">{label}</div>
+      <div className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">{value ?? "—"}</div>
+      <div className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1 truncate" title={label}>{label}</div>
     </div>
   );
 }

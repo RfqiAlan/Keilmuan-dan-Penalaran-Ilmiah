@@ -128,8 +128,8 @@ export default function ArchivesPage() {
 
       {/* Filters */}
       <div className="space-y-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative flex-1 min-w-64">
+        <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+          <div className="relative w-full sm:w-auto sm:flex-1 min-w-[200px]">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               value={search}
@@ -142,7 +142,7 @@ export default function ArchivesPage() {
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="cursor-pointer bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0284c7] shadow-xs"
+            className="cursor-pointer bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0284c7] shadow-xs w-full sm:w-auto"
           >
             <option value="">Semua Format</option>
             <option value="file">📄 File Dokumen</option>
@@ -152,7 +152,7 @@ export default function ArchivesPage() {
           <select
             value={filterYear}
             onChange={(e) => setFilterYear(e.target.value)}
-            className="cursor-pointer bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0284c7] shadow-xs"
+            className="cursor-pointer bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0284c7] shadow-xs w-full sm:w-auto"
           >
             <option value="">Semua Periode</option>
             {availableYears.map((y) => (
@@ -199,7 +199,7 @@ export default function ArchivesPage() {
       ) : (
         <div className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl overflow-hidden shadow-xs">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm min-w-[720px]">
               <thead className="bg-slate-50 dark:bg-slate-800/90 border-b border-slate-200 dark:border-slate-700/60">
                 <tr>
                   {["No. Arsip", "Judul", "Kategori", "Periode", "Tipe", "Divisi", "Akses", "Aksi"].map((h) => (
@@ -331,8 +331,7 @@ export default function ArchivesPage() {
             />
           ) : (
             <div
-              className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 relative shadow-inner bg-slate-900"
-              style={{ height: "520px" }}
+              className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 relative shadow-inner bg-slate-900 h-[60vh] sm:h-[520px]"
             >
               {previewModal.previewUrl && (
                 <>

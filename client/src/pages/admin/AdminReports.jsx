@@ -247,7 +247,7 @@ export default function AdminReports() {
       )}
 
       {/* Main Bar Chart: Monthly Borrowing Volume */}
-      <div className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-6 shadow-xs space-y-4">
+      <div className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-4 sm:p-6 shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-700/60 pb-4">
           <div>
             <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
@@ -264,17 +264,19 @@ export default function AdminReports() {
         </div>
 
         {loading ? (
-          <div className="h-56 flex items-end justify-between gap-2 pt-8 px-4">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-2">
-                <Skeleton className="w-full h-32 rounded-t-md" />
-                <Skeleton className="w-6 h-3" />
-              </div>
-            ))}
+          <div className="h-56 flex items-end justify-between gap-2 pt-8 px-4 overflow-x-auto">
+            <div className="min-w-[500px] flex items-end justify-between gap-2 w-full">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div key={i} className="flex-1 flex flex-col items-center gap-2">
+                  <Skeleton className="w-full h-32 rounded-t-md" />
+                  <Skeleton className="w-6 h-3" />
+                </div>
+              ))}
+            </div>
           </div>
         ) : (
-          <div className="pt-4">
-            <div className="h-52 flex items-end gap-2 sm:gap-4 px-2">
+          <div className="pt-4 overflow-x-auto">
+            <div className="h-52 min-w-[500px] flex items-end gap-2 sm:gap-4 px-2">
               {monthlyTrends.map((col) => (
                 <div key={col.month} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
                   <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300 opacity-80 group-hover:opacity-100 transition-opacity">
@@ -301,9 +303,9 @@ export default function AdminReports() {
       </div>
 
       {/* Two Column Breakdown */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Top Borrowed Items */}
-        <div className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-6 shadow-xs space-y-4">
+        <div className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-4 sm:p-6 shadow-xs space-y-4">
           <div className="border-b border-slate-100 dark:border-slate-700/60 pb-3">
             <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <Package className="w-4 h-4 text-[#0284c7] dark:text-[#38bdf8]" />

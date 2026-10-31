@@ -56,14 +56,14 @@ export default function AdminDashboard() {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard icon={Package}       label="Total Barang"     value={stats.items?.total}     color="indigo" />
         <StatCard icon={CheckCircle2}  label="Barang Tersedia"  value={stats.items?.available}  color="green" />
         <StatCard icon={RefreshCw}     label="Sedang Dipinjam"  value={stats.items?.borrowed}   color="blue" />
         <StatCard icon={AlertTriangle} label="Barang Rusak"     value={stats.items?.damaged}    color="red" />
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard icon={Archive}       label="Total Arsip"          value={stats.archives?.total}            color="indigo" />
         <StatCard icon={Clock}         label="Request Peminjaman"    value={stats.borrowings?.pending}        color="yellow" />
         <StatCard icon={KeyRound}      label="Request Akses Dokumen" value={stats.access_requests?.pending} color="orange" />
@@ -72,12 +72,12 @@ export default function AdminDashboard() {
 
       {/* Recent Activity */}
       <div className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl overflow-hidden shadow-sm">
-        <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700/60">
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-200 dark:border-slate-700/60">
           <h2 className="font-semibold text-slate-900 dark:text-slate-100">Aktivitas Terbaru</h2>
         </div>
         <div className="divide-y divide-slate-100 dark:divide-slate-700/40">
           {stats.recent_activity?.length > 0 ? stats.recent_activity.map((log) => (
-            <div key={log.id} className="px-6 py-3 flex items-center gap-4 hover:bg-slate-50 dark:hover:bg-slate-700/20 transition-colors">
+            <div key={log.id} className="px-4 sm:px-6 py-3 flex items-center gap-3 sm:gap-4 hover:bg-slate-50 dark:hover:bg-slate-700/20 transition-colors">
               <div className="w-8 h-8 bg-[#0284c7]/15 border border-[#0284c7]/30 rounded-full flex items-center justify-center text-xs font-bold text-[#0284c7] dark:text-[#38bdf8] shrink-0">
                 {log.user_name?.charAt(0).toUpperCase()}
               </div>

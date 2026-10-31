@@ -180,7 +180,7 @@ export default function AdminUsers() {
       ) : (
         <div className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl overflow-hidden shadow-xs">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm min-w-[720px]">
               <thead className="bg-slate-50 dark:bg-slate-800/90 border-b border-slate-200 dark:border-slate-700/60">
                 <tr>
                   {["Nama", "Email", "Role", "No. HP", "Status", "Bergabung", "Aksi"].map((h) => (

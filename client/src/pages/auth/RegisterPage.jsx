@@ -49,7 +49,7 @@ export default function RegisterPage() {
           <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">Buat akun baru</p>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 shadow-xl">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-8 shadow-xl">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-6">Daftar Akun</h2>
 
           {error && (
