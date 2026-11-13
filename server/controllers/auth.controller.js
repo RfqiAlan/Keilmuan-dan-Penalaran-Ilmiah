@@ -29,7 +29,7 @@ const register = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const allowedRoles = ["admin", "ketua", "sekretaris", "bendahara", "koordinator", "anggota", "alumni"];
+    const allowedRoles = ["admin", "ketua", "sekretaris", "bendahara", "koordinator", "anggota", "anggota_bph", "alumni"];
     const userRole = allowedRoles.includes(role) ? role : "anggota";
 
     // KTA is kept in memory (req.file) and NOT saved to database/storage

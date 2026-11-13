@@ -37,7 +37,7 @@ const CATEGORIES = [
   "keuangan",
   "sertifikat",
 ];
-const ROLES = ["admin", "ketua", "sekretaris", "bendahara", "koordinator", "anggota", "alumni"];
+const ROLES = ["admin", "ketua", "sekretaris", "bendahara", "koordinator", "anggota", "anggota_bph", "alumni"];
 const DUAL_APPROVAL_CATEGORIES = ["sk", "lpj", "arsip_karya"];
 
 const APPROVAL_LABELS = {
@@ -637,7 +637,9 @@ export default function AdminArchives() {
                         onChange={() => handleRoleToggle(role)}
                         className="rounded border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-[#0284c7] focus:ring-[#0284c7]"
                       />
-                      <span className="text-slate-800 dark:text-slate-200 capitalize">{role}</span>
+                      <span className="text-slate-800 dark:text-slate-200 capitalize">
+                        {role === "anggota_bph" ? "Anggota BPH" : role}
+                      </span>
                     </label>
                   );
                 })}

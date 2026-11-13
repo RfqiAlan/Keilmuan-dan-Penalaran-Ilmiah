@@ -140,7 +140,18 @@ export default function AdminUsers() {
     }
   };
 
-  const roles = ["admin", "ketua", "sekretaris", "bendahara", "koordinator", "anggota", "alumni"];
+  const roleLabels = {
+    admin: "Administrator",
+    ketua: "Ketua UKM",
+    sekretaris: "Sekretaris",
+    bendahara: "Bendahara",
+    koordinator: "Koordinator",
+    anggota: "Anggota",
+    anggota_bph: "Anggota BPH",
+    alumni: "Alumni",
+  };
+
+  const roles = ["admin", "ketua", "sekretaris", "bendahara", "koordinator", "anggota", "anggota_bph", "alumni"];
   const statuses = ["pending", "active", "inactive", "suspended"];
 
   return (
@@ -223,8 +234,8 @@ export default function AdminUsers() {
                       {u.email}
                     </td>
                     <td className="px-4 py-3.5">
-                      <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600 rounded text-xs capitalize font-medium">
-                        {u.role}
+                      <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600 rounded text-xs font-medium">
+                        {roleLabels[u.role] || u.role}
                       </span>
                     </td>
                     <td className="px-4 py-3.5 text-slate-600 dark:text-slate-400 text-xs">
@@ -324,7 +335,7 @@ export default function AdminUsers() {
             >
               {roles.map((r) => (
                 <option key={r} value={r}>
-                  {r.toUpperCase()}
+                  {roleLabels[r] || r.toUpperCase()}
                 </option>
               ))}
             </Select>

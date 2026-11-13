@@ -67,6 +67,7 @@ export default function RegisterPage() {
               onChange={(e) => setForm({ ...form, phone: e.target.value })} />
             <Select label="Role" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
               <option value="anggota">Anggota</option>
+              <option value="anggota_bph">Anggota BPH</option>
               <option value="koordinator">Koordinator Divisi</option>
               <option value="alumni">Alumni</option>
             </Select>

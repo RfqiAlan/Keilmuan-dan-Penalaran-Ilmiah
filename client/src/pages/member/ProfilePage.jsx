@@ -16,6 +16,7 @@ const roleLabels = {
   bendahara: "Bendahara",
   koordinator: "Koordinator Divisi",
   anggota: "Anggota",
+  anggota_bph: "Anggota BPH",
   alumni: "Alumni",
 };
 

@@ -57,7 +57,7 @@ const getUserById = async (req, res) => {
 // PUT /api/users/:id
 const updateUser = async (req, res) => {
   const { name, phone, role, status, avatar_url } = req.body;
-  const allowedRoles = ["admin", "ketua", "sekretaris", "bendahara", "koordinator", "anggota", "alumni"];
+  const allowedRoles = ["admin", "ketua", "sekretaris", "bendahara", "koordinator", "anggota", "anggota_bph", "alumni"];
   const allowedStatuses = ["active", "inactive", "suspended"];
 
   if (role && !allowedRoles.includes(role)) {

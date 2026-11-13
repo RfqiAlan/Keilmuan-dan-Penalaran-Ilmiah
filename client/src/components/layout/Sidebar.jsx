@@ -43,7 +43,8 @@ const memberNav = [
 
 const roleLabels = {
   admin: "Administrator", ketua: "Ketua UKM", sekretaris: "Sekretaris",
-  bendahara: "Bendahara", koordinator: "Koordinator", anggota: "Anggota", alumni: "Alumni",
+  bendahara: "Bendahara", koordinator: "Koordinator", anggota: "Anggota",
+  anggota_bph: "Anggota BPH", alumni: "Alumni",
 };
 
 export default function Sidebar({ isOpen, onClose }) {
