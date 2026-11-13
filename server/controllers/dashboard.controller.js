@@ -3,7 +3,7 @@ const pool = require("../config/db");
 // GET /api/dashboard/summary
 const getDashboardSummary = async (req, res) => {
   try {
-    const [items, borrowings, archives, accessReqs, logs] = await Promise.all([
+    const [items, borrowings, archives, accessReqs, pendingUsers, logs] = await Promise.all([
       pool.query(`SELECT
         COUNT(*) AS total,
         SUM(CASE WHEN status='available' THEN 1 ELSE 0 END) AS available,
@@ -17,6 +17,7 @@ const getDashboardSummary = async (req, res) => {
         FROM borrowings`),
       pool.query("SELECT COUNT(*) AS total FROM archives"),
       pool.query("SELECT COUNT(*) AS pending FROM access_requests WHERE status='pending'"),
+      pool.query("SELECT COUNT(*) AS pending FROM users WHERE status='pending'"),
       pool.query(`SELECT al.*, u.name AS user_name FROM activity_logs al
                   LEFT JOIN users u ON al.user_id = u.id
                   ORDER BY al.created_at DESC LIMIT 10`),
@@ -27,6 +28,7 @@ const getDashboardSummary = async (req, res) => {
       borrowings: borrowings.rows[0],
       archives: archives.rows[0],
       access_requests: accessReqs.rows[0],
+      users: pendingUsers.rows[0],
       recent_activity: logs.rows,
     });
   } catch (err) {

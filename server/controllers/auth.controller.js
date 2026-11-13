@@ -7,10 +7,10 @@ const { notifyAdminNewUser } = require("../utils/notifier");
 
 // POST /api/auth/register
 const register = async (req, res) => {
-  const { name, email, password, phone, role } = req.body;
+  const { name, email, password, phone, role, nra } = req.body;
 
-  if (!name || !email || !password) {
-    return res.status(400).json({ message: "Nama, email, dan password wajib diisi." });
+  if (!name || !email || !password || !nra) {
+    return res.status(400).json({ message: "Nama, NRA, email, dan password wajib diisi." });
   }
   if (password.length < 6) {
     return res.status(400).json({ message: "Password minimal 6 karakter." });
@@ -28,6 +28,11 @@ const register = async (req, res) => {
       return res.status(409).json({ message: "Email sudah terdaftar." });
     }
 
+    const existingNra = await pool.query("SELECT id FROM users WHERE nra = $1", [nra.trim()]);
+    if (existingNra.rows.length > 0) {
+      return res.status(409).json({ message: "NRA sudah terdaftar pada akun lain." });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const allowedRoles = ["admin", "ketua", "sekretaris", "bendahara", "koordinator", "anggota", "anggota_bph", "alumni"];
     const userRole = allowedRoles.includes(role) ? role : "anggota";
@@ -37,13 +42,13 @@ const register = async (req, res) => {
     const initialStatus = "pending";
 
     const result = await pool.query(
-      `INSERT INTO users (name, email, password, phone, role, status, kta_drive_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, name, email, phone, role, status, created_at`,
-      [name, email, hashedPassword, phone || null, userRole, initialStatus, ktaFileName]
+      `INSERT INTO users (name, email, password, phone, role, status, kta_drive_id, nra)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id, name, email, phone, role, status, nra, created_at`,
+      [name, email, hashedPassword, phone || null, userRole, initialStatus, ktaFileName, nra.trim()]
     );
 
     const user = result.rows[0];
-    await logActivity(user.id, "register", "auth", `User baru mendaftar: ${email}`);
+    await logActivity(user.id, "register", "auth", `User baru mendaftar: ${email} (NRA: ${nra.trim()})`);
 
     // Trigger email notification (must be awaited on Vercel Serverless)
     await notifyAdminNewUser(user, req.file);
@@ -103,6 +108,7 @@ const login = async (req, res) => {
         role: user.role,
         status: user.status,
         avatar_url: user.avatar_url,
+        nra: user.nra,
       },
     });
   } catch (err) {
@@ -115,7 +121,7 @@ const login = async (req, res) => {
 const getMe = async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, name, email, phone, role, status, avatar_url, created_at FROM users WHERE id = $1",
+      "SELECT id, name, email, phone, role, status, avatar_url, nra, created_at FROM users WHERE id = $1",
       [req.user.id]
     );
     if (result.rows.length === 0) {

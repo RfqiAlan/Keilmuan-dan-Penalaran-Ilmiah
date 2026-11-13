@@ -60,9 +60,19 @@ const getAllAccessRequests = async (req, res) => {
 const getMyAccessRequests = async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT ar.*, a.title AS archive_title, a.category AS archive_category
-       FROM access_requests ar LEFT JOIN archives a ON ar.archive_id = a.id
-       WHERE ar.user_id = $1 ORDER BY ar.created_at DESC`,
+      `SELECT ar.*,
+              a.title AS archive_title,
+              a.category AS archive_category,
+              a.year AS archive_year,
+              a.archive_number,
+              a.drive_type,
+              a.drive_file_id,
+              a.access_level,
+              a.preview_url
+       FROM access_requests ar
+       LEFT JOIN archives a ON ar.archive_id = a.id
+       WHERE ar.user_id = $1
+       ORDER BY ar.created_at DESC`,
       [req.user.id]
     );
     res.json({ requests: result.rows });
@@ -75,9 +85,18 @@ const getMyAccessRequests = async (req, res) => {
 // PUT /api/access-requests/:id/approve
 const approveAccessRequest = async (req, res) => {
   const { admin_note, duration = "1d" } = req.body;
-  const durationMap = { "1d": 1, "3d": 3, "7d": 7 };
-  const days = durationMap[duration];
-  const expiredAt = days ? new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString() : null;
+  const durationHoursMap = {
+    "1h": 1,
+    "2h": 2,
+    "4h": 4,
+    "8h": 8,
+    "12h": 12,
+    "1d": 24,
+    "3d": 72,
+    "7d": 168,
+  };
+  const hours = durationHoursMap[duration];
+  const expiredAt = hours ? new Date(Date.now() + hours * 60 * 60 * 1000).toISOString() : null;
 
   try {
     const result = await pool.query(

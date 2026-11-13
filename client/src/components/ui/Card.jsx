@@ -26,7 +26,7 @@ export function StatCard({ icon: Icon, label, value, color = "indigo", trend }) 
         </div>
         {trend && <span className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 font-medium">{trend}</span>}
       </div>
-      <div className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">{value ?? "—"}</div>
+      <div className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">{value ?? "-"}</div>
       <div className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1 truncate" title={label}>{label}</div>
     </div>
   );

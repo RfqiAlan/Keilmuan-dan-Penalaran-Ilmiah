@@ -14,6 +14,9 @@ export default function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [filterRole, setFilterRole] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterYear, setFilterYear] = useState("");
   const [editModal, setEditModal] = useState({ open: false, mode: "create", user: null });
   const [delModal, setDelModal] = useState({ open: false, user: null });
   const [form, setForm] = useState({});
@@ -25,8 +28,13 @@ export default function AdminUsers() {
 
   const fetchUsers = () => {
     setLoading(true);
-    const params = search ? `?search=${encodeURIComponent(search)}` : "";
-    api.get(`/users${params}`)
+    const params = new URLSearchParams();
+    if (search) params.set("search", search);
+    if (filterRole) params.set("role", filterRole);
+    if (filterStatus) params.set("status", filterStatus);
+    if (filterYear) params.set("year", filterYear);
+    const queryString = params.toString() ? `?${params.toString()}` : "";
+    api.get(`/users${queryString}`)
       .then((r) => setUsers(r.data.users || []))
       .catch(() => setUsers([]))
       .finally(() => setLoading(false));
@@ -34,10 +42,10 @@ export default function AdminUsers() {
 
   useEffect(() => {
     fetchUsers();
-  }, [search]);
+  }, [search, filterRole, filterStatus, filterYear]);
 
   const openCreate = () => {
-    setForm({ name: "", email: "", password: "", phone: "", role: "anggota", status: "active" });
+    setForm({ name: "", nra: "", email: "", password: "", phone: "", role: "anggota", status: "active" });
     setKtaFile(null);
     setKtaPreview(null);
     setError("");
@@ -47,6 +55,7 @@ export default function AdminUsers() {
   const openEdit = (user) => {
     setForm({
       name: user.name,
+      nra: user.nra || "",
       phone: user.phone || "",
       role: user.role,
       status: user.status,
@@ -154,6 +163,25 @@ export default function AdminUsers() {
   const roles = ["admin", "ketua", "sekretaris", "bendahara", "koordinator", "anggota", "anggota_bph", "alumni"];
   const statuses = ["pending", "active", "inactive", "suspended"];
 
+  const currentYear = new Date().getFullYear();
+  const availableYears = Array.from(
+    new Set([
+      currentYear,
+      ...users
+        .map((u) => u.created_at && new Date(u.created_at).getFullYear())
+        .filter(Boolean),
+      ...Array.from({ length: 6 }, (_, i) => currentYear - (i + 1)),
+    ])
+  ).sort((a, b) => b - a);
+
+  const hasFilter = search || filterRole || filterStatus || filterYear;
+  const resetFilters = () => {
+    setSearch("");
+    setFilterRole("");
+    setFilterStatus("");
+    setFilterYear("");
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -171,14 +199,56 @@ export default function AdminUsers() {
         </Button>
       </div>
 
-      <div className="relative max-w-md">
-        <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Cari nama anggota atau email..."
-          className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0284c7] placeholder-slate-400 shadow-xs"
-        />
+      {/* Filters Toolbar */}
+      <div className="flex flex-wrap gap-2.5 sm:gap-3">
+        <div className="relative w-full sm:w-auto sm:flex-1 min-w-[200px]">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Cari nama anggota atau email..."
+            className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-xl pl-10 pr-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0284c7] placeholder-slate-400 shadow-xs"
+          />
+        </div>
+
+        <select
+          value={filterRole}
+          onChange={(e) => setFilterRole(e.target.value)}
+          className="cursor-pointer bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0284c7] shadow-xs w-full sm:w-auto"
+        >
+          <option value="">Semua Role</option>
+          {roles.map((r) => (
+            <option key={r} value={r}>
+              {roleLabels[r] || r.toUpperCase()}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value)}
+          className="cursor-pointer bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0284c7] shadow-xs w-full sm:w-auto"
+        >
+          <option value="">Semua Status</option>
+          {statuses.map((s) => (
+            <option key={s} value={s}>
+              {s.toUpperCase()}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={filterYear}
+          onChange={(e) => setFilterYear(e.target.value)}
+          className="cursor-pointer bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0284c7] shadow-xs w-full sm:w-auto"
+        >
+          <option value="">Semua Tahun Bergabung</option>
+          {availableYears.map((y) => (
+            <option key={y} value={y}>
+              Tahun {y}
+            </option>
+          ))}
+        </select>
       </div>
 
       {loading ? (
@@ -188,12 +258,12 @@ export default function AdminUsers() {
           icon={Users}
           title="Pengguna Tidak Ditemukan"
           description={
-            search
-              ? "Tidak ada akun pengguna yang cocok dengan pencarian kata kunci tersebut."
+            hasFilter
+              ? "Tidak ada akun pengguna yang cocok dengan kriteria filter saat ini."
               : "Belum ada akun pengguna yang terdaftar di dalam sistem."
           }
-          actionLabel={search ? "Hapus Pencarian" : "Tambah Pengguna Baru"}
-          onAction={search ? () => setSearch("") : openCreate}
+          actionLabel={hasFilter ? "Reset Semua Filter" : "Tambah Pengguna Baru"}
+          onAction={hasFilter ? resetFilters : openCreate}
         />
       ) : (
         <div className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl overflow-hidden shadow-xs">
@@ -225,9 +295,16 @@ export default function AdminUsers() {
                           size="xs"
                           className="w-7 h-7"
                         />
-                        <span className="text-slate-900 dark:text-slate-100 font-medium">
-                          {u.name}
-                        </span>
+                        <div className="min-w-0">
+                          <div className="text-slate-900 dark:text-slate-100 font-medium truncate">
+                            {u.name}
+                          </div>
+                          {u.nra && (
+                            <div className="text-[11px] text-[#0284c7] dark:text-[#38bdf8] font-mono">
+                              NRA: {u.nra}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </td>
                     <td className="px-4 py-3.5 text-slate-600 dark:text-slate-400 text-xs">
@@ -239,7 +316,7 @@ export default function AdminUsers() {
                       </span>
                     </td>
                     <td className="px-4 py-3.5 text-slate-600 dark:text-slate-400 text-xs">
-                      {u.phone || "—"}
+                      {u.phone || "-"}
                     </td>
                     <td className="px-4 py-3.5">
                       <Badge status={u.status} />
@@ -297,6 +374,15 @@ export default function AdminUsers() {
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 placeholder="Contoh: Budi Santoso"
                 required
+              />
+            </div>
+
+            <div className="sm:col-span-2">
+              <Input
+                label="Nomor Registrasi Anggota (NRA)"
+                value={form.nra || ""}
+                onChange={(e) => setForm({ ...form, nra: e.target.value })}
+                placeholder="Contoh: NRA-2024-001"
               />
             </div>
 

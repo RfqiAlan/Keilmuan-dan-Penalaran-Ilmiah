@@ -23,7 +23,21 @@ export default function AdminReports() {
   const [borrowings, setBorrowings] = useState([]);
   const [items, setItems] = useState([]);
   const [archives, setArchives] = useState([]);
+  const currentYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState(currentYear);
   const { showToast } = useToast();
+
+  const availableYears = useMemo(() => {
+    const yearsSet = new Set([
+      currentYear,
+      ...borrowings
+        .map((b) => b.borrow_date && new Date(b.borrow_date).getFullYear())
+        .filter(Boolean),
+      currentYear - 1,
+      currentYear - 2,
+    ]);
+    return Array.from(yearsSet).sort((a, b) => b - a);
+  }, [borrowings, currentYear]);
 
   useEffect(() => {
     fetchReportData();
@@ -51,19 +65,18 @@ export default function AdminReports() {
     }
   };
 
-  // 1. Calculate Monthly Borrowing Trends for current year
+  // 1. Calculate Monthly Borrowing Trends for selected year
   const monthlyTrends = useMemo(() => {
     const months = [
       "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
       "Jul", "Agu", "Sep", "Okt", "Nov", "Des"
     ];
     const counts = new Array(12).fill(0);
-    const currentYear = new Date().getFullYear();
 
     borrowings.forEach((b) => {
       if (!b.borrow_date) return;
       const date = new Date(b.borrow_date);
-      if (date.getFullYear() === currentYear) {
+      if (date.getFullYear() === Number(selectedYear)) {
         counts[date.getMonth()] += Number(b.quantity) || 1;
       }
     });
@@ -74,7 +87,7 @@ export default function AdminReports() {
       count: counts[idx],
       heightPct: Math.round((counts[idx] / maxVal) * 100),
     }));
-  }, [borrowings]);
+  }, [borrowings, selectedYear]);
 
   // 2. Calculate Top Borrowed Items
   const topItems = useMemo(() => {
@@ -248,19 +261,30 @@ export default function AdminReports() {
 
       {/* Main Bar Chart: Monthly Borrowing Volume */}
       <div className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-4 sm:p-6 shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-700/60 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-700/60 pb-4">
           <div>
             <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <Calendar className="w-4 h-4 text-[#0284c7] dark:text-[#38bdf8]" />
-              Tren Peminjaman Bulanan ({new Date().getFullYear()})
+              Tren Peminjaman Bulanan ({selectedYear})
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Volume total unit barang yang dipinjam setiap bulannya
+              Volume total unit barang yang dipinjam setiap bulannya pada tahun {selectedYear}
             </p>
           </div>
-          <span className="text-xs font-semibold px-2.5 py-1 bg-sky-50 dark:bg-sky-950/40 text-[#0284c7] dark:text-[#38bdf8] border border-sky-200 dark:border-sky-800 rounded-full w-fit">
-            Tahun Berjalan
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Filter Tahun:</span>
+            <select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(Number(e.target.value))}
+              className="cursor-pointer bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#0284c7] shadow-xs"
+            >
+              {availableYears.map((y) => (
+                <option key={y} value={y}>
+                  Tahun {y}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {loading ? (

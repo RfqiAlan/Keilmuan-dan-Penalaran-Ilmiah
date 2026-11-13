@@ -265,7 +265,7 @@ export default function ArchivesPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3.5 text-slate-600 dark:text-slate-300 text-xs">
-                      {a.division || "—"}
+                      {a.division || "-"}
                     </td>
                     <td className="px-4 py-3.5">
                       <div className="flex gap-1 flex-wrap max-w-40" title={a.access_level}>

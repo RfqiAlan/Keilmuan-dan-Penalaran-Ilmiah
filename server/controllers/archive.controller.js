@@ -396,6 +396,32 @@ const getPreview = async (req, res) => {
     if (archiveResult.rows.length === 0) return res.status(404).json({ message: "Arsip tidak ditemukan." });
 
     const archive = archiveResult.rows[0];
+    const userRole = req.user.role;
+
+    // Check access permission
+    let hasAccess = userRole === "admin";
+    if (!hasAccess) {
+      const allowedRoles = archive.access_level ? archive.access_level.split(",") : [];
+      if (allowedRoles.includes(userRole)) {
+        hasAccess = true;
+      } else {
+        const accessResult = await pool.query(
+          `SELECT id FROM access_requests
+           WHERE user_id = $1 AND archive_id = $2 AND status = 'approved'
+             AND (expired_at IS NULL OR expired_at > NOW())
+           LIMIT 1`,
+          [req.user.id, req.params.id]
+        );
+        if (accessResult.rows.length > 0) {
+          hasAccess = true;
+        }
+      }
+    }
+
+    if (!hasAccess) {
+      return res.status(403).json({ message: "Anda tidak memiliki izin untuk mengakses dokumen ini." });
+    }
+
     const driveType = archive.drive_type || 'file';
 
     // Build the Google Drive preview URL based on type
@@ -410,6 +436,9 @@ const getPreview = async (req, res) => {
       title: archive.title,
       drive_file_id: archive.drive_file_id,
       drive_type: driveType,
+      year: archive.year,
+      category: archive.category,
+      access_level: archive.access_level,
     });
   } catch (err) {
     console.error(err);

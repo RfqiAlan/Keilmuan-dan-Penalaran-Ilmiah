@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { CreditCard, CheckCircle2, Trash2, Upload, User, Camera, AlertCircle } from "lucide-react";
+import { CreditCard, CheckCircle2, Trash2, Upload, Camera } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import api from "../../api/axios";
 import { Input } from "../../components/ui/Input";
@@ -218,8 +218,14 @@ export default function ProfilePage() {
                 <Badge status={user?.status} label={roleLabels[user?.role]} />
               </div>
             </div>
-            <div className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm truncate mb-3">
-              {user?.email}
+            <div className="flex flex-wrap items-center gap-2 text-xs mb-3 justify-center sm:justify-start">
+              {user?.nra && (
+                <span className="font-mono text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700/60 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-600">
+                  NRA: {user?.nra}
+                </span>
+              )}
+              {user?.nra && <span className="text-slate-400 dark:text-slate-500">•</span>}
+              <span className="text-slate-500 dark:text-slate-400 truncate">{user?.email}</span>
             </div>
 
             {/* Hidden file input */}
@@ -281,12 +287,22 @@ export default function ProfilePage() {
             onChange={(e) => setForm({ ...form, phone: e.target.value })}
             placeholder="08xxxxxxxxxx"
           />
-          <div className="bg-slate-50 dark:bg-slate-700/40 border border-slate-200 dark:border-slate-600/60 rounded-xl p-3.5">
-            <div className="text-xs text-slate-500 dark:text-slate-400 mb-0.5">
-              Alamat Email (Akun)
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-slate-50 dark:bg-slate-700/40 border border-slate-200 dark:border-slate-600/60 rounded-xl p-3.5">
+              <div className="text-xs text-slate-500 dark:text-slate-400 mb-0.5">
+                Nomor Registrasi Anggota (NRA)
+              </div>
+              <div className="text-sm font-semibold font-mono text-slate-800 dark:text-slate-200">
+                {user?.nra || "Belum tercatat"}
+              </div>
             </div>
-            <div className="text-sm font-medium text-slate-800 dark:text-slate-200">
-              {user?.email}
+            <div className="bg-slate-50 dark:bg-slate-700/40 border border-slate-200 dark:border-slate-600/60 rounded-xl p-3.5">
+              <div className="text-xs text-slate-500 dark:text-slate-400 mb-0.5">
+                Alamat Email (Akun)
+              </div>
+              <div className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">
+                {user?.email}
+              </div>
             </div>
           </div>
           <Button type="submit" disabled={saving}>

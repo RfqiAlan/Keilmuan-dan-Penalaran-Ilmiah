@@ -139,7 +139,7 @@ export default function Sidebar({ isOpen, onClose }) {
                 to={item.to}
                 onClick={onClose}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 mb-1 cursor-pointer ${
+                  `flex items-center gap-3 px-3.5 py-2.5 min-h-[44px] rounded-xl text-sm font-medium transition-all duration-150 mb-1 cursor-pointer ${
                     isActive
                       ? "bg-[#0284c7]/10 dark:bg-[#0284c7]/20 text-[#0284c7] dark:text-[#38bdf8] border border-[#0284c7]/20 dark:border-[#38bdf8]/30 font-semibold"
                       : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200"
@@ -165,7 +165,7 @@ export default function Sidebar({ isOpen, onClose }) {
         <div className="p-4 border-t border-slate-200 dark:border-slate-800 space-y-2">
           <button
             onClick={toggleTheme}
-            className="w-full cursor-pointer flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 transition-all duration-150"
+            className="w-full cursor-pointer flex items-center justify-between px-3.5 py-2.5 min-h-[44px] rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 transition-all duration-150"
           >
             <div className="flex items-center gap-3">
               {isDarkMode ? <Moon className="w-4 h-4 text-sky-400" /> : <Sun className="w-4 h-4 text-amber-500" />}
@@ -174,7 +174,7 @@ export default function Sidebar({ isOpen, onClose }) {
           </button>
           <button
             onClick={handleLogout}
-            className="w-full cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all duration-150"
+            className="w-full cursor-pointer flex items-center gap-3 px-3.5 py-2.5 min-h-[44px] rounded-xl text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all duration-150"
           >
             <LogOut className="w-4 h-4 shrink-0" />
             <span>Keluar</span>

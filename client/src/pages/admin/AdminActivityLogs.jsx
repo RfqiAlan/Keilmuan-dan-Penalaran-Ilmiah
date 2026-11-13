@@ -103,7 +103,7 @@ export default function AdminActivityLogs() {
                     <span className="font-semibold text-[#0284c7] dark:text-[#38bdf8]">
                       {log.user_name || "Sistem"}
                     </span>{" "}
-                    — {log.description}
+                    : {log.description}
                   </p>
                   <div className="flex items-center gap-2.5 mt-1 text-xs text-slate-500 dark:text-slate-400">
                     <span className="capitalize font-medium text-slate-700 dark:text-slate-300">

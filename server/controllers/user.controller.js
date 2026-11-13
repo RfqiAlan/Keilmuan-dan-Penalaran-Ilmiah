@@ -19,15 +19,19 @@ const avatarUpload = multer({
 // GET /api/users
 const getAllUsers = async (req, res) => {
   try {
-    const { role, status, search } = req.query;
-    let query = "SELECT id, name, email, phone, role, status, avatar_url, kta_drive_id, created_at FROM users WHERE 1=1";
+    const { role, status, search, year } = req.query;
+    let query = "SELECT id, name, email, phone, role, status, avatar_url, nra, kta_drive_id, created_at FROM users WHERE 1=1";
     const params = [];
 
     if (role) { params.push(role); query += ` AND role = $${params.length}`; }
     if (status) { params.push(status); query += ` AND status = $${params.length}`; }
+    if (year) {
+      params.push(parseInt(year));
+      query += ` AND EXTRACT(YEAR FROM created_at) = $${params.length}`;
+    }
     if (search) {
       params.push(`%${search}%`);
-      query += ` AND (name ILIKE $${params.length} OR email ILIKE $${params.length})`;
+      query += ` AND (name ILIKE $${params.length} OR email ILIKE $${params.length} OR nra ILIKE $${params.length})`;
     }
 
     query += " ORDER BY created_at DESC";
@@ -43,7 +47,7 @@ const getAllUsers = async (req, res) => {
 const getUserById = async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, name, email, phone, role, status, avatar_url, created_at FROM users WHERE id = $1",
+      "SELECT id, name, email, phone, role, status, avatar_url, nra, created_at FROM users WHERE id = $1",
       [req.params.id]
     );
     if (result.rows.length === 0) return res.status(404).json({ message: "User tidak ditemukan." });
@@ -56,7 +60,7 @@ const getUserById = async (req, res) => {
 
 // PUT /api/users/:id
 const updateUser = async (req, res) => {
-  const { name, phone, role, status, avatar_url } = req.body;
+  const { name, phone, role, status, avatar_url, nra } = req.body;
   const allowedRoles = ["admin", "ketua", "sekretaris", "bendahara", "koordinator", "anggota", "anggota_bph", "alumni"];
   const allowedStatuses = ["active", "inactive", "suspended"];
 
@@ -76,10 +80,11 @@ const updateUser = async (req, res) => {
         role = COALESCE($3, role),
         status = COALESCE($4, status),
         avatar_url = CASE WHEN $5::boolean IS TRUE THEN $6 ELSE avatar_url END,
+        nra = COALESCE($7, nra),
         updated_at = NOW()
-       WHERE id = $7
-       RETURNING id, name, email, phone, role, status, avatar_url`,
-      [name, phone, role, status, hasAvatar, avatar_url || null, req.params.id]
+       WHERE id = $8
+       RETURNING id, name, email, phone, role, status, avatar_url, nra`,
+      [name, phone, role, status, hasAvatar, avatar_url || null, nra ? nra.trim() : null, req.params.id]
     );
     if (result.rows.length === 0) return res.status(404).json({ message: "User tidak ditemukan." });
     res.json({ message: "User diperbarui.", user: result.rows[0] });
@@ -116,7 +121,7 @@ const updateProfile = async (req, res) => {
          avatar_url = CASE WHEN $3::boolean IS TRUE THEN $4 ELSE avatar_url END,
          updated_at = NOW()
        WHERE id = $5
-       RETURNING id, name, email, phone, role, status, avatar_url`,
+       RETURNING id, name, email, phone, role, status, avatar_url, nra`,
       [name, phone, hasAvatar, avatar_url || null, req.user.id]
     );
     res.json({ message: "Profil diperbarui.", user: result.rows[0] });
@@ -144,7 +149,7 @@ const uploadAvatar = async (req, res) => {
     const result = await pool.query(
       `UPDATE users SET avatar_url = $1, updated_at = NOW()
        WHERE id = $2
-       RETURNING id, name, email, phone, role, status, avatar_url`,
+       RETURNING id, name, email, phone, role, status, avatar_url, nra`,
       [avatarUrl, req.user.id]
     );
 
@@ -171,7 +176,7 @@ const deleteAvatar = async (req, res) => {
     const result = await pool.query(
       `UPDATE users SET avatar_url = NULL, updated_at = NOW()
        WHERE id = $1
-       RETURNING id, name, email, phone, role, status, avatar_url`,
+       RETURNING id, name, email, phone, role, status, avatar_url, nra`,
       [req.user.id]
     );
 

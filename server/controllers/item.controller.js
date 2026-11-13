@@ -65,7 +65,7 @@ const createItem = async (req, res) => {
     const result = await pool.query(
       `INSERT INTO items (code, name, category, description, total_stock, available_stock, condition, location, image_url)
        VALUES ($1, $2, $3, $4, $5, $5, $6, $7, $8) RETURNING *`,
-      [code, name, category, description, stock, condition || "baik", location, image_url]
+      [code, name, category, description, stock, condition || "baik", location, image_url || null]
     );
 
     await logActivity(req.user.id, "tambah_barang", "items", `Barang baru: ${name} (${code})`);
@@ -86,6 +86,7 @@ const updateItem = async (req, res) => {
   }
 
   try {
+    const hasImageUrl = image_url !== undefined;
     const result = await pool.query(
       `UPDATE items SET
         name            = COALESCE($1, name),
@@ -95,11 +96,11 @@ const updateItem = async (req, res) => {
         available_stock = COALESCE($5, available_stock),
         condition       = COALESCE($6, condition),
         location        = COALESCE($7, location),
-        image_url       = COALESCE($8, image_url),
-        status          = COALESCE($9, status),
+        image_url       = CASE WHEN $8::boolean IS TRUE THEN $9 ELSE image_url END,
+        status          = COALESCE($10, status),
         updated_at      = NOW()
-       WHERE id = $10 RETURNING *`,
-      [name, category, description, total_stock, available_stock, condition, location, image_url, status, req.params.id]
+       WHERE id = $11 RETURNING *`,
+      [name, category, description, total_stock, available_stock, condition, location, hasImageUrl, image_url || null, status, req.params.id]
     );
 
     if (result.rows.length === 0) return res.status(404).json({ message: "Barang tidak ditemukan." });

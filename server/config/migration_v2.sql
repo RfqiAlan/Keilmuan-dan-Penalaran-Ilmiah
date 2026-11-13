@@ -3,9 +3,10 @@
 -- Fitur: KTA Upload, Dual-Approval, Arsip per Periode
 -- =============================================
 
--- 1. Add KTA and avatar to users
+-- 1. Add KTA, avatar, and NRA to users
 ALTER TABLE users ADD COLUMN IF NOT EXISTS kta_drive_id VARCHAR(255);
 ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS nra VARCHAR(100);
 
 -- 2. Add dual-approval system to archives
 -- approval_status: 'approved' (default/non-dual), 'draft', 'approved_admin', 'approved_sekum'
@@ -18,3 +19,9 @@ ALTER TABLE archives ADD COLUMN IF NOT EXISTS sekum_approved_at TIMESTAMP;
 -- 3. Update existing archives to have approval_status = 'approved' (already the default)
 -- This ensures backward compatibility
 UPDATE archives SET approval_status = 'approved' WHERE approval_status IS NULL;
+
+-- 4. Upgrade borrowings date columns to TIMESTAMP to support hourly loan options
+ALTER TABLE borrowings ALTER COLUMN borrow_date TYPE TIMESTAMP;
+ALTER TABLE borrowings ALTER COLUMN return_date TYPE TIMESTAMP;
+ALTER TABLE borrowings ALTER COLUMN actual_return_date TYPE TIMESTAMP;
+

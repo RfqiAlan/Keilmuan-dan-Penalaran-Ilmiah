@@ -7,6 +7,15 @@ import Button from "../../components/ui/Button";
 import { Skeleton } from "../../components/ui/Skeleton";
 import EmptyState from "../../components/ui/EmptyState";
 
+const formatDateTime = (dateStr) => {
+  if (!dateStr) return "-";
+  const d = new Date(dateStr);
+  const hasTime = d.getHours() !== 0 || d.getMinutes() !== 0;
+  return hasTime
+    ? d.toLocaleString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
+    : d.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
+};
+
 export default function MyBorrowingsPage() {
   const [borrowings, setBorrowings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -109,9 +118,17 @@ export default function MyBorrowingsPage() {
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-sky-50 dark:bg-sky-950/40 border border-sky-100 dark:border-sky-900/50 rounded-xl flex items-center justify-center text-[#0284c7] dark:text-[#38bdf8] shrink-0">
-                    <Package className="w-6 h-6 stroke-[1.75]" />
-                  </div>
+                  {b.image_url ? (
+                    <img
+                      src={b.image_url}
+                      alt={b.item_name}
+                      className="w-12 h-12 object-cover rounded-xl border border-slate-200 dark:border-slate-700 shrink-0"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 bg-sky-50 dark:bg-sky-950/40 border border-sky-100 dark:border-sky-900/50 rounded-xl flex items-center justify-center text-[#0284c7] dark:text-[#38bdf8] shrink-0">
+                      <Package className="w-6 h-6 stroke-[1.75]" />
+                    </div>
+                  )}
                   <div>
                     <h3 className="font-semibold text-slate-900 dark:text-slate-100 text-base">
                       {b.item_name}
@@ -131,13 +148,13 @@ export default function MyBorrowingsPage() {
                 <div>
                   <div className="text-slate-500 dark:text-slate-400">Tgl Pinjam</div>
                   <div className="text-slate-800 dark:text-slate-200 font-medium mt-0.5">
-                    {b.borrow_date ? new Date(b.borrow_date).toLocaleDateString("id-ID") : "-"}
+                    {formatDateTime(b.borrow_date)}
                   </div>
                 </div>
                 <div>
                   <div className="text-slate-500 dark:text-slate-400">Rencana Kembali</div>
                   <div className="text-slate-800 dark:text-slate-200 font-medium mt-0.5">
-                    {b.return_date ? new Date(b.return_date).toLocaleDateString("id-ID") : "-"}
+                    {formatDateTime(b.return_date)}
                   </div>
                 </div>
                 <div className="col-span-2 md:col-span-1">

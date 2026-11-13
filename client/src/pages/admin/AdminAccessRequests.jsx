@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { KeyRound, Check, X, Clock } from "lucide-react";
+import { KeyRound, Check, X } from "lucide-react";
 import api from "../../api/axios";
 import Badge from "../../components/ui/Badge";
 import Button from "../../components/ui/Button";
@@ -153,7 +153,7 @@ export default function AdminAccessRequests() {
                       {new Date(r.requested_at).toLocaleDateString("id-ID")}
                     </td>
                     <td className="px-4 py-3.5 text-slate-600 dark:text-slate-400 text-xs">
-                      {r.expired_at ? new Date(r.expired_at).toLocaleDateString("id-ID") : "—"}
+                      {r.expired_at ? new Date(r.expired_at).toLocaleDateString("id-ID") : "-"}
                     </td>
                     <td className="px-4 py-3.5">
                       {r.status === "pending" && (
@@ -217,6 +217,11 @@ export default function AdminAccessRequests() {
               value={duration}
               onChange={(e) => setDuration(e.target.value)}
             >
+              <option value="1h">1 Jam</option>
+              <option value="2h">2 Jam</option>
+              <option value="4h">4 Jam</option>
+              <option value="8h">8 Jam</option>
+              <option value="12h">12 Jam</option>
               <option value="1d">1 x 24 Jam (Standar)</option>
               <option value="3d">3 Hari</option>
               <option value="7d">7 Hari (1 Minggu)</option>

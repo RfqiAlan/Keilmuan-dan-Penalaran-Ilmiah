@@ -4,10 +4,10 @@ const logActivity = require("../middleware/logger");
 // GET /api/borrowings — Admin: all; Member: own
 const getAllBorrowings = async (req, res) => {
   try {
-    const { status, search } = req.query;
+    const { status, search, year } = req.query;
     let query = `
       SELECT b.*, u.name AS user_name, u.email AS user_email,
-             i.name AS item_name, i.code AS item_code,
+             i.name AS item_name, i.code AS item_code, i.image_url,
              a.name AS approved_by_name
       FROM borrowings b
       LEFT JOIN users u ON b.user_id = u.id
@@ -18,6 +18,10 @@ const getAllBorrowings = async (req, res) => {
     const params = [];
 
     if (status) { params.push(status); query += ` AND b.status = $${params.length}`; }
+    if (year) {
+      params.push(parseInt(year));
+      query += ` AND EXTRACT(YEAR FROM b.borrow_date) = $${params.length}`;
+    }
     if (search) {
       params.push(`%${search}%`);
       query += ` AND (u.name ILIKE $${params.length} OR i.name ILIKE $${params.length})`;
@@ -93,7 +97,7 @@ const createBorrowing = async (req, res) => {
     return res.status(400).json({ message: "Semua field wajib diisi." });
   }
   if (new Date(return_date) <= new Date(borrow_date)) {
-    return res.status(400).json({ message: "Tanggal kembali harus setelah tanggal pinjam." });
+    return res.status(400).json({ message: "Waktu / tanggal pengembalian harus setelah waktu / tanggal peminjaman." });
   }
 
   try {

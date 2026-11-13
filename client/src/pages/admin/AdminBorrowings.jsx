@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Search, Check, X, RotateCcw, ClipboardList } from "lucide-react";
+import { Search, Check, X, RotateCcw, ClipboardList, Package } from "lucide-react";
 import api from "../../api/axios";
 import Badge from "../../components/ui/Badge";
 import Button from "../../components/ui/Button";
@@ -9,20 +9,34 @@ import { SkeletonTable } from "../../components/ui/Skeleton";
 import EmptyState from "../../components/ui/EmptyState";
 import { useToast } from "../../contexts/ToastContext";
 
+const formatDateTime = (dateStr) => {
+  if (!dateStr) return "-";
+  const d = new Date(dateStr);
+  const hasTime = d.getHours() !== 0 || d.getMinutes() !== 0;
+  return hasTime
+    ? d.toLocaleString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
+    : d.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
+};
+
 export default function AdminBorrowings() {
   const [borrowings, setBorrowings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState("");
+  const [filterYear, setFilterYear] = useState("");
   const [search, setSearch] = useState("");
   const [actionModal, setActionModal] = useState({ open: false, type: "", borrowing: null });
   const [note, setNote] = useState("");
   const [processing, setProcessing] = useState(false);
   const { showToast } = useToast();
 
+  const currentYear = new Date().getFullYear();
+  const availableYears = Array.from({ length: 6 }, (_, i) => currentYear - i);
+
   const fetchBorrowings = () => {
     setLoading(true);
     const params = new URLSearchParams();
     if (filterStatus) params.set("status", filterStatus);
+    if (filterYear) params.set("year", filterYear);
     if (search) params.set("search", search);
     api.get(`/borrowings?${params}`)
       .then((r) => setBorrowings(r.data.borrowings || []))
@@ -32,7 +46,7 @@ export default function AdminBorrowings() {
 
   useEffect(() => {
     fetchBorrowings();
-  }, [filterStatus, search]);
+  }, [filterStatus, filterYear, search]);
 
   const openAction = (type, borrowing) => {
     setNote("");
@@ -97,6 +111,19 @@ export default function AdminBorrowings() {
             </option>
           ))}
         </select>
+
+        <select
+          value={filterYear}
+          onChange={(e) => setFilterYear(e.target.value)}
+          className="cursor-pointer bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0284c7] shadow-xs w-full sm:w-auto"
+        >
+          <option value="">Semua Tahun Peminjaman</option>
+          {availableYears.map((y) => (
+            <option key={y} value={y}>
+              Tahun {y}
+            </option>
+          ))}
+        </select>
       </div>
 
       {loading ? (
@@ -151,21 +178,36 @@ export default function AdminBorrowings() {
                       </div>
                     </td>
                     <td className="px-4 py-3.5">
-                      <div className="text-slate-800 dark:text-slate-200 font-medium">
-                        {b.item_name}
-                      </div>
-                      <div className="text-xs text-slate-500 dark:text-slate-400 font-mono">
-                        {b.item_code}
+                      <div className="flex items-center gap-2.5">
+                        {b.image_url ? (
+                          <img
+                            src={b.image_url}
+                            alt={b.item_name}
+                            className="w-9 h-9 object-cover rounded-lg border border-slate-200 dark:border-slate-700 shrink-0 shadow-2xs"
+                          />
+                        ) : (
+                          <div className="w-9 h-9 bg-slate-100 dark:bg-slate-700/60 rounded-lg flex items-center justify-center text-slate-400 shrink-0 border border-slate-200 dark:border-slate-700">
+                            <Package className="w-4 h-4 stroke-[1.5]" />
+                          </div>
+                        )}
+                        <div className="min-w-0">
+                          <div className="text-slate-800 dark:text-slate-200 font-medium truncate">
+                            {b.item_name}
+                          </div>
+                          <div className="text-xs text-slate-500 dark:text-slate-400 font-mono">
+                            {b.item_code}
+                          </div>
+                        </div>
                       </div>
                     </td>
                     <td className="px-4 py-3.5 text-slate-700 dark:text-slate-300 font-medium">
                       {b.quantity}
                     </td>
                     <td className="px-4 py-3.5 text-slate-600 dark:text-slate-400 text-xs">
-                      {b.borrow_date ? new Date(b.borrow_date).toLocaleDateString("id-ID") : "-"}
+                      {formatDateTime(b.borrow_date)}
                     </td>
                     <td className="px-4 py-3.5 text-slate-600 dark:text-slate-400 text-xs">
-                      {b.return_date ? new Date(b.return_date).toLocaleDateString("id-ID") : "-"}
+                      {formatDateTime(b.return_date)}
                     </td>
                     <td className="px-4 py-3.5">
                       <Badge status={b.status} />
@@ -229,8 +271,9 @@ export default function AdminBorrowings() {
             <div className="p-3 bg-sky-50 dark:bg-slate-700/40 rounded-xl text-sm text-slate-700 dark:text-slate-300 border border-sky-100 dark:border-slate-600">
               <strong className="text-slate-900 dark:text-slate-100">
                 {actionModal.borrowing.user_name}
-              </strong>{" "}
-              — {actionModal.borrowing.item_name} ({actionModal.borrowing.quantity} unit)
+              </strong>
+              <span className="text-slate-500 mx-1.5">•</span>
+              <span>{actionModal.borrowing.item_name} ({actionModal.borrowing.quantity} unit)</span>
             </div>
           )}
           {actionModal.type !== "return" && (

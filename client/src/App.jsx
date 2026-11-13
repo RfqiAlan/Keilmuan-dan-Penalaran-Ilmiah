@@ -5,6 +5,7 @@ import { ToastProvider } from "./contexts/ToastContext";
 import { PrivateRoute, RoleRoute } from "./routes/ProtectedRoute";
 import AppLayout from "./components/layout/AppLayout";
 
+import LandingPage from "./pages/LandingPage";
 // Auth pages
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
@@ -38,6 +39,7 @@ export default function App() {
           <ToastProvider>
             <Routes>
             {/* Public Routes */}
+            <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/pending-verification" element={<PendingVerificationPage />} />
@@ -71,8 +73,7 @@ export default function App() {
             </Route>
 
             {/* Default Redirects */}
-            <Route path="/" element={<Navigate to="/login" replace />} />
-            <Route path="*" element={<Navigate to="/login" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           </ToastProvider>
         </AuthProvider>
