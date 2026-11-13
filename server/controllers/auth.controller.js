@@ -102,6 +102,7 @@ const login = async (req, res) => {
         phone: user.phone,
         role: user.role,
         status: user.status,
+        avatar_url: user.avatar_url,
       },
     });
   } catch (err) {
@@ -114,7 +115,7 @@ const login = async (req, res) => {
 const getMe = async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, name, email, phone, role, status, created_at FROM users WHERE id = $1",
+      "SELECT id, name, email, phone, role, status, avatar_url, created_at FROM users WHERE id = $1",
       [req.user.id]
     );
     if (result.rows.length === 0) {

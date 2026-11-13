@@ -19,6 +19,7 @@ import {
 import { useAuth } from "../../contexts/AuthContext";
 import { useTheme } from "../../contexts/ThemeContext";
 import api from "../../api/axios";
+import Avatar from "../ui/Avatar";
 
 const adminNav = [
   { to: "/admin/dashboard",      icon: LayoutDashboard, label: "Dashboard" },
@@ -110,9 +111,11 @@ export default function Sidebar({ isOpen, onClose }) {
         {/* User info */}
         <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-[#0284c7]/15 border border-[#0284c7]/30 rounded-full flex items-center justify-center text-sm font-bold text-[#0284c7] dark:text-[#38bdf8]" aria-hidden="true">
-              {user?.name?.charAt(0).toUpperCase()}
-            </div>
+            <Avatar
+              src={user?.avatar_url}
+              name={user?.name}
+              size="sm"
+            />
             <div className="min-w-0">
               <div className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">{user?.name}</div>
               <div className="text-xs text-slate-500 dark:text-slate-500">{roleLabels[user?.role] || user?.role}</div>

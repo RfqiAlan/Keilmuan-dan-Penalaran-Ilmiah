@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { Menu, FolderArchive, Moon, Sun } from "lucide-react";
 import Sidebar from "./Sidebar";
+import Avatar from "../ui/Avatar";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTheme } from "../../contexts/ThemeContext";
 
@@ -43,12 +44,12 @@ export default function AppLayout() {
               {isDarkMode ? <Moon className="w-4 h-4 text-sky-400" /> : <Sun className="w-4 h-4 text-amber-500" />}
             </button>
             {user?.name && (
-              <div
-                className="w-8 h-8 bg-[#0284c7]/15 border border-[#0284c7]/30 rounded-full flex items-center justify-center text-xs font-bold text-[#0284c7] dark:text-[#38bdf8] shrink-0"
+              <Avatar
+                src={user?.avatar_url}
+                name={user.name}
+                size="sm"
                 title={user.name}
-              >
-                {user.name.charAt(0).toUpperCase()}
-              </div>
+              />
             )}
           </div>
         </header>

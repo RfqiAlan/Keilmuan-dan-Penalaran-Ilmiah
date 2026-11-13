@@ -5,6 +5,7 @@ import Button from "../../components/ui/Button";
 import Modal from "../../components/ui/Modal";
 import { Input, Select } from "../../components/ui/Input";
 import Badge from "../../components/ui/Badge";
+import Avatar from "../../components/ui/Avatar";
 import { SkeletonTable } from "../../components/ui/Skeleton";
 import EmptyState from "../../components/ui/EmptyState";
 import { useToast } from "../../contexts/ToastContext";
@@ -44,7 +45,13 @@ export default function AdminUsers() {
   };
 
   const openEdit = (user) => {
-    setForm({ name: user.name, phone: user.phone || "", role: user.role, status: user.status });
+    setForm({
+      name: user.name,
+      phone: user.phone || "",
+      role: user.role,
+      status: user.status,
+      avatar_url: user.avatar_url || null,
+    });
     setKtaFile(null);
     setKtaPreview(null);
     setError("");
@@ -201,9 +208,12 @@ export default function AdminUsers() {
                   >
                     <td className="px-4 py-3.5">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 bg-sky-100 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 rounded-full flex items-center justify-center text-xs font-bold text-[#0284c7] dark:text-[#38bdf8] shrink-0">
-                          {u.name?.charAt(0).toUpperCase()}
-                        </div>
+                        <Avatar
+                          src={u.avatar_url}
+                          name={u.name}
+                          size="xs"
+                          className="w-7 h-7"
+                        />
                         <span className="text-slate-900 dark:text-slate-100 font-medium">
                           {u.name}
                         </span>
@@ -332,6 +342,32 @@ export default function AdminUsers() {
                 ))}
               </Select>
             </div>
+
+            {editModal.mode === "edit" && (
+              <div className="sm:col-span-2 flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700/30 border border-slate-200 dark:border-slate-700 rounded-xl">
+                <div className="flex items-center gap-3">
+                  <Avatar src={form.avatar_url} name={form.name} size="md" />
+                  <div>
+                    <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                      Foto Profil Pengguna
+                    </div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                      {form.avatar_url ? "Foto profil aktif terpasang" : "Belum ada foto profil (menggunakan inisial)"}
+                    </div>
+                  </div>
+                </div>
+                {form.avatar_url && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="danger"
+                    onClick={() => setForm({ ...form, avatar_url: null })}
+                  >
+                    Hapus Foto
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
 
           {editModal.mode === "create" && (

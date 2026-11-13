@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
-import { CreditCard, CheckCircle2, Trash2, Upload, User } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { CreditCard, CheckCircle2, Trash2, Upload, User, Camera, AlertCircle } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import api from "../../api/axios";
 import { Input } from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
 import Badge from "../../components/ui/Badge";
+import Avatar from "../../components/ui/Avatar";
 import KtaUploadModal from "../../components/ui/KtaUploadModal";
 import { useToast } from "../../contexts/ToastContext";
 
@@ -18,11 +19,42 @@ const roleLabels = {
   alumni: "Alumni",
 };
 
+// Helper to crop & downscale image to square for lightweight avatar storage
+const compressAvatar = (file, size = 360, quality = 0.85) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Gagal membaca file gambar."));
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("Format file gambar tidak valid."));
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext("2d");
+
+        // Center square crop
+        const minDim = Math.min(img.width, img.height);
+        const sx = (img.width - minDim) / 2;
+        const sy = (img.height - minDim) / 2;
+
+        ctx.drawImage(img, sx, sy, minDim, minDim, 0, 0, size, size);
+        const dataUrl = canvas.toDataURL("image/jpeg", quality);
+        resolve(dataUrl);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+};
+
 export default function ProfilePage() {
   const { user, setUser } = useAuth();
   const { showToast } = useToast();
+  const fileInputRef = useRef(null);
   const [form, setForm] = useState({ name: user?.name || "", phone: user?.phone || "" });
   const [saving, setSaving] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [error, setError] = useState("");
 
   // KTA state
@@ -44,6 +76,62 @@ export default function ProfilePage() {
       console.error("Failed to check KTA:", err);
     } finally {
       setKtaLoading(false);
+    }
+  };
+
+  const handlePhotoSelected = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const allowed = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowed.includes(file.type)) {
+      showToast("Format file harus berupa gambar (JPG, PNG, atau WEBP).", "error");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      showToast("Ukuran foto maksimal 5MB.", "error");
+      return;
+    }
+
+    setUploadingPhoto(true);
+    try {
+      // Compress and convert to clean square thumbnail
+      const optimizedDataUrl = await compressAvatar(file, 360, 0.85);
+
+      const res = await api.post("/users/profile/avatar", {
+        avatar_url: optimizedDataUrl,
+      });
+
+      setUser(res.data.user);
+      localStorage.setItem("simpar_user", JSON.stringify(res.data.user));
+      showToast("Foto profil berhasil diperbarui!", "success");
+    } catch (err) {
+      console.error("Gagal update foto profil:", err);
+      const msg = err.response?.data?.message || err.message || "Gagal mengunggah foto profil.";
+      showToast(msg, "error");
+    } finally {
+      setUploadingPhoto(false);
+      // Reset input value so same file can be reselected
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleDeletePhoto = async () => {
+    if (!confirm("Hapus foto profil akun Anda?")) return;
+
+    setUploadingPhoto(true);
+    try {
+      const res = await api.delete("/users/profile/avatar");
+      setUser(res.data.user);
+      localStorage.setItem("simpar_user", JSON.stringify(res.data.user));
+      showToast("Foto profil berhasil dihapus.", "info");
+    } catch (err) {
+      console.error("Gagal hapus foto profil:", err);
+      const msg = err.response?.data?.message || "Gagal menghapus foto profil.";
+      showToast(msg, "error");
+    } finally {
+      setUploadingPhoto(false);
     }
   };
 
@@ -95,20 +183,81 @@ export default function ProfilePage() {
 
       {/* Profile Info */}
       <div className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-xl p-4 sm:p-6 shadow-xs">
-        <div className="flex items-center gap-3.5 sm:gap-4 mb-5 sm:mb-6">
-          <div className="w-14 h-14 sm:w-16 sm:h-16 bg-sky-100 dark:bg-sky-950/60 border-2 border-sky-300 dark:border-sky-800 rounded-full flex items-center justify-center text-xl sm:text-2xl font-bold text-[#0284c7] dark:text-[#38bdf8] shrink-0">
-            {user?.name?.charAt(0).toUpperCase()}
+        {/* Avatar & Identity Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5 mb-6 pb-6 border-b border-slate-100 dark:border-slate-700/60">
+          <div className="relative group self-center sm:self-start shrink-0">
+            <Avatar
+              src={user?.avatar_url}
+              name={user?.name}
+              size="xl"
+              className="border-2 border-sky-300 dark:border-sky-700 shadow-sm ring-4 ring-sky-50 dark:ring-sky-950/40"
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadingPhoto}
+              title="Ganti foto profil"
+              aria-label="Ganti foto profil"
+              className="absolute bottom-0 right-0 p-2 bg-[#0284c7] hover:bg-[#0369a1] text-white rounded-full shadow-md transition-all duration-150 cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-50"
+            >
+              {uploadingPhoto ? (
+                <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Camera className="w-3.5 h-3.5" />
+              )}
+            </button>
           </div>
-          <div className="min-w-0">
-            <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100 truncate">
-              {user?.name}
-            </h2>
-            <div className="text-slate-500 dark:text-slate-400 text-xs truncate">
+
+          <div className="flex-1 min-w-0 text-center sm:text-left">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-1 justify-center sm:justify-start">
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 truncate">
+                {user?.name}
+              </h2>
+              <div className="self-center sm:self-auto">
+                <Badge status={user?.status} label={roleLabels[user?.role]} />
+              </div>
+            </div>
+            <div className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm truncate mb-3">
               {user?.email}
             </div>
-            <div className="mt-1.5">
-              <Badge status={user?.status} label={roleLabels[user?.role]} />
+
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handlePhotoSelected}
+              className="hidden"
+            />
+
+            {/* Photo Action Controls */}
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant="secondary"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingPhoto}
+              >
+                <Upload className="w-3.5 h-3.5 mr-1.5" />
+                {user?.avatar_url ? "Ganti Foto" : "Unggah Foto Profil"}
+              </Button>
+              {user?.avatar_url && (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="danger"
+                  onClick={handleDeletePhoto}
+                  disabled={uploadingPhoto}
+                >
+                  <Trash2 className="w-3.5 h-3.5 mr-1.5" />
+                  Hapus Foto
+                </Button>
+              )}
             </div>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
+              Format: JPG, PNG, WEBP (maks. 5MB). Foto otomatis dioptimalkan.
+            </p>
           </div>
         </div>
 

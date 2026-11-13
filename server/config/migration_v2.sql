@@ -3,8 +3,9 @@
 -- Fitur: KTA Upload, Dual-Approval, Arsip per Periode
 -- =============================================
 
--- 1. Add KTA (Kartu Tanda Anggota) Google Drive file ID to users
+-- 1. Add KTA and avatar to users
 ALTER TABLE users ADD COLUMN IF NOT EXISTS kta_drive_id VARCHAR(255);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url TEXT;
 
 -- 2. Add dual-approval system to archives
 -- approval_status: 'approved' (default/non-dual), 'draft', 'approved_admin', 'approved_sekum'
