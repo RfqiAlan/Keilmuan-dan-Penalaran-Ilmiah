@@ -35,6 +35,7 @@ Merujuk pada `client/src/index.css`:
 - **Border Radius:** `rounded-xl` (`0.75rem`) untuk card dan modal.
 
 ## 4. Affordance & Human Factors (Antislop Guardrails)
+- **Liveliness Dials:** ENERGY 2 / RHYTHM 2 / MOTION 2 (GSAP choreographed reveal, scroll-triggered entrance, interactive perspective tilt on mockup card, respect `prefers-reduced-motion`).
 - **Interactive Controls:** Semua elemen klik (`button`, dropdown, tab, link) wajib memiliki `cursor-pointer` dan visible hover/active state.
 - **Focus States:** Selalu sediakan `focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2`.
 - **Mobile Touch Targets:** Minimum 44×44px untuk touch target pada perangkat mobile.

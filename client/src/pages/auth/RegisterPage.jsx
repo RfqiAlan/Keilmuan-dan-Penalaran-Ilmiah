@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FolderArchive, Upload, UserPlus, ArrowLeft } from "lucide-react";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
 import api from "../../api/axios";
 import { Input, Select } from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
@@ -11,6 +13,24 @@ export default function RegisterPage() {
   const [ktaFile, setKtaFile] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const pageRef = useRef(null);
+
+  useGSAP(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    gsap.from(".register-header", {
+      opacity: 0,
+      y: -14,
+      duration: 0.5,
+      ease: "power2.out",
+    });
+    gsap.from(".register-card", {
+      opacity: 0,
+      y: 20,
+      duration: 0.6,
+      ease: "power2.out",
+      delay: 0.1,
+    });
+  }, { scope: pageRef });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,7 +58,10 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col justify-center items-center p-4 py-8 selection:bg-[#0284c7] selection:text-white">
+    <div
+      ref={pageRef}
+      className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col justify-center items-center p-4 py-8 selection:bg-[#0284c7] selection:text-white"
+    >
       <div className="w-full max-w-lg">
         <div className="mb-3">
           <Link
@@ -51,7 +74,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Header */}
-        <div className="text-center mb-6">
+        <div className="register-header text-center mb-6">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#0284c7] text-white shadow-md shadow-[#0284c7]/20 mb-3.5 border border-sky-400/30">
             <FolderArchive className="w-7 h-7 stroke-[1.8]" />
           </div>
@@ -64,7 +87,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xs">
+        <div className="register-card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xs">
           <div className="pb-5 mb-5 border-b border-slate-100 dark:border-slate-800/80">
             <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100">
               Formulir Pendaftaran

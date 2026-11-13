@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import {
   FolderArchive,
@@ -20,27 +20,172 @@ import {
   ChevronRight,
   Menu,
   X,
+  Sparkles,
 } from "lucide-react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function LandingPage() {
   const { user } = useAuth();
   const { isDarkMode, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const containerRef = useRef(null);
+  const cardRef = useRef(null);
+
   const dashboardPath = ["admin", "ketua", "sekretaris"].includes(user?.role)
     ? "/admin/dashboard"
     : "/dashboard";
 
+  // GSAP Choreography & ScrollTrigger
+  useGSAP(
+    () => {
+      const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (prefersReduced) return;
+
+      // Hero Timeline reveal
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      tl.from(".hero-badge", {
+        opacity: 0,
+        y: -14,
+        duration: 0.5,
+      })
+        .from(
+          ".hero-title",
+          {
+            opacity: 0,
+            y: 20,
+            duration: 0.7,
+          },
+          "-=0.3"
+        )
+        .from(
+          ".hero-desc",
+          {
+            opacity: 0,
+            y: 16,
+            duration: 0.6,
+          },
+          "-=0.4"
+        )
+        .from(
+          ".hero-actions",
+          {
+            opacity: 0,
+            y: 14,
+            duration: 0.5,
+          },
+          "-=0.4"
+        )
+        .from(
+          ".hero-spec-item",
+          {
+            opacity: 0,
+            y: 12,
+            stagger: 0.1,
+            duration: 0.5,
+          },
+          "-=0.3"
+        )
+        .from(
+          cardRef.current,
+          {
+            opacity: 0,
+            scale: 0.94,
+            y: 30,
+            duration: 0.85,
+            ease: "back.out(1.1)",
+          },
+          "-=0.6"
+        );
+
+      // Section 1: Layanan Pillar Cards
+      gsap.from(".pillar-card", {
+        scrollTrigger: {
+          trigger: "#layanan",
+          start: "top 82%",
+          toggleActions: "play none none none",
+        },
+        opacity: 0,
+        y: 35,
+        stagger: 0.2,
+        duration: 0.75,
+        ease: "power2.out",
+      });
+
+      // Section 2: Prosedur Step Cards
+      gsap.from(".step-card", {
+        scrollTrigger: {
+          trigger: "#prosedur",
+          start: "top 82%",
+          toggleActions: "play none none none",
+        },
+        opacity: 0,
+        y: 25,
+        stagger: 0.12,
+        duration: 0.65,
+        ease: "power2.out",
+      });
+
+      // Section 3: Sekretariat Box
+      gsap.from(".secretariat-box", {
+        scrollTrigger: {
+          trigger: "#sekretariat",
+          start: "top 85%",
+          toggleActions: "play none none none",
+        },
+        opacity: 0,
+        scale: 0.97,
+        y: 25,
+        duration: 0.75,
+        ease: "power2.out",
+      });
+    },
+    { scope: containerRef }
+  );
+
+  // Subtle 3D perspective mouse tracking on preview card
+  const handleMouseMove = (e) => {
+    if (!cardRef.current || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+
+    gsap.to(cardRef.current, {
+      rotateY: x * 0.03,
+      rotateX: -y * 0.03,
+      transformPerspective: 900,
+      duration: 0.35,
+      ease: "power1.out",
+    });
+  };
+
+  const handleMouseLeave = () => {
+    if (!cardRef.current) return;
+    gsap.to(cardRef.current, {
+      rotateY: 0,
+      rotateX: 0,
+      duration: 0.5,
+      ease: "power2.out",
+    });
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 transition-colors selection:bg-[#0284c7] selection:text-white">
+    <div
+      ref={containerRef}
+      className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 transition-colors selection:bg-[#0284c7] selection:text-white"
+    >
       {/* Navigation Header */}
       <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           {/* Logo & Brand */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#0369a1] to-[#0284c7] text-white flex items-center justify-center shadow-sm shadow-[#0284c7]/25 ring-1 ring-white/20 group-hover:scale-105 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#0369a1] to-[#0284c7] text-white flex items-center justify-center shadow-sm shadow-[#0284c7]/25 ring-1 ring-white/20 group-hover:scale-105 transition-transform duration-200">
               <FolderArchive className="w-5 h-5" />
             </div>
             <div>
@@ -82,7 +227,7 @@ export default function LandingPage() {
             {user ? (
               <Link
                 to={dashboardPath}
-                className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl text-sm font-semibold bg-[#0284c7] text-white hover:bg-[#0369a1] transition-colors shadow-xs"
+                className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl text-sm font-semibold bg-[#0284c7] text-white hover:bg-[#0369a1] transition-all hover:shadow-md hover:shadow-[#0284c7]/20 shadow-xs"
               >
                 <span>Buka Dashboard</span>
                 <ArrowRight className="w-4 h-4" />
@@ -97,7 +242,7 @@ export default function LandingPage() {
                 </Link>
                 <Link
                   to="/register"
-                  className="px-4 py-2.5 min-h-[44px] inline-flex items-center rounded-xl text-sm font-semibold bg-[#0284c7] text-white hover:bg-[#0369a1] transition-colors shadow-xs"
+                  className="px-4 py-2.5 min-h-[44px] inline-flex items-center rounded-xl text-sm font-semibold bg-[#0284c7] text-white hover:bg-[#0369a1] transition-all hover:shadow-md hover:shadow-[#0284c7]/20 shadow-xs"
                 >
                   Daftar Anggota
                 </Link>
@@ -191,25 +336,25 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             {/* Left Column: Headline & Purpose */}
             <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-sky-100/80 dark:bg-sky-950/70 text-[#0284c7] dark:text-[#38bdf8] border border-sky-200 dark:border-sky-800/60">
+              <div className="hero-badge inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-sky-100/80 dark:bg-sky-950/70 text-[#0284c7] dark:text-[#38bdf8] border border-sky-200 dark:border-sky-800/60">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#0284c7] dark:text-[#38bdf8]" />
                 Portal Resmi Pengelolaan Sarana & Dokumen UKM KPI
               </div>
 
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-slate-50 leading-[1.15]">
+              <h1 className="hero-title text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-slate-50 leading-[1.15]">
                 Peminjaman Sarana Kegiatan & Tata Kelola Arsip Ilmiah Terpadu.
               </h1>
 
-              <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
+              <p className="hero-desc text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
                 Ajukan permohonan peminjaman inventaris organisasi dengan opsi per jam atau harian, serta akses repositori dokumen, modul pelatihan, dan laporan pertanggungjawaban dalam sistem terproteksi.
               </p>
 
               {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-3 pt-2">
+              <div className="hero-actions flex flex-wrap items-center gap-3 pt-2">
                 {user ? (
                   <Link
                     to={dashboardPath}
-                    className="px-6 py-3.5 min-h-[44px] rounded-xl font-semibold bg-[#0284c7] text-white hover:bg-[#0369a1] transition-all flex items-center gap-2 shadow-sm shadow-[#0284c7]/30 text-sm sm:text-base"
+                    className="px-6 py-3.5 min-h-[44px] rounded-xl font-semibold bg-[#0284c7] text-white hover:bg-[#0369a1] transition-all flex items-center gap-2 shadow-sm shadow-[#0284c7]/30 text-sm sm:text-base hover:scale-[1.02] active:scale-[0.98]"
                   >
                     Buka Dashboard Saya
                     <ArrowRight className="w-4 h-4" />
@@ -218,7 +363,7 @@ export default function LandingPage() {
                   <>
                     <Link
                       to="/login"
-                      className="px-6 py-3.5 min-h-[44px] rounded-xl font-semibold bg-[#0284c7] text-white hover:bg-[#0369a1] transition-all flex items-center gap-2 shadow-sm shadow-[#0284c7]/30 text-sm sm:text-base"
+                      className="px-6 py-3.5 min-h-[44px] rounded-xl font-semibold bg-[#0284c7] text-white hover:bg-[#0369a1] transition-all flex items-center gap-2 shadow-sm shadow-[#0284c7]/30 text-sm sm:text-base hover:scale-[1.02] active:scale-[0.98]"
                     >
                       Masuk ke Sistem
                       <ArrowRight className="w-4 h-4" />
@@ -240,8 +385,8 @@ export default function LandingPage() {
               </div>
 
               {/* Key System Specs */}
-              <div className="grid grid-cols-3 gap-3 pt-4 border-t border-slate-200 dark:border-slate-800/80">
-                <div>
+              <div className="hero-specs grid grid-cols-3 gap-3 pt-4 border-t border-slate-200 dark:border-slate-800/80">
+                <div className="hero-spec-item">
                   <div className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100">
                     Opsi Per Jam & Hari
                   </div>
@@ -249,7 +394,7 @@ export default function LandingPage() {
                     Fleksibel untuk durasi kegiatan
                   </div>
                 </div>
-                <div>
+                <div className="hero-spec-item">
                   <div className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100">
                     Folder Drive Terproteksi
                   </div>
@@ -257,7 +402,7 @@ export default function LandingPage() {
                     Izin akses bertingkat & terdata
                   </div>
                 </div>
-                <div>
+                <div className="hero-spec-item">
                   <div className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100">
                     Validasi KTA & NRA
                   </div>
@@ -268,9 +413,17 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Right Column: Interactive UI Showcase Preview */}
-            <div className="lg:col-span-5">
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden">
+            {/* Right Column: Interactive UI Showcase Preview with GSAP 3D Tilt */}
+            <div
+              className="lg:col-span-5"
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+            >
+              <div
+                ref={cardRef}
+                style={{ transformStyle: "preserve-3d" }}
+                className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden will-change-transform transition-shadow duration-300 hover:shadow-2xl hover:shadow-[#0284c7]/10"
+              >
                 {/* Mock Browser Header */}
                 <div className="bg-slate-100 dark:bg-slate-800/80 px-4 py-3 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
@@ -360,7 +513,7 @@ export default function LandingPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Pilar 1: Peminjaman Inventaris */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-xs flex flex-col justify-between">
+          <div className="pillar-card bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-xs flex flex-col justify-between">
             <div className="space-y-4">
               <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-sky-950/50 text-[#0284c7] dark:text-[#38bdf8] flex items-center justify-center">
                 <Package className="w-6 h-6" />
@@ -400,7 +553,7 @@ export default function LandingPage() {
           </div>
 
           {/* Pilar 2: Repositori Arsip Dokumen */}
-          <div id="arsip" className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-xs flex flex-col justify-between">
+          <div id="arsip" className="pillar-card bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-xs flex flex-col justify-between">
             <div className="space-y-4">
               <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center">
                 <Archive className="w-6 h-6" />
@@ -458,7 +611,7 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Step 1 */}
-            <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs relative">
+            <div className="step-card bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs relative">
               <div className="w-9 h-9 rounded-xl bg-[#0284c7] text-white font-bold flex items-center justify-center text-sm mb-4">
                 1
               </div>
@@ -471,7 +624,7 @@ export default function LandingPage() {
             </div>
 
             {/* Step 2 */}
-            <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs relative">
+            <div className="step-card bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs relative">
               <div className="w-9 h-9 rounded-xl bg-[#0284c7] text-white font-bold flex items-center justify-center text-sm mb-4">
                 2
               </div>
@@ -484,7 +637,7 @@ export default function LandingPage() {
             </div>
 
             {/* Step 3 */}
-            <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs relative">
+            <div className="step-card bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs relative">
               <div className="w-9 h-9 rounded-xl bg-[#0284c7] text-white font-bold flex items-center justify-center text-sm mb-4">
                 3
               </div>
@@ -497,7 +650,7 @@ export default function LandingPage() {
             </div>
 
             {/* Step 4 */}
-            <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs relative">
+            <div className="step-card bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs relative">
               <div className="w-9 h-9 rounded-xl bg-[#0284c7] text-white font-bold flex items-center justify-center text-sm mb-4">
                 4
               </div>
@@ -514,7 +667,7 @@ export default function LandingPage() {
 
       {/* Section 3: Sekretariat & Informasi Kontak */}
       <section id="sekretariat" className="py-16 sm:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-br from-white to-sky-50/50 dark:from-slate-900 dark:to-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-10 shadow-xs">
+        <div className="secretariat-box bg-gradient-to-br from-white to-sky-50/50 dark:from-slate-900 dark:to-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-10 shadow-xs">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-7 space-y-4">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-sky-100 dark:bg-sky-950/70 text-[#0284c7] dark:text-[#38bdf8]">

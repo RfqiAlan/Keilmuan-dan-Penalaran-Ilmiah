@@ -1,17 +1,42 @@
+import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { FolderArchive, Clock, ShieldCheck, CheckCircle2, Lock, ArrowLeft, RefreshCw } from "lucide-react";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
 import Button from "../../components/ui/Button";
 
 export default function PendingVerificationPage() {
+  const pageRef = useRef(null);
+
+  useGSAP(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    gsap.from(".pending-header", {
+      opacity: 0,
+      y: -14,
+      duration: 0.5,
+      ease: "power2.out",
+    });
+    gsap.from(".pending-card", {
+      opacity: 0,
+      y: 20,
+      duration: 0.6,
+      ease: "power2.out",
+      delay: 0.1,
+    });
+  }, { scope: pageRef });
+
   const handleReload = () => {
     window.location.reload();
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative selection:bg-[#0284c7] selection:text-white">
+    <div
+      ref={pageRef}
+      className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative selection:bg-[#0284c7] selection:text-white"
+    >
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center px-4">
         {/* Brand Header */}
-        <div className="inline-flex items-center justify-center gap-3 mb-6">
+        <div className="pending-header inline-flex items-center justify-center gap-3 mb-6">
           <div className="w-12 h-12 bg-gradient-to-tr from-[#0369a1] to-[#0284c7] text-white rounded-2xl flex items-center justify-center shadow-lg shadow-[#0284c7]/25 ring-1 ring-white/20">
             <FolderArchive className="w-6 h-6" />
           </div>
@@ -26,7 +51,7 @@ export default function PendingVerificationPage() {
         </div>
 
         {/* Verification Status Card */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6 text-left">
+        <div className="pending-card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6 text-left">
           <div className="flex items-center gap-3 pb-5 border-b border-slate-100 dark:border-slate-800">
             <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
               <Clock className="w-5 h-5" />
